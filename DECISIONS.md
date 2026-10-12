@@ -2,6 +2,16 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 5: copia de seguridad (F12)
+
+- **Orden de la Fase 5:** primero F12, porque protege lo que el comerciante ya carga (todo vive sólo en su dispositivo). Decisión de Leandro. Después F10 (etiquetas) y F11 (lista de precios y CSV).
+- **Archivo:** un JSON (`lista-rapida-respaldo-AAAA-MM-DD.json`) con todas las tablas, la versión del esquema y la fecha. Sin comprimir: se puede abrir y revisar, y con miles de productos sigue pesando poco.
+- **Restaurar reemplaza todo** lo que hay en el dispositivo, en una sola transacción: si algo falla, no queda nada a medias. Se pide confirmación mostrando la fecha de la copia y cuántos productos y proveedores trae.
+- **Versiones:** una copia de una versión anterior del esquema se migra al restaurar (hoy: recalcular la descripción normalizada de la versión 1). Una copia de una versión más nueva se rechaza con un aviso para actualizar la app.
+- **Otro dispositivo:** en la primera pantalla (antes de configurar) está "Tengo una copia de seguridad", para no tener que configurar nada antes de restaurar.
+- **Recordatorio semanal:** en el inicio, si hay productos o proveedores y nunca se hizo una copia, o pasaron 7 días o más. La fecha de la última copia se guarda al generar el archivo (no podemos saber si el comerciante lo guardó bien), y va dentro de la copia, así no salta el aviso apenas se restaura.
+- **Pendiente:** compartir la copia directo a WhatsApp o Drive desde el celular (con la función de compartir del sistema), si con el piloto vemos que bajar el archivo es incómodo.
+
 ## 12/10/2026 · Fase 4: revisión de precios (F09)
 
 - **Orden:** Leandro eligió seguir con la Fase 4 antes de probar con listas reales.

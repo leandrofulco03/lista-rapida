@@ -3,6 +3,7 @@ import type { EntityTable } from 'dexie';
 import type { Centavos, Porcentaje } from '../domain/dinero';
 import type { ConfigComercio } from '../domain/config';
 import type { MapeoColumnas } from '../domain/columnas';
+import { TABLAS_RESPALDO } from '../domain/respaldo';
 import { normalizarDescripcion } from '../domain/vinculacion';
 
 export type { MapeoColumnas };
@@ -133,13 +134,5 @@ export class BaseListaRapida extends Dexie {
   }
 }
 
-export const TABLAS = [
-  'config',
-  'rubros',
-  'proveedores',
-  'productos',
-  'vinculos',
-  'importaciones',
-  'lineasImportacion',
-  'historialPrecios',
-] as const;
+/** Todas las tablas; la copia de seguridad (F12) las guarda todas. */
+export const TABLAS = TABLAS_RESPALDO;
