@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('F01: primera configuración, queda guardada al recargar y se puede editar', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Lista Rápida' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ListaMatch' })).toBeVisible();
 
   // Sin nombre no deja avanzar
   await page.getByRole('button', { name: 'Guardar y empezar' }).click();
@@ -51,6 +51,6 @@ test('F01: primera configuración, queda guardada al recargar y se puede editar'
 test('F01: la app ofrece instalarse (manifest)', async ({ page, request }) => {
   await page.goto('/');
   const manifest = await (await request.get('/manifest.webmanifest')).json();
-  expect(manifest).toMatchObject({ name: 'Lista Rápida', lang: 'es-AR', display: 'standalone' });
+  expect(manifest).toMatchObject({ name: 'ListaMatch', lang: 'es-AR', display: 'standalone' });
   expect(manifest.description).toContain('proveedores');
 });

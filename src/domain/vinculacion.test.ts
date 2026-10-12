@@ -6,6 +6,7 @@ import {
   contenidoDistinto,
   normalizarDescripcion,
   similitud,
+  variedadDistinta,
   vincularLinea,
 } from './vinculacion';
 
@@ -27,6 +28,9 @@ describe('normalizarDescripcion', () => {
     ['Té Taragüí', 'te taragui'],
     ["Mayonesa Hellmann's", 'mayonesa hellmanns'],
     ['Agua s/gas', 'agua s gas'],
+    ['Mecha para hormigón 6 mm', 'mecha para hormigon 6mm'],
+    ['Térmica 2 x 20 A', 'termica 2 x 20a'],
+    ['Lámpara LED 9 W 220 V', 'lampara led 9w 220v'],
   ])('%s → %s', (texto, esperado) => {
     expect(normalizarDescripcion(texto)).toBe(esperado);
   });
@@ -62,6 +66,17 @@ describe('similitud', () => {
   });
 });
 
+describe('variedadDistinta', () => {
+  const n = normalizarDescripcion;
+  it('una palabra de más de cada lado, o light/zero de un solo lado', () => {
+    expect(variedadDistinta(n('Yogur Ser vainilla'), n('Yogur Ser frutilla'))).toBe(true);
+    expect(variedadDistinta(n('Coca Cola Zero 500cc'), n('Coca-Cola 500 ml'))).toBe(true);
+    expect(variedadDistinta(n('Coca Cola sabor original 500cc'), n('Coca-Cola 500 ml'))).toBe(false);
+    expect(variedadDistinta(n('Yerba Playadito 1 kg'), n('Yerba mate Playadito 1 kg'))).toBe(false);
+    expect(variedadDistinta(n('YERBA TARAGUI C/PALO 1KG'), n('Yerba mate Taragüí con palo 1 kg'))).toBe(false);
+  });
+});
+
 describe('vincularLinea', () => {
   const indice = new IndiceCatalogo(
     [
@@ -84,6 +99,23 @@ describe('vincularLinea', () => {
   it('sin códigos, recuerda por la descripción normalizada', () => {
     const vinculados = new Map([[claveVinculo(null, 'YERBA PLAYADITO 1 KG'), 1]]);
     expect(vincularLinea({ codigo: null, descripcion: 'Yerba Playadito 1kg' }, vinculados, indice).estado).toBe('vinculada');
+  });
+
+  it('sin códigos, la presentación es parte de lo que se recuerda', () => {
+    const vinculados = new Map([[claveVinculo(null, 'Látex Alba', '4 l'), 1]]);
+    expect(vincularLinea({ codigo: null, descripcion: 'Latex Alba', presentacion: '4 lts' }, vinculados, indice).estado).toBe('vinculada');
+    expect(vincularLinea({ codigo: null, descripcion: 'Latex Alba', presentacion: '20 lts' }, vinculados, indice).estado).not.toBe('vinculada');
+    // Si la lista no tiene presentación aparte, la clave no cambia con lo que había antes.
+    expect(claveVinculo(null, 'Yerba 1 kg', null)).toBe(claveVinculo(null, 'Yerba 1 kg'));
+  });
+
+  it('otra variedad del mismo producto no se sugiere sola', () => {
+    const lacteos = new IndiceCatalogo(
+      ['Yogur bebible Ser frutilla 900 g', 'Coca-Cola 500 ml'].map((d, id) => ({ id: id + 1, descripcionNormalizada: normalizarDescripcion(d) })),
+    );
+    expect(vincularLinea({ codigo: null, descripcion: 'YOGUR BEBIBLE SER VAINILLA 900GR' }, new Map(), lacteos).estado).toBe('dudosa');
+    expect(vincularLinea({ codigo: null, descripcion: 'Coca Cola Light 500cc' }, new Map(), lacteos).estado).toBe('dudosa');
+    expect(vincularLinea({ codigo: null, descripcion: 'COCA COLA 500CC' }, new Map(), lacteos)).toMatchObject({ estado: 'sugerida', productoId: 2 });
   });
 
   it('sugiere cuando se parece mucho y el contenido coincide', () => {

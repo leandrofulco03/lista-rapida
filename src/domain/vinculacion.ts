@@ -59,6 +59,8 @@ export function normalizarDescripcion(texto: string): string {
   t = t.replace(/(\d+(?:\.\d+)?)\s*(?:l|lt|lts|ltr|litros?)\b/g, (_, n: string) => `${formatear(Number(n) * 1000)}ml`);
   t = t.replace(/(\d+(?:\.\d+)?)\s*(?:ml|cc|cm3)\b/g, (_, n: string) => `${formatear(Number(n))}ml`);
   t = t.replace(/(\d+(?:\.\d+)?)\s*(?:m|mt|mts|metros?)\b/g, '$1m');
+  // Medidas de ferretería y electricidad: "6 mm" → "6mm", "20 A" → "20a", "220 V" → "220v".
+  t = t.replace(/(\d+(?:\.\d+)?)\s*(mm|cm|a|amp|w|v)\b/g, (_, n: string, u: string) => `${n}${u === 'amp' ? 'a' : u}`);
   t = t.replace(/\b(?:pack|pck|caja|bulto)\s*(?:x\s*)?(\d+)\b/g, 'x$1');
   t = t.replace(/\bx\s*(\d+)\b(?!\.\d)/g, 'x$1');
   t = t.replace(/\b(?:x)?(\d+)\s*(?:u|un|uni|unid|unidades|uds)\b/g, 'x$1');
@@ -114,6 +116,23 @@ function cobertura(desde: readonly string[], hacia: readonly string[]): number {
   return desde.reduce((suma, p) => suma + Math.max(0, ...hacia.map((q) => parecidoPalabras(p, q))), 0);
 }
 
+/** Palabras que marcan otra variedad del mismo producto: si una descripción la tiene y la otra no, no son el mismo. */
+const VARIEDADES = new Set(['light', 'zero', 'diet', 'descremada', 'descremado', 'semidescremada', 'integral']);
+
+/**
+ * true si parecen otra variedad del mismo producto: una tiene "light" o "zero" y la otra no, o a cada una
+ * le sobra una palabra que la otra no tiene ("vainilla" contra "frutilla"). Así nunca se sugieren solas.
+ * No cuentan las palabras de una o dos letras: suelen ser abreviaturas ("c/palo").
+ */
+export function variedadDistinta(a: string, b: string): boolean {
+  const pa = palabras(a);
+  const pb = palabras(b);
+  const sueltas = (desde: string[], hacia: string[]) => desde.filter((p) => p.length >= 3 && !/\d/.test(p) && hacia.every((q) => parecidoPalabras(p, q) === 0));
+  const sa = sueltas(pa, pb);
+  const sb = sueltas(pb, pa);
+  return [...sa, ...sb].some((p) => VARIEDADES.has(p)) || (sa.length > 0 && sb.length > 0);
+}
+
 /** Similitud entre dos descripciones normalizadas, de 0 a 1: cuánto de cada una se encuentra en la otra. */
 export function similitud(a: string, b: string): number {
   const pa = palabras(a);
@@ -148,7 +167,7 @@ export class IndiceCatalogo {
   }
 
   /** Las mejores opciones para una descripción, de mayor a menor similitud. */
-  buscar(normalizada: string, cantidad = OPCIONES_DUDOSA): (Opcion & { contenidoDistinto: boolean })[] {
+  buscar(normalizada: string, cantidad = OPCIONES_DUDOSA): (Opcion & { contenidoDistinto: boolean; variedadDistinta: boolean })[] {
     const candidatos = new Set<number>();
     for (const clave of this.claves(normalizada)) for (const id of this.porClave.get(clave) ?? []) candidatos.add(id);
     const contenido = contenidoDe(normalizada);
@@ -159,6 +178,7 @@ export class IndiceCatalogo {
           productoId: id,
           similitud: similitud(normalizada, producto.normalizada),
           contenidoDistinto: contenidoDistinto(contenido, producto.contenido),
+          variedadDistinta: variedadDistinta(normalizada, producto.normalizada),
         };
       })
       .filter((o) => o.similitud > 0)
@@ -171,9 +191,10 @@ export class IndiceCatalogo {
  * Clave con la que se recuerda el vínculo de una línea: su código o, si la lista no trae códigos,
  * su descripción normalizada.
  */
-export function claveVinculo(codigo: string | null, descripcion: string): string {
+export function claveVinculo(codigo: string | null, descripcion: string, presentacion?: string | null): string {
   const limpio = codigo?.trim().toLowerCase();
-  return limpio ? limpio : `desc:${normalizarDescripcion(descripcion)}`;
+  // Sin código, la presentación es parte de la clave: "Látex Alba" de 4 l y de 20 l son productos distintos.
+  return limpio ? limpio : `desc:${normalizarDescripcion([descripcion, presentacion].filter(Boolean).join(' '))}`;
 }
 
 /**
@@ -185,7 +206,7 @@ export function vincularLinea(
   vinculados: ReadonlyMap<string, number>,
   indice: IndiceCatalogo,
 ): ResultadoVinculo {
-  const recordado = vinculados.get(claveVinculo(linea.codigo, linea.descripcion));
+  const recordado = vinculados.get(claveVinculo(linea.codigo, linea.descripcion, linea.presentacion));
   if (recordado !== undefined) return { estado: 'vinculada', productoId: recordado, opciones: [] };
 
   const texto = normalizarDescripcion([linea.descripcion, linea.presentacion].filter(Boolean).join(' '));
@@ -197,7 +218,7 @@ export function vincularLinea(
   if (!mejor || mejor.similitud < SIMILITUD_MEDIA) return { estado: 'nueva', productoId: null, opciones: [] };
   // Una sugerida tiene que ganarle claro a la segunda opción; si no, que elija el comerciante.
   const segunda = encontradas[1]?.similitud ?? 0;
-  if (mejor.similitud >= SIMILITUD_ALTA && !mejor.contenidoDistinto && mejor.similitud - segunda >= 0.05) {
+  if (mejor.similitud >= SIMILITUD_ALTA && !mejor.contenidoDistinto && !mejor.variedadDistinta && mejor.similitud - segunda >= 0.05) {
     return { estado: 'sugerida', productoId: mejor.productoId, opciones };
   }
   return { estado: 'dudosa', productoId: null, opciones };

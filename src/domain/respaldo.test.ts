@@ -47,5 +47,5 @@ describe('recordatorio', () => {
 });
 
 it('nombre del archivo con la fecha', () => {
-  expect(nombreArchivoRespaldo(new Date(2026, 9, 2))).toBe('lista-rapida-respaldo-2026-10-02.json');
+  expect(nombreArchivoRespaldo(new Date(2026, 9, 2))).toBe('listamatch-respaldo-2026-10-02.json');
 });

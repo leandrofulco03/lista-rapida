@@ -1,0 +1,182 @@
+{
+ "comercio": "Ferretería San Martín",
+ "proveedor": "Mayorista Ferretero del Litoral",
+ "listaIncluyeIva": false,
+ "lineas": [
+  {
+   "codigo": "FL00107",
+   "descripcion": "TORNILLO AUTOPERF. CAB. HEX. 8X1/2 X100",
+   "presentacion": null,
+   "costo": 329600,
+   "producto": "0001"
+  },
+  {
+   "codigo": "FL00114",
+   "descripcion": "TORNILLO AUTOPERF. CAB. HEX. 10X3/4 X100",
+   "presentacion": null,
+   "costo": 426400,
+   "producto": "0002"
+  },
+  {
+   "codigo": "FL00121",
+   "descripcion": "TARUGO FISCHER S6 X 100 UNID",
+   "presentacion": null,
+   "costo": 280000,
+   "producto": "0003"
+  },
+  {
+   "codigo": "FL00128",
+   "descripcion": "TARUGO FISCHER S8 X 100 UNID",
+   "presentacion": null,
+   "costo": 413400,
+   "producto": "0004"
+  },
+  {
+   "codigo": "FL00135",
+   "descripcion": "CLAVO P/PARIS 2\" X KG",
+   "presentacion": null,
+   "costo": 353500,
+   "producto": "0005"
+  },
+  {
+   "codigo": "FL00142",
+   "descripcion": "CINTA AISLADORA 3M TEMFLEX 20MTS NEGRA",
+   "presentacion": null,
+   "costo": 203300,
+   "producto": "0006"
+  },
+  {
+   "codigo": "FL00149",
+   "descripcion": "LAMPARA LED 9W E27 LUZ FRIA",
+   "presentacion": null,
+   "costo": 171200,
+   "producto": "0007"
+  },
+  {
+   "codigo": "FL00156",
+   "descripcion": "LAMPARA LED 12W E27 LUZ CALIDA",
+   "presentacion": null,
+   "costo": 235400,
+   "producto": "0008"
+  },
+  {
+   "codigo": "FL00163",
+   "descripcion": "TOMA DOBLE 10A JELUZ VERONA",
+   "presentacion": null,
+   "costo": 421200,
+   "producto": "0009"
+  },
+  {
+   "codigo": "FL00170",
+   "descripcion": "ZAPATILLA 4 TOMAS C/CABLE 1,5MTS",
+   "presentacion": null,
+   "costo": 850000,
+   "producto": "0010"
+  },
+  {
+   "codigo": "FL00177",
+   "descripcion": "CABLE UNIPOLAR 2.5MM ROLLO X 100MTS",
+   "presentacion": null,
+   "costo": 7878000,
+   "producto": "0011"
+  },
+  {
+   "codigo": "FL00184",
+   "descripcion": "CINTA TEFLON 3/4 X 10MTS",
+   "presentacion": null,
+   "costo": 45450,
+   "producto": "0012"
+  },
+  {
+   "codigo": "FL00191",
+   "descripcion": "TERMICA BIPOLAR 2X20A SICA",
+   "presentacion": null,
+   "costo": 1464500,
+   "producto": "0013"
+  },
+  {
+   "codigo": "FL00198",
+   "descripcion": "SELLADOR SILICONA TRANSP. 280ML",
+   "presentacion": null,
+   "costo": 420000,
+   "producto": "0014"
+  },
+  {
+   "codigo": "FL00205",
+   "descripcion": "DESTORNILLADOR PHILLIPS 1/4 X 4\"",
+   "presentacion": null,
+   "costo": 388800,
+   "producto": "0015"
+  },
+  {
+   "codigo": "FL00212",
+   "descripcion": "MARTILLO CARPINTERO MANGO MADERA 27MM",
+   "presentacion": null,
+   "costo": 1242000,
+   "producto": "0016"
+  },
+  {
+   "codigo": "FL00219",
+   "descripcion": "MECHA WIDIA HORMIGON 6MM",
+   "presentacion": null,
+   "costo": 180200,
+   "producto": "0017"
+  },
+  {
+   "codigo": "FL00226",
+   "descripcion": "MECHA WIDIA HORMIGON 8MM",
+   "presentacion": null,
+   "costo": 243800,
+   "producto": "0018"
+  },
+  {
+   "codigo": "FL00233",
+   "descripcion": "LIJA AL AGUA GR. 120",
+   "presentacion": null,
+   "costo": 68250,
+   "producto": "0019"
+  },
+  {
+   "codigo": "FL00240",
+   "descripcion": "CANDADO BRONCE 40MM",
+   "presentacion": null,
+   "costo": 724500,
+   "producto": "0020"
+  },
+  {
+   "codigo": "FL00247",
+   "descripcion": "TORNILLO AUTOPERF. CAB. HEX. 8X1 X100",
+   "presentacion": null,
+   "costo": 388800,
+   "producto": null
+  },
+  {
+   "codigo": "FL00254",
+   "descripcion": "MECHA WIDIA HORMIGON 10MM",
+   "presentacion": null,
+   "costo": 328600,
+   "producto": null
+  },
+  {
+   "codigo": "FL00261",
+   "descripcion": "LAMPARA LED 9W E27 LUZ CALIDA",
+   "presentacion": null,
+   "costo": 160000,
+   "producto": null
+  },
+  {
+   "codigo": "FL00268",
+   "descripcion": "CANDADO BRONCE 50MM",
+   "presentacion": null,
+   "costo": 910000,
+   "producto": null
+  },
+  {
+   "codigo": "FL00275",
+   "descripcion": "TARUGO FISCHER S10 X 100 UNID",
+   "presentacion": null,
+   "costo": 576800,
+   "producto": null
+  }
+ ]
+}

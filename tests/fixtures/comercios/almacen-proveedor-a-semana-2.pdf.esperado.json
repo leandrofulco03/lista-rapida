@@ -1,0 +1,196 @@
+{
+ "comercio": "Almacén Doña Rosa",
+ "proveedor": "Mayorista La Económica",
+ "listaIncluyeIva": false,
+ "lineas": [
+  {
+   "codigo": "00107",
+   "descripcion": "YERBA PLAYADITO C/P 1KG",
+   "presentacion": null,
+   "costo": 723690,
+   "producto": "0001"
+  },
+  {
+   "codigo": "00114",
+   "descripcion": "YERBA TARAGUI C/PALO 500G",
+   "presentacion": null,
+   "costo": 221540,
+   "producto": "0002"
+  },
+  {
+   "codigo": "00121",
+   "descripcion": "YERBA ROSAMONTE SUAVE 1 KG",
+   "presentacion": null,
+   "costo": 395200,
+   "producto": "0003"
+  },
+  {
+   "codigo": "00128",
+   "descripcion": "FIDEOS LUCCHETTI TIRABUZON 500G",
+   "presentacion": null,
+   "costo": 115500,
+   "producto": "0004"
+  },
+  {
+   "codigo": "00135",
+   "descripcion": "FIDEOS MATARAZZO SPAGHETTI N°7 500G",
+   "presentacion": null,
+   "costo": 163770,
+   "producto": "0005"
+  },
+  {
+   "codigo": "00142",
+   "descripcion": "ARROZ GALLO ORO LARGO FINO 1KG",
+   "presentacion": null,
+   "costo": 201552,
+   "producto": "0006"
+  },
+  {
+   "codigo": "00149",
+   "descripcion": "HARINA BLANCAFLOR LEUDANTE 1KG",
+   "presentacion": null,
+   "costo": 149884,
+   "producto": "0007"
+  },
+  {
+   "codigo": "00156",
+   "descripcion": "HARINA CAÑUELAS 000 1KG",
+   "presentacion": null,
+   "costo": 97263,
+   "producto": "0008"
+  },
+  {
+   "codigo": "00163",
+   "descripcion": "ACEITE COCINERO GIRASOL 1.5LT",
+   "presentacion": null,
+   "costo": 478400,
+   "producto": "0009"
+  },
+  {
+   "codigo": "00170",
+   "descripcion": "ACEITE NATURA GIRASOL 900ML",
+   "presentacion": null,
+   "costo": 322712,
+   "producto": "0010"
+  },
+  {
+   "codigo": "00177",
+   "descripcion": "AZUCAR LEDESMA CLASICA 1KG",
+   "presentacion": null,
+   "costo": 139178,
+   "producto": "0011"
+  },
+  {
+   "codigo": "00184",
+   "descripcion": "SAL FINA DOS ANCLAS 500G",
+   "presentacion": null,
+   "costo": 74970,
+   "producto": "0012"
+  },
+  {
+   "codigo": "00191",
+   "descripcion": "PURE DE TOMATE ARCOR TETRA 520G",
+   "presentacion": null,
+   "costo": 97263,
+   "producto": "0013"
+  },
+  {
+   "codigo": "00198",
+   "descripcion": "ARVEJAS INCA 300G",
+   "presentacion": null,
+   "costo": 90736,
+   "producto": "0014"
+  },
+  {
+   "codigo": "00205",
+   "descripcion": "ATUN LA CAMPAGNOLA LOMITOS AL ACEITE 170G",
+   "presentacion": null,
+   "costo": 283764,
+   "producto": "0015"
+  },
+  {
+   "codigo": "00212",
+   "descripcion": "MAYONESA NATURA DOYPACK 500G",
+   "presentacion": null,
+   "costo": 213465,
+   "producto": "0016"
+  },
+  {
+   "codigo": "00219",
+   "descripcion": "CAFE LA VIRGINIA MOLIDO 250G",
+   "presentacion": null,
+   "costo": 567528,
+   "producto": "0017"
+  },
+  {
+   "codigo": "00226",
+   "descripcion": "MATE COCIDO TARAGUI X25 SAQ",
+   "presentacion": null,
+   "costo": 140556,
+   "producto": "0018"
+  },
+  {
+   "codigo": "00233",
+   "descripcion": "GALLETITAS CRIOLLITAS TRIPACK 300G",
+   "presentacion": null,
+   "costo": 149968,
+   "producto": "0019"
+  },
+  {
+   "codigo": "00240",
+   "descripcion": "LAVANDINA AYUDIN 1LT",
+   "presentacion": null,
+   "costo": 99216,
+   "producto": "0020"
+  },
+  {
+   "codigo": "00247",
+   "descripcion": "DETERGENTE MAGISTRAL LIMON 500ML",
+   "presentacion": null,
+   "costo": 180285,
+   "producto": "0021"
+  },
+  {
+   "codigo": "00261",
+   "descripcion": "YERBA PLAYADITO C/P 500G",
+   "presentacion": null,
+   "costo": 243984,
+   "producto": null
+  },
+  {
+   "codigo": "00268",
+   "descripcion": "YERBA ROSAMONTE SUAVE 500 GR",
+   "presentacion": null,
+   "costo": 218400,
+   "producto": null
+  },
+  {
+   "codigo": "00275",
+   "descripcion": "FIDEOS LUCCHETTI MOSTACHOL 500G",
+   "presentacion": null,
+   "costo": 116688,
+   "producto": null
+  },
+  {
+   "codigo": "00282",
+   "descripcion": "ACEITE COCINERO GIRASOL 900ML",
+   "presentacion": null,
+   "costo": 310648,
+   "producto": null
+  },
+  {
+   "codigo": "00296",
+   "descripcion": "POLENTA PRESTO PRONTA 500G",
+   "presentacion": null,
+   "costo": 105900,
+   "producto": null
+  },
+  {
+   "codigo": "00303",
+   "descripcion": "VINAGRE DE ALCOHOL MENOYO 1LT",
+   "presentacion": null,
+   "costo": 781500,
+   "producto": null
+  }
+ ]
+}

@@ -1,0 +1,196 @@
+{
+ "comercio": "Kiosco El Pibe",
+ "proveedor": "Golosinas Mayorista Norte",
+ "listaIncluyeIva": false,
+ "lineas": [
+  {
+   "codigo": "GMN-0107",
+   "descripcion": "ALFAJOR JORGITO CHOCOLATE X 55 GR",
+   "presentacion": null,
+   "costo": 87516,
+   "producto": "0001"
+  },
+  {
+   "codigo": "GMN-0114",
+   "descripcion": "ALF. GUAYMALLEN BLANCO 38G",
+   "presentacion": null,
+   "costo": 25441,
+   "producto": "0002"
+  },
+  {
+   "codigo": "GMN-0121",
+   "descripcion": "ALFAJOR HAVANNA CHOC. 50 GR",
+   "presentacion": null,
+   "costo": 143260,
+   "producto": "0003"
+  },
+  {
+   "codigo": "GMN-0128",
+   "descripcion": "ALFAJOR CAPITAN DEL ESPACIO NEGRO 70G",
+   "presentacion": null,
+   "costo": 81900,
+   "producto": "0004"
+  },
+  {
+   "codigo": "GMN-0135",
+   "descripcion": "CHOCOLATE MILKA LECHE 55 GRS",
+   "presentacion": null,
+   "costo": 147420,
+   "producto": "0005"
+  },
+  {
+   "codigo": "GMN-0142",
+   "descripcion": "COFLER BLOCK 38G",
+   "presentacion": null,
+   "costo": 103880,
+   "producto": "0006"
+  },
+  {
+   "codigo": "GMN-0149",
+   "descripcion": "BON O BON LECHE X 15 G",
+   "presentacion": null,
+   "costo": 35160,
+   "producto": "0007"
+  },
+  {
+   "codigo": "GMN-0156",
+   "descripcion": "TURRON ARCOR 25G",
+   "presentacion": null,
+   "costo": 29580,
+   "producto": "0008"
+  },
+  {
+   "codigo": "GMN-0163",
+   "descripcion": "BELDENT MENTA X 10 U",
+   "presentacion": null,
+   "costo": 67626,
+   "producto": "0009"
+  },
+  {
+   "codigo": "GMN-0170",
+   "descripcion": "HALLS MENTHOL LYPTUS 28 G",
+   "presentacion": null,
+   "costo": 74160,
+   "producto": "0010"
+  },
+  {
+   "codigo": "GMN-0177",
+   "descripcion": "MANTECOL X 110 GR",
+   "presentacion": null,
+   "costo": 193800,
+   "producto": "0011"
+  },
+  {
+   "codigo": "GMN-0184",
+   "descripcion": "MOGUL OSITOS 30G",
+   "presentacion": null,
+   "costo": 46818,
+   "producto": "0012"
+  },
+  {
+   "codigo": "GMN-0191",
+   "descripcion": "CHUPETIN PICO DULCE",
+   "presentacion": null,
+   "costo": 19271,
+   "producto": "0013"
+  },
+  {
+   "codigo": "GMN-0198",
+   "descripcion": "ROCKLETS CONFITES CHOC 40 GR",
+   "presentacion": null,
+   "costo": 109148,
+   "producto": "0014"
+  },
+  {
+   "codigo": "GMN-0205",
+   "descripcion": "GALL. OREO 118G",
+   "presentacion": null,
+   "costo": 144664,
+   "producto": "0015"
+  },
+  {
+   "codigo": "GMN-0212",
+   "descripcion": "GALLETITAS PEPITOS 119 G",
+   "presentacion": null,
+   "costo": 139100,
+   "producto": "0016"
+  },
+  {
+   "codigo": "GMN-0219",
+   "descripcion": "PAPAS LAYS CLASICAS 85G",
+   "presentacion": null,
+   "costo": 227115,
+   "producto": "0017"
+  },
+  {
+   "codigo": "GMN-0226",
+   "descripcion": "PALITOS PEHUAMAR X 100GR",
+   "presentacion": null,
+   "costo": 168540,
+   "producto": "0018"
+  },
+  {
+   "codigo": "GMN-0233",
+   "descripcion": "MANI PEHUAMAR 120 GRS",
+   "presentacion": null,
+   "costo": 152796,
+   "producto": "0019"
+  },
+  {
+   "codigo": "GMN-0240",
+   "descripcion": "GALLETITA TITA 36G",
+   "presentacion": null,
+   "costo": 32277,
+   "producto": "0020"
+  },
+  {
+   "codigo": "GMN-0254",
+   "descripcion": "ALF. FANTOCHE TRIPLE 85G",
+   "presentacion": null,
+   "costo": 73528,
+   "producto": null
+  },
+  {
+   "codigo": "GMN-0261",
+   "descripcion": "CHOCOLATE AGUILA 150 G",
+   "presentacion": null,
+   "costo": 421824,
+   "producto": null
+  },
+  {
+   "codigo": "GMN-0268",
+   "descripcion": "GOMITAS FIZZ 400G",
+   "presentacion": null,
+   "costo": 341744,
+   "producto": null
+  },
+  {
+   "codigo": "GMN-0275",
+   "descripcion": "CHICLES TOPLINE STRONG",
+   "presentacion": null,
+   "costo": 63648,
+   "producto": null
+  },
+  {
+   "codigo": "GMN-0282",
+   "descripcion": "ALFAJOR JORGITO DULCE DE LECHE X 55 GR",
+   "presentacion": null,
+   "costo": 54621,
+   "producto": null
+  },
+  {
+   "codigo": "GMN-0296",
+   "descripcion": "ALFAJOR TERRABUSI TRIPLE CHOC 70G",
+   "presentacion": null,
+   "costo": 161200,
+   "producto": null
+  },
+  {
+   "codigo": "GMN-0303",
+   "descripcion": "CARAMELOS MASTICABLES SUGUS X 150 U",
+   "presentacion": null,
+   "costo": 739700,
+   "producto": null
+  }
+ ]
+}
