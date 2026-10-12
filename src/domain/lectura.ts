@@ -69,7 +69,10 @@ export function extraerLineas(filas: readonly (readonly Celda[])[], mapeo: Mapeo
 
     const costo = leerImporte(costoCrudo, formato);
     if (costo === null) {
-      return saltear(textoCelda(costoCrudo) === '' && codigo === '' ? 'titulo' : 'sin-precio');
+      // Un rubro trae un solo texto, esté en la columna que esté (en un PDF suele ir sobre el margen, bajo "Código").
+      const unSoloTexto = fila.filter((c) => textoCelda(c) !== '').length === 1;
+      const esTitulo = textoCelda(costoCrudo) === '' && (codigo === '' || unSoloTexto);
+      return saltear(esTitulo ? 'titulo' : 'sin-precio');
     }
     if (descripcion === '') return saltear('sin-descripcion');
 
