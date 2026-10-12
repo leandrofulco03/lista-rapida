@@ -1,0 +1,10 @@
+// Publicación en Cloudflare (Workers con archivos estáticos): compila la app y sirve dist/.
+{
+  "name": "lista-rapida",
+  "compatibility_date": "2026-10-01",
+  "build": { "command": "npm run build" },
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
