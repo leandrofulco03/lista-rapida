@@ -1,0 +1,31 @@
+Cod	Descripcion	Presentacion	Precio unitario
+G0001	Yerba mate Playadito	1 kg	37.597,00
+G0002	Yerba mate Taragüí con palo	500 g	28.257,50
+G0003	Fideos Matarazzo tirabuzón	500 g	38.035,00
+G0004	Fideos Lucchetti spaghetti	500 g	13.656,50
+G0005	Arroz Gallo Oro largo fino	1 kg	53.451,50
+G0006	Harina Pureza leudante	1 kg	54.124,00
+G0007	Aceite Natura girasol	1,5 l	42.975,00
+G0008	Aceite Cocinero mezcla	900 ml	2.404,25
+G0009	Azúcar Ledesma	1 kg	32.268,00
+G0010	Sal fina Celusal	500 g	5.136,00
+G0011	Leche La Serenísima entera	1 l	49.010,00
+G0012	Dulce de leche Sancor	400 g	3.070,50
+G0013	Galletitas Express	3 x 101 g	56.521,00
+G0014	Galletitas Criollitas	3 x 100 g	39.680,00
+G0015	Café La Virginia molido	250 g	25.158,50
+G0016	Té Taragüí	x 50 saquitos	18.737,99
+G0017	Mate cocido Unión	x 25	17.341,50
+G0018	Puré de tomate Arcor	520 g	11.597,99
+G0019	Arvejas Inalpa	350 g	20.014,99
+G0020	Atún La Campagnola al natural	170 g	23.912,00
+G0021	Mayonesa Hellmann's	475 g	30.095,00
+G0022	Lavandina Ayudín	1 l	28.962,25
+G0023	Detergente Magistral limón	750 ml	24.741,00
+G0024	Jabón en polvo Ala	800 g	38.353,00
+G0025	Papel higiénico Higienol	4 x 30 m	15.593,00
+G0026	Shampoo Sedal	340 ml	12.926,00
+G0027	Desodorante Rexona	150 ml	35.299,00
+G0028	Gaseosa Coca-Cola	2,25 l	50.747,00
+G0029	Agua Villavicencio sin gas	2 l	20.752,99
+G0030	Cerveza Quilmes lata	473 ml	36.128,50
