@@ -2,6 +2,14 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 5: lista de precios y CSV para la caja (F11)
+
+- **CSV para Excel en castellano:** UTF-8 con BOM (sin el BOM, Excel muestra mal los acentos), separado por punto y coma (Excel en castellano usa la coma para decimales) y precio con coma decimal y sin separador de miles ("1580,50"), así Excel lo toma como número. Renglones con CRLF.
+- **Columnas del CSV:** Código, Descripción, Rubro, Precio, IVA % y Actualizado. No sabemos todavía qué sistemas de caja usan los comercios (pregunta abierta de la spec); cuando lo sepamos, se suma un formato por sistema.
+- **Sin fórmulas en el CSV:** un texto que empieza con =, +, - o @ lleva un apóstrofo adelante, para que Excel no lo ejecute como fórmula.
+- **Lista para el mostrador en PDF:** A4, agrupada por rubro (en orden alfabético, "Sin rubro" al final), productos por descripción, renglones alternados en gris para seguir la línea con el ojo, precio con centavos alineado a la derecha y "Página N de M". Un rubro no empieza al pie de una hoja.
+- **Qué productos:** todos, o los que cambiaron de precio en la última lista revisada. Los productos sin precio no se incluyen (se avisa cuántos son). Se llega desde el inicio y al terminar una revisión.
+
 ## 12/10/2026 · Fase 5: etiquetas para imprimir (F10)
 
 - **pdf-lib (1.17.1)** para armar el PDF (la spec daba a elegir entre pdf-lib y jsPDF). pdf-lib no tiene dependencias y mide todo en puntos exactos; con jsPDF habría que cuidar más las unidades. Se baja sólo cuando se arma el PDF, como pdf.js.

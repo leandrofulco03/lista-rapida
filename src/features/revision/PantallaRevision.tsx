@@ -16,6 +16,7 @@ interface Props {
   listaIncluyeIva: boolean;
   config: ConfigComercio;
   onEtiquetas: (productos: number[]) => void;
+  onListaPrecios: () => void;
   onVolver: () => void;
 }
 
@@ -38,7 +39,7 @@ function textoVariacion(v: number | null): string {
 }
 
 /** F09: revisión de los precios nuevos antes de guardarlos. Ningún precio cambia sin pasar por acá. */
-export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, config, onEtiquetas, onVolver }: Props) {
+export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, config, onEtiquetas, onListaPrecios, onVolver }: Props) {
   const [cargada, setCargada] = useState<Cargada | null>(null);
   const [decisiones, setDecisiones] = useState<Map<number, Decision>>(new Map());
   const [guardando, setGuardando] = useState(false);
@@ -75,6 +76,11 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
           {actualizados > 0 && (
             <Boton type="button" onClick={() => onEtiquetas([...decisiones.keys()])}>
               Imprimir {actualizados === 1 ? 'su etiqueta' : `sus ${actualizados} etiquetas`}
+            </Boton>
+          )}
+          {actualizados > 0 && (
+            <Boton type="button" variante="secundario" onClick={onListaPrecios}>
+              Lista de precios y CSV para la caja
             </Boton>
           )}
           <Boton type="button" variante={actualizados > 0 ? 'secundario' : 'principal'} onClick={onVolver}>

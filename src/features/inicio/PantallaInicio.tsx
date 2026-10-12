@@ -7,7 +7,7 @@ import { Boton } from '../../ui/Boton';
 
 interface Props {
   config: ConfigComercio;
-  onIr: (pantalla: 'subir' | 'catalogo' | 'proveedores' | 'config' | 'respaldo' | 'etiquetas') => void;
+  onIr: (pantalla: 'subir' | 'catalogo' | 'proveedores' | 'config' | 'respaldo' | 'etiquetas' | 'lista-precios') => void;
 }
 
 /**
@@ -40,6 +40,9 @@ export function PantallaInicio({ config, onIr }: Props) {
         <Boton onClick={() => onIr('subir')}>Subí una lista</Boton>
         <Boton variante="secundario" onClick={() => onIr('etiquetas')}>
           Etiquetas
+        </Boton>
+        <Boton variante="secundario" onClick={() => onIr('lista-precios')}>
+          Lista de precios
         </Boton>
         <Boton variante="secundario" onClick={() => onIr('catalogo')}>
           Catálogo
