@@ -32,6 +32,7 @@ Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
 - **F01 en una sola pantalla** con nombre, recargo general (sugerido 30%), redondeo (sugerido a $10) y, en opciones avanzadas, IVA en el precio de venta (sí por defecto) e IVA de productos nuevos (21% o 10,5%). Descartado: asistente en pasos (más lento). Los rubros se crean en F03. Decisiones de Leandro.
 - La pantalla muestra un ejemplo vivo ("$ 1.000 + IVA lo venderías a $ 1.580") calculado con `calcularPrecioVenta`, para que se entienda el recargo sin explicaciones.
+- **Ejemplo desglosado paso a paso** (pedido de Leandro): costo, + IVA, + recargo y + redondeo, cada uno en % y en $ con el subtotal que queda ("+ IVA 21%: $ 210,00 → $ 1.210,00"). Sale de `desglosarPrecio` (`src/domain/desglose.ts`): el precio final sigue viniendo de `calcularPrecioVenta`; los pasos intermedios se redondean al centavo sólo para mostrarlos y siempre suman el precio. Montos con centavos, como en el resto de la app.
 - **Esquema Dexie v1** con las 8 tablas de la spec. Campos en camelCase (convención de TypeScript) en vez del snake_case de la spec; mismos datos. `config` es una sola fila con id fijo `comercio`. `historialPrecios` suma un `id` autoincremental. Recargos con el nombre `recargoPct` (la spec dice `margen_pct`) para no confundir recargo con margen.
 - **Nombre y descripción** en un solo archivo (`src/marca.ts`), que usan la interfaz y el manifest.
 - **Pospuesto:** Web Share Target (recibir archivos desde WhatsApp) va con la pantalla de subir lista (Fase 2), que es la que lo usa.

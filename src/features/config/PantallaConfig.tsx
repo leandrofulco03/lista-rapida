@@ -4,7 +4,8 @@ import { CONFIG_SUGERIDA, REGLAS_REDONDEO, mismaRegla, validarConfig } from '../
 import type { ConfigComercio, ErroresConfig } from '../../domain/config';
 import { formatearPesos } from '../../domain/dinero';
 import { IVA_GENERAL, IVA_REDUCIDO, formatearPorcentaje, parsearPorcentaje } from '../../domain/porcentaje';
-import { calcularPrecioVenta } from '../../domain/precio';
+import { desglosarPrecio } from '../../domain/desglose';
+import type { DesglosePrecio } from '../../domain/desglose';
 import { DESCRIPCION_APP, NOMBRE_APP } from '../../marca';
 import { Boton } from '../../ui/Boton';
 
@@ -33,7 +34,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar }: Props) {
   const ejemplo =
     recargo === null
       ? null
-      : calcularPrecioVenta({
+      : desglosarPrecio({
           costo: COSTO_EJEMPLO,
           descuentos: [],
           ivaPct: ivaDefault,
@@ -41,7 +42,8 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar }: Props) {
           ventaIncluyeIva,
           recargo: Math.min(recargo, 100_000),
           redondeo,
-        }).precio;
+        });
+  const etiquetaRedondeo = REGLAS_REDONDEO.find((r) => mismaRegla(r.regla, redondeo))?.etiqueta ?? '';
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
@@ -135,12 +137,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar }: Props) {
           </div>
         </fieldset>
 
-        {ejemplo !== null && (
-          <p className="rounded-xl bg-green-50 p-3 text-green-900" data-testid="ejemplo-precio">
-            Un producto que te cuesta {formatearPesos(COSTO_EJEMPLO)} + IVA lo venderías a{' '}
-            <strong>{formatearPesos(ejemplo)}</strong>.
-          </p>
-        )}
+        {ejemplo !== null && <EjemploPrecio desglose={ejemplo} etiquetaRedondeo={etiquetaRedondeo} />}
 
         <details className="rounded-xl border border-stone-300 bg-white p-3">
           <summary className="min-h-11 cursor-pointer content-center text-base font-semibold">Opciones avanzadas</summary>
@@ -185,5 +182,37 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar }: Props) {
         </div>
       </form>
     </main>
+  );
+}
+
+/**
+ * Ejemplo vivo del cálculo, paso a paso en $ y %: cada línea muestra cuánto suma y cómo queda el precio.
+ * Cambia con el recargo, el IVA y el redondeo elegidos.
+ */
+function EjemploPrecio({ desglose: d, etiquetaRedondeo }: { desglose: DesglosePrecio; etiquetaRedondeo: string }) {
+  const pasos: { concepto: string; monto: number; total: number }[] = [
+    {
+      concepto: d.iva.aplicado ? `+ IVA ${formatearPorcentaje(d.iva.pct)}%` : '+ IVA (vendés sin IVA)',
+      monto: d.iva.monto,
+      total: d.conIva,
+    },
+    { concepto: `+ Recargo ${formatearPorcentaje(d.recargo.pct)}%`, monto: d.recargo.monto, total: d.sinRedondeo },
+    { concepto: `+ Redondeo (${etiquetaRedondeo.toLowerCase()})`, monto: d.redondeo, total: d.precio },
+  ];
+  return (
+    <section className="rounded-xl bg-green-50 p-3 text-green-900" data-testid="ejemplo-precio">
+      <h2 className="font-semibold">Ejemplo con un producto que te cuesta <span className="whitespace-nowrap">{formatearPesos(d.costo)} + IVA</span></h2>
+      <ul className="mt-2 space-y-1 tabular-nums">
+        <li data-testid="ejemplo-paso">Costo {formatearPesos(d.costo)}</li>
+        {pasos.map(({ concepto, monto, total }) => (
+          <li key={concepto} data-testid="ejemplo-paso">
+            {concepto}: {formatearPesos(monto)} → {formatearPesos(total)}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 border-t border-green-700/30 pt-1 text-lg font-bold">
+        Lo venderías a <span data-testid="ejemplo-precio-final">{formatearPesos(d.precio)}</span>
+      </p>
+    </section>
   );
 }
