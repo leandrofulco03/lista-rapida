@@ -13,12 +13,14 @@ interface Props {
   inicial?: ConfigComercio;
   onGuardar: (config: ConfigComercio) => Promise<void>;
   onCancelar?: () => void;
+  /** Primera vez: traer los datos de otro dispositivo con una copia de seguridad (F12). */
+  onRestaurar?: () => void;
 }
 
 const COSTO_EJEMPLO = 100_000;
 
 /** F01: configuración inicial del comercio, en una sola pantalla. */
-export function PantallaConfig({ inicial, onGuardar, onCancelar }: Props) {
+export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: Props) {
   const primeraVez = !inicial;
   const base = inicial ?? CONFIG_SUGERIDA;
   const [nombre, setNombre] = useState(base.nombreComercio);
@@ -177,6 +179,11 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar }: Props) {
           {onCancelar && (
             <Boton type="button" variante="secundario" onClick={onCancelar}>
               Cancelar
+            </Boton>
+          )}
+          {onRestaurar && (
+            <Boton type="button" variante="secundario" onClick={onRestaurar}>
+              Tengo una copia de seguridad
             </Boton>
           )}
         </div>

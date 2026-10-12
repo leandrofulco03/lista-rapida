@@ -6,16 +6,23 @@ import { PantallaInicio } from './features/inicio/PantallaInicio';
 import { PantallaSubirLista } from './features/subir/PantallaSubirLista';
 import { PantallaCatalogo } from './features/catalogo/PantallaCatalogo';
 import { PantallaProveedores } from './features/proveedores/PantallaProveedores';
+import { PantallaRespaldo } from './features/respaldo/PantallaRespaldo';
 
-type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores';
+type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo';
 
-type Estado = { tipo: 'cargando' } | { tipo: 'sin-config' } | { tipo: 'listo'; config: ConfigComercio; pantalla: Pantalla };
+type Estado =
+  | { tipo: 'cargando' }
+  | { tipo: 'sin-config'; restaurando?: boolean }
+  | { tipo: 'listo'; config: ConfigComercio; pantalla: Pantalla };
 
 export function App() {
   const [estado, setEstado] = useState<Estado>({ tipo: 'cargando' });
 
+  const cargar = (pantalla: Pantalla = 'inicio') =>
+    leerConfig(db).then((config) => setEstado(config ? { tipo: 'listo', config, pantalla } : { tipo: 'sin-config' }));
+
   useEffect(() => {
-    leerConfig(db).then((config) => setEstado(config ? { tipo: 'listo', config, pantalla: 'inicio' } : { tipo: 'sin-config' }));
+    cargar();
   }, []);
 
   async function guardar(config: ConfigComercio) {
@@ -24,13 +31,28 @@ export function App() {
   }
 
   if (estado.tipo === 'cargando') return null;
-  if (estado.tipo === 'sin-config') return <PantallaConfig onGuardar={guardar} />;
+  if (estado.tipo === 'sin-config') {
+    if (estado.restaurando) {
+      return <PantallaRespaldo onRestaurado={() => cargar()} onVolver={() => setEstado({ tipo: 'sin-config' })} />;
+    }
+    return <PantallaConfig onGuardar={guardar} onRestaurar={() => setEstado({ tipo: 'sin-config', restaurando: true })} />;
+  }
   const ir = (pantalla: Pantalla) => setEstado({ ...estado, pantalla });
   if (estado.pantalla === 'config') {
     return <PantallaConfig inicial={estado.config} onGuardar={guardar} onCancelar={() => ir('inicio')} />;
   }
   if (estado.pantalla === 'subir') return <PantallaSubirLista config={estado.config} onVolver={() => ir('inicio')} />;
   if (estado.pantalla === 'catalogo') return <PantallaCatalogo config={estado.config} onVolver={() => ir('inicio')} />;
+  if (estado.pantalla === 'respaldo') {
+    return (
+      <PantallaRespaldo
+        ultimoRespaldo={estado.config.ultimoRespaldo}
+        onExportado={() => cargar('respaldo')}
+        onRestaurado={() => cargar()}
+        onVolver={() => ir('inicio')}
+      />
+    );
+  }
   if (estado.pantalla === 'proveedores') return <PantallaProveedores onVolver={() => ir('inicio')} />;
   return <PantallaInicio config={estado.config} onIr={ir} />;
 }

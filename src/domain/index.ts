@@ -13,3 +13,4 @@ export * from './proveedor';
 export * from './catalogo';
 export * from './vinculacion';
 export * from './revision';
+export * from './respaldo';
