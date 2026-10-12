@@ -213,6 +213,7 @@ export async function vinculosDeProveedor(db: BaseListaRapida, proveedorId: numb
 export interface VinculoNuevo {
   codigo: string | null;
   descripcion: string;
+  presentacion?: string | null;
   productoId: number;
 }
 
@@ -222,7 +223,7 @@ export async function guardarVinculos(db: BaseListaRapida, proveedorId: number, 
     const existentes = await db.vinculos.where('[proveedorId+codigoProveedor]').between([proveedorId, ''], [proveedorId, '￿']).toArray();
     const porClave = new Map(existentes.map((v) => [v.codigoProveedor, v.id]));
     // Si la lista repite una línea, vale la última elección.
-    const porClaveNueva = new Map(vinculos.map((v) => [claveVinculo(v.codigo, v.descripcion), v]));
+    const porClaveNueva = new Map(vinculos.map((v) => [claveVinculo(v.codigo, v.descripcion, v.presentacion), v]));
     const filas = [...porClaveNueva].map(([codigoProveedor, v]) => {
       const id = porClave.get(codigoProveedor);
       const fila = { proveedorId, codigoProveedor, descripcionProveedor: v.descripcion, productoId: v.productoId, confirmado: true };

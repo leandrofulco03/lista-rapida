@@ -24,7 +24,7 @@ test('F12: la copia de seguridad se guarda en un dispositivo y se restaura en ot
   await page.getByRole('button', { name: 'Guardar una copia ahora' }).click();
   await expect(page.getByTestId('ultimo-respaldo')).toHaveText('Todavía no hiciste ninguna copia.');
   const [descarga] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Guardar copia en un archivo' }).click()]);
-  expect(descarga.suggestedFilename()).toMatch(/^lista-rapida-respaldo-\d{4}-\d{2}-\d{2}\.json$/);
+  expect(descarga.suggestedFilename()).toMatch(/^listamatch-respaldo-\d{4}-\d{2}-\d{2}\.json$/);
   await expect(page.getByTestId('ultimo-respaldo')).toHaveText('La última copia es de hoy.');
   await page.getByRole('button', { name: 'Volver' }).click();
   await expect(page.getByTestId('recordatorio-respaldo')).toHaveCount(0);

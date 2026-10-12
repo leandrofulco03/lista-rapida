@@ -1,0 +1,133 @@
+{
+ "comercio": "Kiosco El Pibe",
+ "proveedor": "Distribuidora de Bebidas del Sur",
+ "listaIncluyeIva": true,
+ "lineas": [
+  {
+   "codigo": null,
+   "descripcion": "Coca Cola Sabor Original 500cc",
+   "presentacion": null,
+   "costo": 139755,
+   "producto": "0022"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Coca Cola Sabor Original 2,25 Lts",
+   "presentacion": null,
+   "costo": 368445,
+   "producto": "0023"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Coca Cola Zero 500cc",
+   "presentacion": null,
+   "costo": 142417,
+   "producto": "0024"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Sprite Lima Limón 500cc",
+   "presentacion": null,
+   "costo": 128260,
+   "producto": "0025"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Agua Villavicencio s/gas 500cc",
+   "presentacion": null,
+   "costo": 79437,
+   "producto": "0026"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Agua Villa del Sur s/gas 2 lts",
+   "presentacion": null,
+   "costo": 137093,
+   "producto": "0027"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Energizante Speed Lata 250cc",
+   "presentacion": null,
+   "costo": 160446,
+   "producto": "0028"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Monster Energy Lata 473cc",
+   "presentacion": null,
+   "costo": 296208,
+   "producto": "0029"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Gatorade Manzana 500cc",
+   "presentacion": null,
+   "costo": 185130,
+   "producto": "0030"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Cerveza Quilmes Clásica Lata 473cc",
+   "presentacion": null,
+   "costo": 168311,
+   "producto": "0031"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Cerveza Brahma Lata 473cc",
+   "presentacion": null,
+   "costo": 149556,
+   "producto": "0032"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Levite Pomelo 1500cc",
+   "presentacion": null,
+   "costo": 199408,
+   "producto": "0033"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Jugo Cepita Naranja 1 Lt",
+   "presentacion": null,
+   "costo": 207757,
+   "producto": "0034"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Coca Cola Sabor Original 1,5 Lts",
+   "presentacion": null,
+   "costo": 294998,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "Fanta Naranja 500cc",
+   "presentacion": null,
+   "costo": 129470,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "Cerveza Stella Artois Lata 473cc",
+   "presentacion": null,
+   "costo": 215985,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "Agua Villavicencio s/gas 1,5 lts",
+   "presentacion": null,
+   "costo": 146652,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "Pepsi 500cc",
+   "presentacion": null,
+   "costo": 124146,
+   "producto": null
+  }
+ ]
+}

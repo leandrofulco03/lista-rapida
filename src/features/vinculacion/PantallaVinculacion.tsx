@@ -57,7 +57,7 @@ export function PantallaVinculacion({ proveedor, lineas, onSeguir, onVolver }: P
   const cambios = lineas.flatMap((l, i) => {
     const productoId = elecciones[i];
     if (productoId == null || productoId === (resultados[i]!.estado === 'vinculada' ? resultados[i]!.productoId : undefined)) return [];
-    return [{ codigo: l.codigo, descripcion: l.descripcion, productoId }];
+    return [{ codigo: l.codigo, descripcion: l.descripcion, presentacion: l.presentacion, productoId }];
   });
   const elegir = (i: number, productoId: number | null) => {
     setElecciones((actuales) => actuales.map((e, j) => (j === i ? productoId : e)));

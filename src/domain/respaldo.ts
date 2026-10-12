@@ -3,6 +3,7 @@
  * para restaurar todo en otro dispositivo.
  */
 
+/** Marca interna del archivo. Quedó del primer nombre de la app y no se cambia, para seguir leyendo las copias viejas. */
 export const MARCA_RESPALDO = 'lista-rapida';
 /** Formato del archivo (no del esquema): cambia sólo si cambia la forma del archivo. */
 export const FORMATO_RESPALDO = 1;
@@ -70,10 +71,10 @@ export function leerRespaldo(texto: string, versionActual: number): LecturaRespa
   return { ok: true, respaldo: dato as unknown as Respaldo };
 }
 
-/** Nombre del archivo: lista-rapida-respaldo-2026-10-12.json (fecha local). */
+/** Nombre del archivo: listamatch-respaldo-2026-10-12.json (fecha local). */
 export function nombreArchivoRespaldo(fecha: Date): string {
   const dos = (n: number) => String(n).padStart(2, '0');
-  return `${MARCA_RESPALDO}-respaldo-${fecha.getFullYear()}-${dos(fecha.getMonth() + 1)}-${dos(fecha.getDate())}.json`;
+  return `listamatch-respaldo-${fecha.getFullYear()}-${dos(fecha.getMonth() + 1)}-${dos(fecha.getDate())}.json`;
 }
 
 /** Días enteros desde el último respaldo; null si nunca se hizo. */

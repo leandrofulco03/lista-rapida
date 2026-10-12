@@ -1,0 +1,105 @@
+{
+ "comercio": "Almacén Doña Rosa",
+ "proveedor": "Lácteos y Fiambres Don Pedro",
+ "listaIncluyeIva": true,
+ "lineas": [
+  {
+   "codigo": null,
+   "descripcion": "LECHE ENTERA LS SACHET 1L",
+   "presentacion": null,
+   "costo": 293486,
+   "producto": "0023"
+  },
+  {
+   "codigo": null,
+   "descripcion": "LECHE DESCREMADA LS SACHET 1L",
+   "presentacion": null,
+   "costo": 168977,
+   "producto": "0024"
+  },
+  {
+   "codigo": null,
+   "descripcion": "YOGUR BEBIBLE SER FRUTILLA 900GR",
+   "presentacion": null,
+   "costo": 322780,
+   "producto": "0025"
+  },
+  {
+   "codigo": null,
+   "descripcion": "MANTECA LA SERENISIMA 200G",
+   "presentacion": null,
+   "costo": 346302,
+   "producto": "0026"
+  },
+  {
+   "codigo": null,
+   "descripcion": "QUESO CREMOSO X KG",
+   "presentacion": null,
+   "costo": 1080542,
+   "producto": "0027"
+  },
+  {
+   "codigo": null,
+   "descripcion": "JAMON COCIDO NATURAL X KG",
+   "presentacion": null,
+   "costo": 1573454,
+   "producto": "0028"
+  },
+  {
+   "codigo": null,
+   "descripcion": "DULCE DE LECHE LS CLASICO 400G",
+   "presentacion": null,
+   "costo": 289543,
+   "producto": "0029"
+  },
+  {
+   "codigo": null,
+   "descripcion": "CREMA DE LECHE LS 200CC",
+   "presentacion": null,
+   "costo": 288200,
+   "producto": "0030"
+  },
+  {
+   "codigo": null,
+   "descripcion": "HUEVO BLANCO MAPLE X 30",
+   "presentacion": null,
+   "costo": 990990,
+   "producto": "0031"
+  },
+  {
+   "codigo": null,
+   "descripcion": "DULCE DE LECHE LS CLASICO 1KG",
+   "presentacion": null,
+   "costo": 673873,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "QUESO TYBO X KG",
+   "presentacion": null,
+   "costo": 1282561,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "YOGUR BEBIBLE SER VAINILLA 900GR",
+   "presentacion": null,
+   "costo": 350087,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "RICOTA LS 500G",
+   "presentacion": null,
+   "costo": 794244,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "MORTADELA X KG",
+   "presentacion": null,
+   "costo": 608872,
+   "producto": null
+  }
+ ]
+}

@@ -1,4 +1,4 @@
-# Lista Rápida
+# ListaMatch
 
 Web instalable (PWA) para que comercios chicos de Argentina actualicen precios a partir de las listas de sus proveedores. La especificación completa vive en el proyecto (spec.md).
 
@@ -9,6 +9,7 @@ Web instalable (PWA) para que comercios chicos de Argentina actualicen precios a
 - Fase 3 (Catálogo y vinculación): F02 (proveedores), F03 (catálogo propio) y F07 (vinculación) hechos; la vinculación está medida sólo con un set sintético.
 - Fase 4 (Revisión): F09 (revisión de precios con los controles de seguridad) hecho; falta medir los 5 minutos con una lista real.
 - Fase 5 (Salidas y respaldo): F12 (copia de seguridad), F10 (etiquetas) y F11 (lista de precios y CSV) hechos. Las etiquetas falta probarlas en una impresora.
+- Fase 6 (Piloto): listas ficticias de un kiosco, una ferretería y un almacén en `tests/fixtures/comercios` (se arman con `python3 scripts/generar-comercios.py`), medidas de punta a punta. Falta publicar y probar con listas reales.
 
 ## Comandos
 

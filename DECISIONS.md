@@ -2,6 +2,22 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 6: piloto con comercios ficticios y nombre ListaMatch
+
+- **Nombre:** la app pasa a llamarse ListaMatch (elegido por Leandro entre su lista de opciones). Cambia lo que se ve: título, manifest de la PWA y el archivo de la copia de seguridad (`listamatch-respaldo-AAAA-MM-DD.json`). No cambia lo interno: la base del navegador sigue siendo `lista-rapida` y la marca dentro de la copia también, así nadie pierde datos y las copias viejas se siguen leyendo.
+- **Listas ficticias:** un kiosco, una ferretería y un almacén, con su catálogo y dos proveedores cada uno (Excel, CSV y PDF; con y sin códigos; con y sin IVA; una con la presentación en columna aparte), semana 1 y semana 2. Entre semanas: una suba del 65%, bajas, productos que dejan de venir y productos nuevos. Las listas traen productos que el comercio no tiene y que se parecen mucho (otro tamaño, otro sabor, otra marca). Se arman con `scripts/generar-comercios.py`; los precios son estimados, no de una lista real.
+- **Medición a ciegas (antes de tocar nada), 6 proveedores:**
+  - Lectura: 12 de 12 listas leídas completas y con el costo exacto, todas con confianza alta.
+  - Semana 1: 60 de 96 líneas sugeridas bien con un toque, 1 sugerida mal (yogur de vainilla → el de frutilla), 6 que el comercio tenía quedaron como "nuevas" (5 de ferretería).
+  - Semana 2: 89 de 90 vinculadas solas bien (99%), pero 4 líneas vinculadas o sugeridas mal.
+- **Tres errores reales que encontró, corregidos:**
+  - Sin códigos, la clave del vínculo no incluía la presentación: "Látex Albalatex blanco" de 4 l y de 20 l quedaban como el mismo. Ahora la presentación de su columna es parte de la clave. Las listas sin presentación aparte guardan la misma clave que antes; las que la tienen, la primera vez vuelven a sugerir en vez de vincular solas.
+  - "6 mm" y "6MM" no se unificaban (tampoco amperes, watts y volts): ahora sí.
+  - Otra variedad del mismo producto se sugería sola. Ahora no se sugiere si a cada descripción le sobra una palabra que la otra no tiene ("vainilla" contra "frutilla"), o si una dice light, zero, diet, descremada o integral y la otra no. Queda dudosa: elige el comerciante.
+- **Después de corregir** (ya no es a ciegas, porque los errores salieron de este set): semana 1, 66 de 96 sugeridas bien y ninguna mal, ninguna "nueva" que existiera salvo "Halls Menthol Lyptus" contra "Pastillas Halls mentol"; semana 2, 90 de 90 solas y ninguna mal. La prueba (`src/parsers/comercios-ficticios.test.ts`) exige lectura exacta, ninguna sugerencia equivocada y al menos 85% solas en la segunda lista.
+- **Pendiente:** el número que vale es el de listas reales de comercios del piloto.
+- **Publicación:** en https://lista-rapida.leandro-fulco.workers.dev. Leandro conectó el repo a Cloudflare como Worker (no como Pages). El panel compila con `npm run build` y `wrangler.jsonc` sirve `dist/` como archivos estáticos, con cualquier ruta desconocida yendo a la app (`single-page-application`). Sin código del lado del servidor: todo sigue en el navegador.
+
 ## 12/10/2026 · Fase 5: lista de precios y CSV para la caja (F11)
 
 - **CSV para Excel en castellano:** UTF-8 con BOM (sin el BOM, Excel muestra mal los acentos), separado por punto y coma (Excel en castellano usa la coma para decimales) y precio con coma decimal y sin separador de miles ("1580,50"), así Excel lo toma como número. Renglones con CRLF.

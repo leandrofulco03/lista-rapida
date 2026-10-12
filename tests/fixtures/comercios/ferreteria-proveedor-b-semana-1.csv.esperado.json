@@ -1,0 +1,105 @@
+{
+ "comercio": "Ferretería San Martín",
+ "proveedor": "Pinturería Distribuidora Centro",
+ "listaIncluyeIva": false,
+ "lineas": [
+  {
+   "codigo": null,
+   "descripcion": "Latex Interior Albalatex Blanco",
+   "presentacion": "4 Lts",
+   "costo": 2828000,
+   "producto": "0021"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Latex Interior Albalatex Blanco",
+   "presentacion": "20 Lts",
+   "costo": 12626000,
+   "producto": "0022"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Esmalte Sintetico Albalux Blanco Brillante",
+   "presentacion": "1 Lt",
+   "costo": 1732500,
+   "producto": "0023"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Esmalte Sintetico Albalux Negro Brillante",
+   "presentacion": "1 Lt",
+   "costo": 1782000,
+   "producto": "0024"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Aguarras Mineral",
+   "presentacion": "1 Lt",
+   "costo": 449400,
+   "producto": "0025"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Thinner Standard",
+   "presentacion": "1 Lt",
+   "costo": 513600,
+   "producto": "0026"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Rodillo Lana Natural 22cm",
+   "presentacion": null,
+   "costo": 620000,
+   "producto": "0027"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Pincel Virola N°20",
+   "presentacion": null,
+   "costo": 220500,
+   "producto": "0028"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Enduido Plástico Interior",
+   "presentacion": "4 Kg",
+   "costo": 954000,
+   "producto": "0029"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Cinta Papel Enmascarar 24mm",
+   "presentacion": "50 mts",
+   "costo": 199500,
+   "producto": "0030"
+  },
+  {
+   "codigo": null,
+   "descripcion": "Esmalte Sintetico Albalux Blanco Brillante",
+   "presentacion": "4 Lts",
+   "costo": 6313000,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "Latex Exterior Albalatex Blanco",
+   "presentacion": "4 Lts",
+   "costo": 3638000,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "Antióxido Rojo",
+   "presentacion": "1 Lt",
+   "costo": 1312500,
+   "producto": null
+  },
+  {
+   "codigo": null,
+   "descripcion": "Pincel Virola N°10",
+   "presentacion": null,
+   "costo": 135200,
+   "producto": null
+  }
+ ]
+}
