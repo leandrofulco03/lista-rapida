@@ -35,7 +35,7 @@ test('F04/F06: la primera lista pide confirmar columnas y la segunda del mismo p
   await expect(page.getByTestId('titulo-resultado')).toHaveText('Leímos 40 productos');
   await expect(page.getByTestId('lineas-leidas').locator('li').first()).toContainText('Yerba mate Playadito');
   await expect(page.getByTestId('lineas-leidas').locator('li').first()).toContainText('+ IVA');
-  await page.getByRole('button', { name: 'Listo' }).click();
+  await page.getByRole('button', { name: 'Volver' }).click();
 
   // Segunda lista del mismo proveedor, con filas de más arriba y las columnas en otro orden.
   await page.getByRole('button', { name: 'Subí una lista' }).click();

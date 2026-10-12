@@ -2,6 +2,31 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 3: vinculación con el catálogo (F07)
+
+- **Comparador propio en vez de Fuse.js** (la spec nombraba Fuse.js). Fuse compara letras sueltas y con descripciones de almacén confundía productos de la misma marca. El comparador propio compara palabras: iguales valen 1, abreviatura ("ent" de "entera") 0,8, una letra de diferencia 0,7, y "x50" contra "50" 0,9; sin palabras vacías ("de", "con", "x"). Sin dependencias nuevas. Un índice por palabra evita comparar cada línea con todo el catálogo.
+- **Descripción normalizada con unidades unificadas:** "1 lt", "1l" y "1000 cc" → "1000ml"; "1 kg" y "1000 grs" → "1000g"; "x6", "pack 6" y "6 un" → "x6"; "30 mts" → "30m". Se usa también para buscar en el catálogo. La versión 2 de la base recalcula las descripciones ya guardadas.
+- **Umbrales** (constantes en `src/domain/vinculacion.ts`): desde 0,8 se sugiere; entre 0,5 y 0,8 es dudosa (se muestran hasta 3 opciones); debajo de 0,5 es nueva. Además, una sugerida tiene que sacarle al menos 0,05 a la segunda opción, y si el contenido o el pack no coinciden (500 g contra 1 kg) nunca se sugiere: queda dudosa.
+- **Calibración:** set de 30 productos y 40 líneas escritas como las escriben los proveedores (`tests/fixtures/vinculacion/casos.json`). Resultado: 31 de 31 existentes sugeridas con el producto correcto, ninguna sugerida equivocada, las 9 que el comercio no tiene quedan dudosas o nuevas. **La medida es optimista:** ajustamos la normalización mirando los fallos de este mismo set ("Hellmann's", "3x101g", "mts", "x50"). Hay que medirlo con listas reales.
+- **Vínculo recordado por proveedor:** la clave es el código de la línea en minúsculas; si la lista no trae códigos, la descripción normalizada (`desc:…`). Desde la segunda lista, lo confirmado se vincula solo; la prueba con el set da 100% de las que existen (meta: 85%), con y sin códigos.
+- **Pantalla de vinculación** después de leer la lista ("Comparar con mi catálogo"): arriba las dudosas (elegir entre opciones o buscar), después las sugeridas (se confirman todas con el botón de guardar; "No es este" para rechazar una), y plegadas las que no están y las ya vinculadas (se pueden cambiar). Sólo se guarda lo que el comerciante confirmó.
+- **Pendiente:** dar de alta en el catálogo los productos que no están (se ve con F09, junto con el costo y el IVA de la línea) y guardar la importación para la revisión de precios (F09).
+
+## 12/10/2026 · Fase 3: proveedores (F02) y catálogo propio (F03)
+
+- **Orden de la Fase 3:** primero F02 y F03, después F07 (vinculación), todo en el mismo PR. Decisión de Leandro: seguir con la Fase 3 antes de probar con listas reales.
+- **Ficha del proveedor:** nombre, si su lista trae IVA, descuentos en cascada escritos como "10 + 5" (muestra el total equivalente, 14,5%) y las columnas recordadas, con un botón para olvidarlas. La baja borra sus vínculos e importaciones; los productos del catálogo quedan.
+- **Catálogo:** búsqueda por palabras sueltas o código, sin acentos. Se muestran 100 productos a la vez; el resto se encuentra buscando.
+- **Código interno automático** (P0001, P0002…) para productos sin código; se puede cambiar. El código no se repite (sin importar mayúsculas).
+- **Rubros con recargo opcional.** Al borrar un rubro, sus productos quedan sin rubro y usan el recargo general (o el propio).
+- **Precio de venta sugerido:** en la ficha del producto se muestra lo que daría el cálculo de F08 con su costo y recargo, y se usa con un toque. No se pisa solo: el precio de venta lo decide el comerciante.
+- **Importar catálogo** desde Excel, CSV o PDF, con la misma pantalla de columnas que las listas (ahora compartida en `SelectorColumnas`). Campos: código, descripción, rubro, costo, precio de venta e IVA. Con un solo "Precio" se toma como precio de venta (es el catálogo del comercio, no una lista de proveedor).
+  - Un producto que ya existe (mismo código; si el archivo no trae código, misma descripción) se actualiza y conserva lo que el archivo no trae (costo, recargo propio, rubro).
+  - Sin precio de venta, se calcula desde el costo con el recargo y el redondeo del comercio. **Supuesto:** el costo del catálogo está sin IVA. Sin costo ni precio, queda en cero.
+  - Un renglón con un solo texto y sin precios es un título de rubro; si el archivo no tiene columna de rubro, los productos de abajo quedan en ese rubro.
+  - Códigos repetidos en el archivo: vale el primero y los demás se listan como salteados.
+- **Condición de F03:** un Excel sintético de 500 productos (`tests/fixtures/catalogo/`) se importa completo, en la prueba unitaria y en el recorrido de Playwright.
+
 ## 12/10/2026 · Fase 2: lectura de listas en PDF (F05)
 
 - **pdf.js (`pdfjs-dist` 6.3.289), versión "legacy"**, como pide la spec. La versión moderna usa funciones que no tienen los navegadores de celulares de hace un par de años (por ejemplo `Promise.try`); la legacy funciona en ellos.

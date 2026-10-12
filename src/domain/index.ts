@@ -9,3 +9,6 @@ export * from './texto';
 export * from './lineaLista';
 export * from './columnas';
 export * from './lectura';
+export * from './proveedor';
+export * from './catalogo';
+export * from './vinculacion';

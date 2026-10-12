@@ -3,6 +3,7 @@ import type { EntityTable } from 'dexie';
 import type { Centavos, Porcentaje } from '../domain/dinero';
 import type { ConfigComercio } from '../domain/config';
 import type { MapeoColumnas } from '../domain/columnas';
+import { normalizarDescripcion } from '../domain/vinculacion';
 
 export type { MapeoColumnas };
 
@@ -50,6 +51,7 @@ export interface Producto {
 export interface Vinculo {
   id: number;
   proveedorId: number;
+  /** Clave de la línea (ver claveVinculo): el código en minúsculas o "desc:" + la descripción normalizada si la lista no trae códigos. */
   codigoProveedor: string;
   descripcionProveedor: string;
   productoId: number;
@@ -117,6 +119,17 @@ export class BaseListaRapida extends Dexie {
       lineasImportacion: '++id, importacionId, estado',
       historialPrecios: '++id, [productoId+fecha], proveedorId',
     });
+    // F07: la descripción normalizada unifica unidades ("1 lt" = "1000 ml") para vincular con las listas.
+    this.version(2)
+      .stores({})
+      .upgrade((tx) =>
+        tx
+          .table<Producto, number>('productos')
+          .toCollection()
+          .modify((p) => {
+            p.descripcionNormalizada = normalizarDescripcion(p.descripcion);
+          }),
+      );
   }
 }
 

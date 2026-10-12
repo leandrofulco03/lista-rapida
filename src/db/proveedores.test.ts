@@ -2,7 +2,14 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { MapeoColumnas } from '../domain/columnas';
 import { BaseListaRapida } from './esquema';
-import { crearProveedor, guardarLecturaProveedor, listarProveedores } from './proveedores';
+import {
+  actualizarProveedor,
+  borrarProveedor,
+  crearProveedor,
+  guardarLecturaProveedor,
+  listarProveedores,
+  olvidarColumnas,
+} from './proveedores';
 
 let db: BaseListaRapida;
 let n = 0;
@@ -53,5 +60,48 @@ describe('proveedores (mínimo para la Fase 2)', () => {
     // Guardar lo mismo otra vez no falla.
     await guardarLecturaProveedor(db, id, MAPEO, true);
     await expect(guardarLecturaProveedor(db, 999, MAPEO, true)).rejects.toThrow('No encontramos');
+  });
+});
+
+describe('F02: ficha del proveedor', () => {
+  it('edita nombre, IVA y descuentos sin repetir nombres', async () => {
+    const { id } = await crearProveedor(db, 'El Sol', false);
+    await crearProveedor(db, 'Norte', false);
+    const editado = await actualizarProveedor(db, id, { nombre: ' El Sol S.A. ', listaIncluyeIva: true, descuentosPct: [1000, 500] });
+    expect(editado).toMatchObject({ nombre: 'El Sol S.A.', listaIncluyeIva: true, descuentosPct: [1000, 500] });
+    await expect(actualizarProveedor(db, id, { nombre: 'norte', listaIncluyeIva: true, descuentosPct: [] })).rejects.toThrow(
+      'Ya existe el proveedor Norte',
+    );
+    await expect(actualizarProveedor(db, id, { nombre: 'El Sol', listaIncluyeIva: true, descuentosPct: [10_000] })).rejects.toThrow(
+      'entre 0% y 100%',
+    );
+  });
+
+  it('olvida las columnas recordadas', async () => {
+    const { id } = await crearProveedor(db, 'El Sol', false);
+    await guardarLecturaProveedor(db, id, MAPEO, false);
+    await olvidarColumnas(db, id);
+    expect((await db.proveedores.get(id))?.mapeoColumnas).toBeNull();
+  });
+
+  it('la baja borra sus vínculos e importaciones, pero no los de otros proveedores', async () => {
+    const sol = await crearProveedor(db, 'El Sol', false);
+    const norte = await crearProveedor(db, 'Norte', false);
+    const vinculo = { codigoProveedor: 'A1', descripcionProveedor: 'Yerba', productoId: 1, confirmado: true };
+    await db.vinculos.bulkAdd([{ ...vinculo, proveedorId: sol.id }, { ...vinculo, proveedorId: norte.id }] as never);
+    const importacion = await db.importaciones.add({
+      proveedorId: sol.id,
+      archivoNombre: 'lista.xlsx',
+      fecha: '2026-10-12',
+      totalLineas: 1,
+      vinculadas: 1,
+      estado: 'borrador',
+    } as never);
+    await db.lineasImportacion.add({ importacionId: importacion, estado: 'nueva' } as never);
+    await borrarProveedor(db, sol.id);
+    expect((await listarProveedores(db)).map((p) => p.nombre)).toEqual(['Norte']);
+    expect((await db.vinculos.toArray()).map((v) => v.proveedorId)).toEqual([norte.id]);
+    expect(await db.importaciones.count()).toBe(0);
+    expect(await db.lineasImportacion.count()).toBe(0);
   });
 });
