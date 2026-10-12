@@ -11,6 +11,8 @@ import { Boton } from '../../ui/Boton';
 interface Props {
   proveedor: Proveedor;
   lineas: LineaLista[];
+  /** Sigue a la revisión de precios (F09) con el producto de cada línea (null: sin vincular). */
+  onSeguir: (elecciones: (number | null)[]) => void;
   onVolver: () => void;
 }
 
@@ -23,12 +25,11 @@ interface Comparacion {
 /** Producto elegido para cada línea (por posición). null: sin vincular. */
 type Elecciones = (number | null)[];
 
-/** F07: une cada línea de la lista con un producto del catálogo. Lo confirmado queda guardado para la próxima lista. */
-export function PantallaVinculacion({ proveedor, lineas, onVolver }: Props) {
+/** F07: une cada línea de la lista con un producto del catálogo. Lo confirmado queda guardado para la próxima lista; después sigue la revisión de precios (F09). */
+export function PantallaVinculacion({ proveedor, lineas, onSeguir, onVolver }: Props) {
   const [comparacion, setComparacion] = useState<Comparacion | null>(null);
   const [elecciones, setElecciones] = useState<Elecciones>([]);
   const [buscando, setBuscando] = useState<number | null>(null);
-  const [guardados, setGuardados] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
@@ -67,33 +68,10 @@ export function PantallaVinculacion({ proveedor, lineas, onVolver }: Props) {
     setGuardando(true);
     try {
       await guardarVinculos(db, proveedor.id, cambios);
-      setGuardados(cambios.length);
     } finally {
       setGuardando(false);
     }
-  }
-
-  if (guardados !== null) {
-    const vinculadas = elecciones.filter((e) => e != null).length;
-    return (
-      <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-        <p className="text-sm font-semibold text-green-800">{proveedor.nombre}</p>
-        <h1 className="mt-1 text-2xl font-bold" data-testid="titulo-vinculos-guardados">
-          {vinculadas} de {lineas.length} productos vinculados
-        </h1>
-        <p className="mt-2 text-lg text-stone-700">
-          {guardados > 0
-            ? `Guardamos ${guardados} ${guardados === 1 ? 'vínculo nuevo' : 'vínculos nuevos'}. La próxima lista de ${proveedor.nombre} los reconoce sola.`
-            : 'No hubo vínculos nuevos para guardar.'}
-        </p>
-        <p className="mt-4 rounded-xl border border-dashed border-stone-300 bg-white p-4 text-stone-600">
-          Pronto vas a poder revisar y aprobar los precios nuevos de estos productos.
-        </p>
-        <Boton type="button" onClick={onVolver} className="mt-6">
-          Listo
-        </Boton>
-      </main>
-    );
+    onSeguir(elecciones);
   }
 
   if (todos.length === 0) {
@@ -227,7 +205,7 @@ export function PantallaVinculacion({ proveedor, lineas, onVolver }: Props) {
 
       <div className="mt-6 space-y-3">
         <Boton type="button" onClick={guardar} disabled={guardando}>
-          {guardando ? 'Guardando…' : cambios.length > 0 ? `Guardar ${cambios.length} ${cambios.length === 1 ? 'vínculo' : 'vínculos'}` : 'Seguir'}
+          {guardando ? 'Guardando…' : cambios.length > 0 ? `Guardar ${cambios.length} ${cambios.length === 1 ? 'vínculo' : 'vínculos'} y revisar precios` : 'Revisar precios'}
         </Boton>
         <Boton type="button" variante="secundario" onClick={onVolver}>
           Volver sin guardar

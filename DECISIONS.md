@@ -2,6 +2,22 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 4: revisión de precios (F09)
+
+- **Orden:** Leandro eligió seguir con la Fase 4 antes de probar con listas reales.
+- **Recorrido:** subir la lista → columnas → "Comparar con mi catálogo" (F07) → "Revisar precios" (F09) → guardar. Ningún precio cambia en otro lado: `aplicarRevision` es el único que actualiza precios desde una lista.
+- **Costo que guarda el catálogo:** el de la lista con los descuentos del proveedor y sin IVA (si la lista lo incluía, se saca con la alícuota del producto). La variación se mide sobre ese costo, contra el costo que tenía el producto.
+- **Precio sugerido:** el de F08, con el costo de la lista, los descuentos, el IVA y el recargo del producto, rubro o general. Si la lista incluye IVA y el comercio vende sin IVA, el IVA queda como parte del costo (igual que en F08).
+- **Controles de seguridad (spec):**
+  - Más del 15% de variación: resaltado en amarillo. Arriba van los de mayor variación.
+  - Más del 50%, costo en cero, o producto sin costo anterior para comparar: en rojo, fuera de "Aprobar todo"; se aprueban de a uno. Lo de "sin costo anterior" lo sumamos nosotros: sin costo no hay forma de saber si el cambio es razonable.
+  - Si el costo baja: marcado en azul, con "Bajar a $X" o "Mantener $Y". "Aprobar todo" las incluye con el precio nuevo; se puede deshacer y mantener.
+  - Productos vinculados antes con este proveedor que no vinieron en la lista: aviso "No vinieron en esta lista", sin cambios.
+- **"Aprobar todo" marca, no guarda:** se ve qué quedó aprobado y después se guarda con un botón fijo abajo. Mantener el precio igual actualiza el costo.
+- **Líneas repetidas** (dos líneas con el mismo producto): vale la primera; la otra se lista como repetida y no cambia nada.
+- **Al guardar** queda un registro en el historial de cada producto y la importación con todas sus líneas (aprobadas o no). No se guarda un borrador a medio revisar: si se sale, se vuelve a subir la lista y los vínculos ya están.
+- **Pendiente:** la condición de la fase ("300 productos se revisan en menos de 5 minutos") se mide con una persona y una lista real; dar de alta en el catálogo los productos que no están; editar a mano el precio final en la revisión.
+
 ## 12/10/2026 · Fase 3: vinculación con el catálogo (F07)
 
 - **Comparador propio en vez de Fuse.js** (la spec nombraba Fuse.js). Fuse compara letras sueltas y con descripciones de almacén confundía productos de la misma marca. El comparador propio compara palabras: iguales valen 1, abreviatura ("ent" de "entera") 0,8, una letra de diferencia 0,7, y "x50" contra "50" 0,9; sin palabras vacías ("de", "con", "x"). Sin dependencias nuevas. Un índice por palabra evita comparar cada línea con todo el catálogo.
@@ -10,7 +26,7 @@ Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 - **Calibración:** set de 30 productos y 40 líneas escritas como las escriben los proveedores (`tests/fixtures/vinculacion/casos.json`). Resultado: 31 de 31 existentes sugeridas con el producto correcto, ninguna sugerida equivocada, las 9 que el comercio no tiene quedan dudosas o nuevas. **La medida es optimista:** ajustamos la normalización mirando los fallos de este mismo set ("Hellmann's", "3x101g", "mts", "x50"). Hay que medirlo con listas reales.
 - **Vínculo recordado por proveedor:** la clave es el código de la línea en minúsculas; si la lista no trae códigos, la descripción normalizada (`desc:…`). Desde la segunda lista, lo confirmado se vincula solo; la prueba con el set da 100% de las que existen (meta: 85%), con y sin códigos.
 - **Pantalla de vinculación** después de leer la lista ("Comparar con mi catálogo"): arriba las dudosas (elegir entre opciones o buscar), después las sugeridas (se confirman todas con el botón de guardar; "No es este" para rechazar una), y plegadas las que no están y las ya vinculadas (se pueden cambiar). Sólo se guarda lo que el comerciante confirmó.
-- **Pendiente:** dar de alta en el catálogo los productos que no están (se ve con F09, junto con el costo y el IVA de la línea) y guardar la importación para la revisión de precios (F09).
+- **Pendiente:** dar de alta en el catálogo los productos que no están.
 
 ## 12/10/2026 · Fase 3: proveedores (F02) y catálogo propio (F03)
 
