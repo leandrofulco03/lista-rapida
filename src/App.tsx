@@ -4,8 +4,10 @@ import type { ConfigComercio } from './domain/config';
 import { PantallaConfig } from './features/config/PantallaConfig';
 import { PantallaInicio } from './features/inicio/PantallaInicio';
 import { PantallaSubirLista } from './features/subir/PantallaSubirLista';
+import { PantallaCatalogo } from './features/catalogo/PantallaCatalogo';
+import { PantallaProveedores } from './features/proveedores/PantallaProveedores';
 
-type Pantalla = 'inicio' | 'config' | 'subir';
+type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores';
 
 type Estado = { tipo: 'cargando' } | { tipo: 'sin-config' } | { tipo: 'listo'; config: ConfigComercio; pantalla: Pantalla };
 
@@ -28,5 +30,7 @@ export function App() {
     return <PantallaConfig inicial={estado.config} onGuardar={guardar} onCancelar={() => ir('inicio')} />;
   }
   if (estado.pantalla === 'subir') return <PantallaSubirLista onVolver={() => ir('inicio')} />;
-  return <PantallaInicio config={estado.config} onSubirLista={() => ir('subir')} onEditarConfig={() => ir('config')} />;
+  if (estado.pantalla === 'catalogo') return <PantallaCatalogo config={estado.config} onVolver={() => ir('inicio')} />;
+  if (estado.pantalla === 'proveedores') return <PantallaProveedores onVolver={() => ir('inicio')} />;
+  return <PantallaInicio config={estado.config} onIr={ir} />;
 }

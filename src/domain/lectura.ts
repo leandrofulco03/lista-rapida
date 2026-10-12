@@ -6,7 +6,7 @@ import type { LineaLista } from './lineaLista';
 import { normalizarTexto } from './texto';
 
 /** Por qué una fila con algo escrito no se tomó como producto. */
-export type MotivoSalteo = 'titulo' | 'sin-precio' | 'sin-descripcion' | 'encabezado' | 'total';
+export type MotivoSalteo = 'titulo' | 'sin-precio' | 'sin-descripcion' | 'encabezado' | 'total' | 'repetido';
 
 export const TEXTO_MOTIVO: Record<MotivoSalteo, string> = {
   titulo: 'Título o rubro, sin precio',
@@ -14,6 +14,7 @@ export const TEXTO_MOTIVO: Record<MotivoSalteo, string> = {
   'sin-descripcion': 'Tiene precio pero no descripción',
   encabezado: 'Repite los títulos de las columnas',
   total: 'Total o subtotal',
+  repetido: 'El código ya apareció más arriba',
 };
 
 export interface FilaSalteada {

@@ -36,3 +36,8 @@ export function formatearPesos(monto: Centavos): string {
   const pesosConPuntos = pesos.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   return `${signo}$ ${pesosConPuntos},${centavos}`;
 }
+
+/** Monto para editar en un campo: 123450 → "1.234,50" (sin el signo $). */
+export function pesosParaEditar(monto: Centavos): string {
+  return formatearPesos(monto).replace(/^\$\s*/, '');
+}
