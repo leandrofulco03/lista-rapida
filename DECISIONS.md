@@ -16,7 +16,7 @@ Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
   - Otra variedad del mismo producto se sugería sola. Ahora no se sugiere si a cada descripción le sobra una palabra que la otra no tiene ("vainilla" contra "frutilla"), o si una dice light, zero, diet, descremada o integral y la otra no. Queda dudosa: elige el comerciante.
 - **Después de corregir** (ya no es a ciegas, porque los errores salieron de este set): semana 1, 66 de 96 sugeridas bien y ninguna mal, ninguna "nueva" que existiera salvo "Halls Menthol Lyptus" contra "Pastillas Halls mentol"; semana 2, 90 de 90 solas y ninguna mal. La prueba (`src/parsers/comercios-ficticios.test.ts`) exige lectura exacta, ninguna sugerencia equivocada y al menos 85% solas en la segunda lista.
 - **Pendiente:** el número que vale es el de listas reales de comercios del piloto.
-- **Publicación:** Leandro conectó el repo a Cloudflare como Worker (no como Pages). `wrangler.jsonc` le dice qué hacer: compilar con `npm run build` y servir `dist/` como archivos estáticos, con cualquier ruta desconocida yendo a la app (`single-page-application`). Sin código del lado del servidor: todo sigue en el navegador.
+- **Publicación:** en https://lista-rapida.leandro-fulco.workers.dev. Leandro conectó el repo a Cloudflare como Worker (no como Pages). El panel compila con `npm run build` y `wrangler.jsonc` sirve `dist/` como archivos estáticos, con cualquier ruta desconocida yendo a la app (`single-page-application`). Sin código del lado del servidor: todo sigue en el navegador.
 
 ## 12/10/2026 · Fase 5: lista de precios y CSV para la caja (F11)
 
