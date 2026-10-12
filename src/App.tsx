@@ -3,31 +3,30 @@ import { db, guardarConfig, leerConfig } from './db';
 import type { ConfigComercio } from './domain/config';
 import { PantallaConfig } from './features/config/PantallaConfig';
 import { PantallaInicio } from './features/inicio/PantallaInicio';
+import { PantallaSubirLista } from './features/subir/PantallaSubirLista';
 
-type Estado = { tipo: 'cargando' } | { tipo: 'sin-config' } | { tipo: 'listo'; config: ConfigComercio; editando: boolean };
+type Pantalla = 'inicio' | 'config' | 'subir';
+
+type Estado = { tipo: 'cargando' } | { tipo: 'sin-config' } | { tipo: 'listo'; config: ConfigComercio; pantalla: Pantalla };
 
 export function App() {
   const [estado, setEstado] = useState<Estado>({ tipo: 'cargando' });
 
   useEffect(() => {
-    leerConfig(db).then((config) => setEstado(config ? { tipo: 'listo', config, editando: false } : { tipo: 'sin-config' }));
+    leerConfig(db).then((config) => setEstado(config ? { tipo: 'listo', config, pantalla: 'inicio' } : { tipo: 'sin-config' }));
   }, []);
 
   async function guardar(config: ConfigComercio) {
     const guardada = await guardarConfig(db, config);
-    setEstado({ tipo: 'listo', config: guardada, editando: false });
+    setEstado({ tipo: 'listo', config: guardada, pantalla: 'inicio' });
   }
 
   if (estado.tipo === 'cargando') return null;
   if (estado.tipo === 'sin-config') return <PantallaConfig onGuardar={guardar} />;
-  if (estado.editando) {
-    return (
-      <PantallaConfig
-        inicial={estado.config}
-        onGuardar={guardar}
-        onCancelar={() => setEstado({ ...estado, editando: false })}
-      />
-    );
+  const ir = (pantalla: Pantalla) => setEstado({ ...estado, pantalla });
+  if (estado.pantalla === 'config') {
+    return <PantallaConfig inicial={estado.config} onGuardar={guardar} onCancelar={() => ir('inicio')} />;
   }
-  return <PantallaInicio config={estado.config} onEditarConfig={() => setEstado({ ...estado, editando: true })} />;
+  if (estado.pantalla === 'subir') return <PantallaSubirLista onVolver={() => ir('inicio')} />;
+  return <PantallaInicio config={estado.config} onSubirLista={() => ir('subir')} onEditarConfig={() => ir('config')} />;
 }

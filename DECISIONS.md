@@ -2,6 +2,21 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 2: lectura de listas Excel y CSV (F04, F06)
+
+- **Orden:** Excel/CSV primero; PDF (F05) en un PR aparte; WhatsApp (Web Share Target) después. Decisiones de Leandro (respuestas 1B 2A 3A 4A 5B).
+- **Listas de prueba sintéticas** (20, en `tests/fixtures/sinteticas/`) en vez de listas reales. Se leen bien 20 de 20, pero la medida es optimista porque las armamos nosotros.
+- **La app adivina y el usuario corrige:** busca la fila de títulos en las primeras 30 filas por palabras conocidas ("Cód. Art.", "Descripción", "Precio s/IVA") y lo que hay debajo; si no hay títulos, adivina por el contenido y avisa que no está segura. Descartado: mapeo siempre a mano (más lento).
+- **"Precio sugerido", "PVP" y "Precio venta" nunca se toman como costo.** Con dos precios se prefiere el sin IVA. Si el título dice "c/IVA" o "s/IVA" manda eso; si no, lo que diga el proveedor.
+- **Números ambiguos:** "1.234" es mil doscientos treinta y cuatro (formato argentino) salvo que la columna use punto decimal ("1234.50"); el formato se deduce por columna. Más de 2 decimales se redondean al centavo.
+- **Mapeo recordado por proveedor** con los títulos de cada columna, así se reencuentra aunque el proveedor agregue filas arriba o cambie el orden. Si ya no lee al menos el 80% de las filas, vuelve a preguntar. Sin títulos, se reusa por posición.
+- **Ninguna fila se descarta en silencio:** rubros, totales, títulos repetidos y precios como "Consultar" se listan con el motivo.
+- **CSV con lector propio** (detecta `;` `,` tabulador y Latin-1/UTF-8) en vez de SheetJS, porque los CSV de Excel en Windows rompen acentos y separadores. Excel y ODS con SheetJS. Ambos corren en un Web Worker; SheetJS queda sólo en el worker y no agranda la carga inicial.
+- **SheetJS desde su CDN oficial** (`cdn.sheetjs.com`, versión 0.20.3), como pide la spec. El `package-lock.json` no tiene el hash del paquete porque el entorno de Claude no llega a ese CDN; se completa solo la próxima vez que Leandro corra `npm install`.
+- **Proveedor mínimo al subir:** se elige uno o se escribe el nombre de uno nuevo (sin duplicar por mayúsculas). La ficha completa es F02 (Fase 3).
+- **Por ahora sólo se muestra lo leído y se guarda el mapeo;** la importación en borrador y los cambios de precio llegan con F07 y F09.
+- **Tipo `MapeoColumnas`** pasa a `src/domain/columnas.ts` con `filaEncabezado` que admite `null` (lista sin títulos) y `titulos`. No cambia índices de Dexie, así que no hace falta versión nueva del esquema.
+
 ## 12/10/2026 · Fase 1: base de la app y F01
 
 - **F01 en una sola pantalla** con nombre, recargo general (sugerido 30%), redondeo (sugerido a $10) y, en opciones avanzadas, IVA en el precio de venta (sí por defecto) e IVA de productos nuevos (21% o 10,5%). Descartado: asistente en pasos (más lento). Los rubros se crean en F03. Decisiones de Leandro.

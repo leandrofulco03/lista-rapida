@@ -2,6 +2,9 @@ import Dexie from 'dexie';
 import type { EntityTable } from 'dexie';
 import type { Centavos, Porcentaje } from '../domain/dinero';
 import type { ConfigComercio } from '../domain/config';
+import type { MapeoColumnas } from '../domain/columnas';
+
+export type { MapeoColumnas };
 
 /**
  * Esquema local (IndexedDB) según el modelo de datos de la spec.
@@ -20,18 +23,10 @@ export interface Rubro {
   recargoPct: Porcentaje | null;
 }
 
-/** Mapeo de columnas de la lista del proveedor (F06): índice de columna de cada dato. */
-export interface MapeoColumnas {
-  filaEncabezado: number;
-  codigo: number | null;
-  descripcion: number;
-  costo: number;
-  presentacion: number | null;
-}
-
 export interface Proveedor {
   id: number;
   nombre: string;
+  /** Columnas de su lista, recordadas para el próximo envío (F06). */
   mapeoColumnas: MapeoColumnas | null;
   listaIncluyeIva: boolean;
   /** Descuentos en cascada (desvío de la spec, ver DECISIONS.md). */

@@ -4,3 +4,8 @@ export * from './precio';
 export * from './porcentaje';
 export * from './config';
 export * from './desglose';
+export * from './importe';
+export * from './texto';
+export * from './lineaLista';
+export * from './columnas';
+export * from './lectura';

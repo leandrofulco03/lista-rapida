@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { COLOR_TEMA, DESCRIPCION_APP, NOMBRE_APP, NOMBRE_CORTO } from './src/marca';
 
 export default defineConfig({
+  worker: { format: 'es' },
   plugins: [
     react(),
     tailwindcss(),
