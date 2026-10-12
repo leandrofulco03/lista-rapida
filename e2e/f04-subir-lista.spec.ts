@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 const LISTAS = fileURLToPath(new URL('../tests/fixtures/sinteticas/', import.meta.url));
+const LISTAS_PDF = fileURLToPath(new URL('../tests/fixtures/sinteticas-pdf/', import.meta.url));
 
 async function configurar(page: Page) {
   await page.goto('/');
@@ -86,11 +87,29 @@ test('F06: si la app no está segura, se corrigen las columnas a mano', async ({
   await expect(page.getByTestId('lineas-leidas')).toContainText('con IVA');
 });
 
-test('F04: un PDF avisa que todavía no se puede leer', async ({ page }) => {
+test('F05: lee una lista en PDF con texto', async ({ page }) => {
+  await configurar(page);
+  await page.getByRole('button', { name: 'Subí una lista' }).click();
+  await page.getByLabel('Nombre del proveedor').fill('Distribuidora El Sol');
+  await page.getByLabel('Archivo de la lista').setInputFiles(join(LISTAS_PDF, '02-distribuidora-con-membrete.pdf'));
+  await page.getByRole('button', { name: 'Leer lista' }).click();
+
+  // Los títulos están en el renglón 4, debajo del membrete.
+  await expect(page.getByRole('heading', { name: '¿Qué columna es cada dato?' })).toBeVisible();
+  await expect(page.getByLabel('Fila con los títulos')).toHaveValue('3');
+  await expect(page.getByLabel('Columna D')).toHaveValue('costo');
+  await page.getByRole('button', { name: 'Usar estas columnas' }).click();
+
+  await expect(page.getByTestId('titulo-resultado')).toHaveText('Leímos 35 productos');
+  await expect(page.getByTestId('lineas-leidas').locator('li').first()).toContainText('Yerba mate Playadito');
+  await expect(page.getByTestId('lineas-leidas').locator('li').first()).toContainText('+ IVA');
+});
+
+test('F05: un PDF escaneado avisa que no tiene texto', async ({ page }) => {
   await configurar(page);
   await page.getByRole('button', { name: 'Subí una lista' }).click();
   await page.getByLabel('Nombre del proveedor').fill('Proveedor PDF');
-  await page.getByLabel('Archivo de la lista').setInputFiles({ name: 'lista.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4') });
+  await page.getByLabel('Archivo de la lista').setInputFiles(join(LISTAS, '../pdf-escaneado.pdf'));
   await page.getByRole('button', { name: 'Leer lista' }).click();
-  await expect(page.getByRole('alert')).toContainText('PDF todavía no se pueden leer');
+  await expect(page.getByRole('alert')).toContainText('no tiene texto');
 });

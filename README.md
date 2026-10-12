@@ -4,7 +4,8 @@ Web instalable (PWA) para que comercios chicos de Argentina actualicen precios a
 
 ## Estado
 
-Fase 1 (Base): F08 (cálculo de precios) y F01 (configuración inicial) hechos; falta publicar en Cloudflare Pages.
+- Fase 1 (Base): F08 (cálculo de precios) y F01 (configuración inicial) hechos; falta publicar en Cloudflare Pages.
+- Fase 2 (Lectura de listas): F04 (Excel/CSV), F05 (PDF con texto) y F06 (mapeo de columnas) hechos y medidos con listas sintéticas; faltan listas reales.
 
 ## Comandos
 

@@ -21,8 +21,8 @@ const listas = readdirSync(CARPETA)
   .filter((n) => !n.endsWith('.json') && !n.endsWith('.md'))
   .sort();
 
-function leer(nombre: string): LineaLista[] {
-  const tabla = leerArchivo(nombre, new Uint8Array(readFileSync(join(CARPETA, nombre))));
+async function leer(nombre: string): Promise<LineaLista[]> {
+  const tabla = await leerArchivo(nombre, new Uint8Array(readFileSync(join(CARPETA, nombre))));
   const { mapeo } = detectarColumnas(tabla.filas);
   return mapeo ? extraerLineas(tabla.filas, mapeo).lineas : [];
 }
@@ -49,9 +49,9 @@ describe('F04: set de listas de prueba', () => {
 
   const resultados = new Map<string, boolean>();
 
-  it.each(listas)('%s', (nombre) => {
+  it.each(listas)('%s', async (nombre) => {
     const esperado = JSON.parse(readFileSync(join(CARPETA, `${nombre}.esperado.json`), 'utf-8')) as Esperado;
-    const lineas = leer(nombre);
+    const lineas = await leer(nombre);
     const ok = coincide(lineas, esperado);
     resultados.set(nombre, ok);
     // Si falla, mostrar la diferencia completa.

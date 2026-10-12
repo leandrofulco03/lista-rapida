@@ -2,6 +2,17 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 2: lectura de listas en PDF (F05)
+
+- **pdf.js (`pdfjs-dist` 6.3.289), versión "legacy"**, como pide la spec. La versión moderna usa funciones que no tienen los navegadores de celulares de hace un par de años (por ejemplo `Promise.try`); la legacy funciona en ellos.
+- **Columnas por posición:** los textos a la misma altura forman un renglón; los textos pegados (menos de media letra de distancia) son una misma celda; las columnas son las franjas horizontales que ocupan los textos en los renglones con más de un dato. Una franja cuenta si la ocupa más del 5% de esos renglones, así un título o un rubro que cruza columnas no las junta. Un texto suelto (membrete, rubro, pie de página) queda en la columna donde empieza, como en Excel.
+- **Después de armar la tabla, todo sigue igual que en Excel/CSV:** detección de títulos, mapeo recordado por proveedor (F06) y filas salteadas con su motivo. En un PDF, "fila" es el número de renglón con texto del documento, de arriba hacia abajo y página por página.
+- **Rubros:** un renglón con un solo texto y sin precio se toma como rubro, esté en la columna que esté (en los PDF suelen ir sobre el margen, debajo de "Código"). Antes sólo se reconocían en la columna de la descripción. Vale también para Excel y CSV.
+- **Motor de pdf.js en su propio Web Worker,** abierto desde el worker de lectura. Descartado: cargarlo dentro del worker de lectura (pdf.js se adueña de los mensajes del worker donde se carga y la lectura se colgaba). El código de PDF se baja sólo cuando se sube un PDF, pero queda guardado para usar la app sin conexión.
+- **PDF escaneados (sin texto):** se avisa que parece una foto y se sugiere pedir Excel o un PDF hecho en computadora. Leer fotos es F13 (con IA, fuera del MVP). PDF con contraseña: se avisa.
+- **12 PDF de prueba sintéticos** (`tests/fixtures/sinteticas-pdf/`) armados con reportlab; se leen 12 de 12 (meta: 85%). La medida es optimista: todos salen del mismo programa y los armamos sabiendo cómo los lee la app.
+- **Pendiente para con PDF reales:** descripciones partidas en dos renglones, tablas en dos columnas por página y PDF con columnas muy juntas. Se ven cuando tengamos listas reales.
+
 ## 12/10/2026 · Fase 2: lectura de listas Excel y CSV (F04, F06)
 
 - **Orden:** Excel/CSV primero; PDF (F05) en un PR aparte; WhatsApp (Web Share Target) después. Decisiones de Leandro (respuestas 1B 2A 3A 4A 5B).

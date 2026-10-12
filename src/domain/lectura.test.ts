@@ -115,6 +115,12 @@ describe('extraerLineas', () => {
     ]);
   });
 
+  it('toma como rubro un texto solo aunque esté en la columna del código', () => {
+    const filas = [...LISTA_SIMPLE.slice(0, 6), ['PERFUMERÍA', null, null, null], LISTA_SIMPLE[8]!];
+    const { salteadas } = extraerLineas(filas, mapeo);
+    expect(salteadas).toEqual([{ fila: 7, motivo: 'titulo', texto: 'PERFUMERÍA' }]);
+  });
+
   it('saltea los títulos repetidos en cada página', () => {
     const filas = [...LISTA_SIMPLE.slice(0, 6), ['Código', 'Descripción', 'Presentación', 'Precio s/IVA'], LISTA_SIMPLE[8]!];
     const { lineas, salteadas } = extraerLineas(filas, mapeo);

@@ -1,7 +1,7 @@
 import type { Centavos } from './dinero';
 
 /**
- * Formato común que devuelven todos los lectores de listas (Excel, CSV y, más adelante, PDF y fotos).
+ * Formato común que devuelven todos los lectores de listas (Excel, CSV, PDF y, más adelante, fotos).
  * El resto de la app sólo conoce este formato, no el archivo de origen.
  */
 export interface LineaLista {
@@ -13,6 +13,6 @@ export interface LineaLista {
   costo: Centavos;
   /** true / false si el encabezado del precio lo dice ("c/IVA", "+ IVA"); null si hay que usar lo del proveedor. */
   ivaIncluido: boolean | null;
-  /** Número de fila en el archivo, contando desde 1 como lo muestra Excel. */
+  /** Número de fila en el archivo, contando desde 1 como lo muestra Excel. En un PDF, el número de renglón con texto. */
   filaOrigen: number;
 }

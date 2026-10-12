@@ -133,7 +133,7 @@ export function PantallaSubirLista({ onVolver }: Props) {
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
       <h1 className="text-2xl font-bold">Subí una lista</h1>
-      <p className="mt-1 text-stone-600">Excel o CSV. Los precios no cambian hasta que los revises.</p>
+      <p className="mt-1 text-stone-600">Excel, CSV o PDF. Los precios no cambian hasta que los revises.</p>
 
       <form onSubmit={leer} noValidate className="mt-6 space-y-6">
         <div>
