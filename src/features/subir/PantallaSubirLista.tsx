@@ -18,6 +18,8 @@ import { ResumenLectura } from './ResumenLectura';
 
 interface Props {
   config: ConfigComercio;
+  /** Imprimir las etiquetas de los productos que cambiaron de precio (F10). */
+  onEtiquetas: (productos: number[]) => void;
   onVolver: () => void;
 }
 
@@ -38,7 +40,7 @@ type Paso =
   | { tipo: 'revision'; proveedor: Proveedor; archivo: string; lineas: { linea: LineaLista; productoId: number | null }[] };
 
 /** F04 + F06 + F07 + F09: subir la lista de un proveedor, leerla, unirla con el catálogo y revisar los precios nuevos. */
-export function PantallaSubirLista({ config, onVolver }: Props) {
+export function PantallaSubirLista({ config, onEtiquetas, onVolver }: Props) {
   const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
   const [elegido, setElegido] = useState<string>(NUEVO);
   const [nombreNuevo, setNombreNuevo] = useState('');
@@ -139,6 +141,7 @@ export function PantallaSubirLista({ config, onVolver }: Props) {
         lineas={paso.lineas}
         listaIncluyeIva={conIva}
         config={config}
+        onEtiquetas={onEtiquetas}
         onVolver={onVolver}
       />
     );

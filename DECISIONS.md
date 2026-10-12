@@ -2,6 +2,15 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 5: etiquetas para imprimir (F10)
+
+- **pdf-lib (1.17.1)** para armar el PDF (la spec daba a elegir entre pdf-lib y jsPDF). pdf-lib no tiene dependencias y mide todo en puntos exactos; con jsPDF habría que cuidar más las unidades. Se baja sólo cuando se arma el PDF, como pdf.js.
+- **Hoja A4 en tamaño real**, repartida en partes iguales: columnas × filas dentro de un margen. Formatos de fábrica: 24 (3 × 8), 40 (4 × 10), 21 (3 × 7) y 10 grandes (2 × 5), todos con margen de 10 mm para hoja común (las impresoras no imprimen al borde). En "Medidas a mano" se eligen columnas (1 a 6), filas (1 a 20) y margen (0 a 25 mm; 0 para hojas autoadhesivas que llegan al borde).
+- **El formato se recuerda en el dispositivo** (almacenamiento del navegador), no en la configuración: depende de la impresora y del papel de cada equipo. No viaja en la copia de seguridad.
+- **Cada etiqueta:** descripción en hasta dos renglones (si no entra, termina en "…"), precio grande a la derecha (sin centavos si son cero: "$ 1.580") y la fecha chica abajo. Borde gris finito para recortar. Los caracteres que la fuente del PDF no tiene (comillas tipográficas, guiones largos, emojis) se cambian por equivalentes o se sacan.
+- **Qué productos:** al terminar una revisión, "Imprimir sus N etiquetas" lleva los que cambiaron (la spec: "imprime etiquetas sólo de lo que cambió"). Desde el inicio, "Etiquetas" arranca con los que cambiaron en la última lista revisada, y se pueden sacar o agregar del catálogo.
+- **Pendiente:** la condición de F10 ("se imprimen alineadas en una impresora común") se prueba imprimiendo de verdad. El PDF mide exacto (verificado en las pruebas); lo que falta ver es el margen real de cada impresora. Si no alinea, se corrige con el margen.
+
 ## 12/10/2026 · Fase 5: copia de seguridad (F12)
 
 - **Orden de la Fase 5:** primero F12, porque protege lo que el comerciante ya carga (todo vive sólo en su dispositivo). Decisión de Leandro. Después F10 (etiquetas) y F11 (lista de precios y CSV).

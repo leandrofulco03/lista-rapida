@@ -66,3 +66,11 @@ export async function aplicarRevision(db: BaseListaRapida, datos: DatosAplicar, 
     return { importacionId, actualizados: aprobados.length };
   });
 }
+
+/** F10: productos a los que les cambió el precio en la última lista revisada (para imprimir sus etiquetas). */
+export async function productosUltimaRevision(db: BaseListaRapida): Promise<number[]> {
+  const ultima = (await db.importaciones.orderBy('fecha').reverse().toArray()).find((i) => i.estado === 'aprobada');
+  if (!ultima) return [];
+  const lineas = await db.lineasImportacion.where('importacionId').equals(ultima.id).toArray();
+  return lineas.filter((l) => l.estado === 'aprobada' && l.productoId !== null).map((l) => l.productoId!);
+}

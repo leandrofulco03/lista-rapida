@@ -3,6 +3,7 @@ import { db, exportarRespaldo, restaurarRespaldo } from '../../db';
 import { diasDesdeRespaldo, leerRespaldo, nombreArchivoRespaldo } from '../../domain/respaldo';
 import type { Respaldo } from '../../domain/respaldo';
 import { Boton } from '../../ui/Boton';
+import { descargar } from '../../ui/descargar';
 
 interface Props {
   /** Fecha del último respaldo; undefined si el comercio todavía no se configuró (primera vez en este dispositivo). */
@@ -11,16 +12,6 @@ interface Props {
   onExportado?: () => void;
   onRestaurado: () => void;
   onVolver: () => void;
-}
-
-/** Baja un archivo generado en el navegador. */
-function descargar(nombre: string, contenido: string) {
-  const url = URL.createObjectURL(new Blob([contenido], { type: 'application/json' }));
-  const enlace = document.createElement('a');
-  enlace.href = url;
-  enlace.download = nombre;
-  enlace.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function textoUltimo(ultimo: string | null): string {
@@ -46,7 +37,7 @@ export function PantallaRespaldo({ ultimoRespaldo, onExportado, onRestaurado, on
     setTrabajando(true);
     try {
       const respaldo = await exportarRespaldo(db);
-      descargar(nombreArchivoRespaldo(new Date(respaldo.fecha)), JSON.stringify(respaldo));
+      descargar(nombreArchivoRespaldo(new Date(respaldo.fecha)), JSON.stringify(respaldo), 'application/json');
       setExportado(true);
       onExportado?.();
     } catch (err) {

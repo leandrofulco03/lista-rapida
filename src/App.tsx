@@ -7,13 +7,14 @@ import { PantallaSubirLista } from './features/subir/PantallaSubirLista';
 import { PantallaCatalogo } from './features/catalogo/PantallaCatalogo';
 import { PantallaProveedores } from './features/proveedores/PantallaProveedores';
 import { PantallaRespaldo } from './features/respaldo/PantallaRespaldo';
+import { PantallaEtiquetas } from './features/etiquetas/PantallaEtiquetas';
 
-type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo';
+type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo' | 'etiquetas';
 
 type Estado =
   | { tipo: 'cargando' }
   | { tipo: 'sin-config'; restaurando?: boolean }
-  | { tipo: 'listo'; config: ConfigComercio; pantalla: Pantalla };
+  | { tipo: 'listo'; config: ConfigComercio; pantalla: Pantalla; etiquetas?: number[] };
 
 export function App() {
   const [estado, setEstado] = useState<Estado>({ tipo: 'cargando' });
@@ -37,11 +38,20 @@ export function App() {
     }
     return <PantallaConfig onGuardar={guardar} onRestaurar={() => setEstado({ tipo: 'sin-config', restaurando: true })} />;
   }
-  const ir = (pantalla: Pantalla) => setEstado({ ...estado, pantalla });
+  const ir = (pantalla: Pantalla) => setEstado({ ...estado, pantalla, etiquetas: undefined });
   if (estado.pantalla === 'config') {
     return <PantallaConfig inicial={estado.config} onGuardar={guardar} onCancelar={() => ir('inicio')} />;
   }
-  if (estado.pantalla === 'subir') return <PantallaSubirLista config={estado.config} onVolver={() => ir('inicio')} />;
+  if (estado.pantalla === 'subir') {
+    return (
+      <PantallaSubirLista
+        config={estado.config}
+        onEtiquetas={(productos) => setEstado({ ...estado, pantalla: 'etiquetas', etiquetas: productos })}
+        onVolver={() => ir('inicio')}
+      />
+    );
+  }
+  if (estado.pantalla === 'etiquetas') return <PantallaEtiquetas preseleccion={estado.etiquetas} onVolver={() => ir('inicio')} />;
   if (estado.pantalla === 'catalogo') return <PantallaCatalogo config={estado.config} onVolver={() => ir('inicio')} />;
   if (estado.pantalla === 'respaldo') {
     return (
