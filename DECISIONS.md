@@ -2,6 +2,12 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 12/10/2026 · Fase 1: los 20 casos de control los calcula Claude
+
+- **Elegido:** Claude calculó los 20 casos de la planilla con un cálculo aparte (aritmética decimal paso a paso, sin usar el código de la app). Leandro validó el procedimiento con el caso 1. Los 20 coinciden al centavo (`src/domain/casos-a-mano.test.ts`).
+- **Descartado:** que Leandro los calcule a mano (lo delegó).
+- **Por qué:** decisión de Leandro. **Límite:** el control es independiente del código, pero no de la interpretación de las reglas: si una regla se entendió mal, los dos cálculos fallan igual. Conviene que un comerciante revise algunos casos en el piloto.
+
 ## 12/10/2026 · F08: porcentajes en centésimos de punto
 
 - **Elegido:** todo porcentaje es un entero en centésimos de punto (21% = 2100; 10,5% = 1050; 33,33% = 3333).
