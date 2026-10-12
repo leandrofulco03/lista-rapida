@@ -1,4 +1,6 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
+import { PDFDocument } from 'pdf-lib';
 import type { Page } from '@playwright/test';
 
 const csv = (nombre: string, filas: string[]) => ({ name: nombre, mimeType: 'text/csv', buffer: Buffer.from(filas.join('\r\n')) });
@@ -10,7 +12,7 @@ async function configurar(page: Page) {
   await expect(page.getByRole('heading', { name: 'Almacén Don José' })).toBeVisible();
 }
 
-test('F09: se revisan los precios con los controles de seguridad y se guardan', async ({ page }) => {
+test('F09/F10: se revisan los precios con los controles de seguridad, se guardan y se imprimen sus etiquetas', async ({ page }) => {
   await configurar(page); // recargo 30%, redondeo a $10, venta con IVA
 
   await page.getByRole('button', { name: 'Catálogo' }).click();
@@ -67,7 +69,19 @@ test('F09: se revisan los precios con los controles de seguridad y se guardan', 
 
   await page.getByRole('button', { name: 'Guardar 4 precios' }).click();
   await expect(page.getByTestId('titulo-precios-guardados')).toHaveText('Actualizamos 4 precios');
-  await page.getByRole('button', { name: 'Listo' }).click();
+
+  // F10: etiquetas de lo que cambió.
+  await page.getByRole('button', { name: 'Imprimir sus 4 etiquetas' }).click();
+  await expect(page.getByRole('heading', { name: 'Productos (4)' })).toBeVisible();
+  await expect(page.getByTestId('productos-etiquetas')).toContainText('Aceite Natura 900 ml$ 3.150');
+  await page.getByRole('button', { name: '40 por hoja (4 × 10)' }).click();
+  await expect(page.getByTestId('medida-etiqueta')).toHaveText('Cada etiqueta mide 47,5 × 27,7 mm.');
+  await page.getByRole('button', { name: 'Sacar Yerba Playadito 1 kg' }).click();
+  const [descarga] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Bajar PDF (3 etiquetas, 1 hoja)' }).click()]);
+  expect(descarga.suggestedFilename()).toMatch(/^etiquetas-\d{4}-\d{2}-\d{2}\.pdf$/);
+  const pdf = await PDFDocument.load(readFileSync(await descarga.path()));
+  expect(pdf.getPageCount()).toBe(1);
+  await page.getByRole('button', { name: 'Volver' }).click();
 
   await page.getByRole('button', { name: 'Catálogo' }).click();
   const productos = page.getByTestId('lista-productos');

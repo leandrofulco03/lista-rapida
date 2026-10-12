@@ -62,3 +62,18 @@ it('guarda sólo lo aprobado, con historial, y deja la importación con todas su
     [aceite.id, 'ignorada', null, -1000],
   ]);
 });
+
+it('productosUltimaRevision: los aprobados de la última lista revisada', async () => {
+  const { productosUltimaRevision } = await import('./revision');
+  expect(await productosUltimaRevision(db)).toEqual([]);
+  const base = { proveedorId: 1, archivoNombre: 'x', totalLineas: 2, vinculadas: 2, estado: 'aprobada' as const };
+  const vieja = await db.importaciones.add({ ...base, fecha: '2026-10-01T00:00:00.000Z' });
+  const nueva = await db.importaciones.add({ ...base, fecha: '2026-10-10T00:00:00.000Z' });
+  const linea = { filaOrigen: 1, codigo: null, descripcion: 'x', costo: 1, costoAnterior: 1, precioSugerido: 1, precioFinal: 1, variacionPct: 0 };
+  await db.lineasImportacion.bulkAdd([
+    { ...linea, importacionId: vieja, productoId: 1, estado: 'aprobada' },
+    { ...linea, importacionId: nueva, productoId: 2, estado: 'aprobada' },
+    { ...linea, importacionId: nueva, productoId: 3, estado: 'ignorada' },
+  ]);
+  expect(await productosUltimaRevision(db)).toEqual([2]);
+});

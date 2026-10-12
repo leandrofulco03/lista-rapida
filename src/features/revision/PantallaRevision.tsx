@@ -15,6 +15,7 @@ interface Props {
   lineas: { linea: LineaLista; productoId: number | null }[];
   listaIncluyeIva: boolean;
   config: ConfigComercio;
+  onEtiquetas: (productos: number[]) => void;
   onVolver: () => void;
 }
 
@@ -37,7 +38,7 @@ function textoVariacion(v: number | null): string {
 }
 
 /** F09: revisión de los precios nuevos antes de guardarlos. Ningún precio cambia sin pasar por acá. */
-export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, config, onVolver }: Props) {
+export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, config, onEtiquetas, onVolver }: Props) {
   const [cargada, setCargada] = useState<Cargada | null>(null);
   const [decisiones, setDecisiones] = useState<Map<number, Decision>>(new Map());
   const [guardando, setGuardando] = useState(false);
@@ -70,9 +71,16 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
           {actualizados === 0 ? 'No cambiamos ningún precio' : `Actualizamos ${actualizados} ${actualizados === 1 ? 'precio' : 'precios'}`}
         </h1>
         <p className="mt-2 text-lg text-stone-700">Los cambios quedan en el historial de cada producto.</p>
-        <Boton type="button" onClick={onVolver} className="mt-6">
-          Listo
-        </Boton>
+        <div className="mt-6 space-y-3">
+          {actualizados > 0 && (
+            <Boton type="button" onClick={() => onEtiquetas([...decisiones.keys()])}>
+              Imprimir {actualizados === 1 ? 'su etiqueta' : `sus ${actualizados} etiquetas`}
+            </Boton>
+          )}
+          <Boton type="button" variante={actualizados > 0 ? 'secundario' : 'principal'} onClick={onVolver}>
+            Listo
+          </Boton>
+        </div>
       </main>
     );
   }

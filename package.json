@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "dexie": "^4.4.6",
+    "pdf-lib": "1.17.1",
     "pdfjs-dist": "6.3.289",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
