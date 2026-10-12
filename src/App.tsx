@@ -8,8 +8,9 @@ import { PantallaCatalogo } from './features/catalogo/PantallaCatalogo';
 import { PantallaProveedores } from './features/proveedores/PantallaProveedores';
 import { PantallaRespaldo } from './features/respaldo/PantallaRespaldo';
 import { PantallaEtiquetas } from './features/etiquetas/PantallaEtiquetas';
+import { PantallaListaPrecios } from './features/exportar/PantallaListaPrecios';
 
-type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo' | 'etiquetas';
+type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo' | 'etiquetas' | 'lista-precios';
 
 type Estado =
   | { tipo: 'cargando' }
@@ -47,9 +48,13 @@ export function App() {
       <PantallaSubirLista
         config={estado.config}
         onEtiquetas={(productos) => setEstado({ ...estado, pantalla: 'etiquetas', etiquetas: productos })}
+        onListaPrecios={() => ir('lista-precios')}
         onVolver={() => ir('inicio')}
       />
     );
+  }
+  if (estado.pantalla === 'lista-precios') {
+    return <PantallaListaPrecios nombreComercio={estado.config.nombreComercio} onVolver={() => ir('inicio')} />;
   }
   if (estado.pantalla === 'etiquetas') return <PantallaEtiquetas preseleccion={estado.etiquetas} onVolver={() => ir('inicio')} />;
   if (estado.pantalla === 'catalogo') return <PantallaCatalogo config={estado.config} onVolver={() => ir('inicio')} />;
