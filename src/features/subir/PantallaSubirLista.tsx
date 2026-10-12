@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from 'react';
 import type { FormEvent } from 'react';
 import { crearProveedor, db, guardarLecturaProveedor, listarProveedores } from '../../db';
 import type { Proveedor } from '../../db';
+import type { ConfigComercio } from '../../domain/config';
 import { detectarColumnas } from '../../domain/columnas';
 import type { Deteccion, MapeoColumnas } from '../../domain/columnas';
 import { aplicarMapeoGuardado, extraerLineas } from '../../domain/lectura';
@@ -11,10 +12,12 @@ import { EXTENSIONES_LISTA } from '../../parsers/tabla';
 import { Boton } from '../../ui/Boton';
 import { leerArchivoEnSegundoPlano } from '../../workers/leerArchivoEnSegundoPlano';
 import { PantallaMapeo } from '../mapeo/PantallaMapeo';
+import { PantallaRevision } from '../revision/PantallaRevision';
 import { PantallaVinculacion } from '../vinculacion/PantallaVinculacion';
 import { ResumenLectura } from './ResumenLectura';
 
 interface Props {
+  config: ConfigComercio;
   onVolver: () => void;
 }
 
@@ -31,10 +34,11 @@ type Paso =
   | { tipo: 'leyendo' }
   | ({ tipo: 'mapeo'; deteccion: Deteccion } & Leida)
   | ({ tipo: 'resultado'; mapeo: MapeoColumnas; automatico: boolean } & Leida)
-  | { tipo: 'vinculacion'; proveedor: Proveedor; lineas: LineaLista[] };
+  | { tipo: 'vinculacion'; proveedor: Proveedor; archivo: string; lineas: LineaLista[] }
+  | { tipo: 'revision'; proveedor: Proveedor; archivo: string; lineas: { linea: LineaLista; productoId: number | null }[] };
 
-/** F04 + F06 + F07: subir la lista de un proveedor, leerla y unirla con el catálogo. Todavía no cambia ningún precio. */
-export function PantallaSubirLista({ onVolver }: Props) {
+/** F04 + F06 + F07 + F09: subir la lista de un proveedor, leerla, unirla con el catálogo y revisar los precios nuevos. */
+export function PantallaSubirLista({ config, onVolver }: Props) {
   const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
   const [elegido, setElegido] = useState<string>(NUEVO);
   const [nombreNuevo, setNombreNuevo] = useState('');
@@ -110,7 +114,34 @@ export function PantallaSubirLista({ onVolver }: Props) {
   }
 
   if (paso.tipo === 'vinculacion') {
-    return <PantallaVinculacion proveedor={paso.proveedor} lineas={paso.lineas} onVolver={onVolver} />;
+    return (
+      <PantallaVinculacion
+        proveedor={paso.proveedor}
+        lineas={paso.lineas}
+        onSeguir={(elecciones) =>
+          setPaso({
+            tipo: 'revision',
+            proveedor: paso.proveedor,
+            archivo: paso.archivo,
+            lineas: paso.lineas.map((linea, i) => ({ linea, productoId: elecciones[i] ?? null })),
+          })
+        }
+        onVolver={onVolver}
+      />
+    );
+  }
+
+  if (paso.tipo === 'revision') {
+    return (
+      <PantallaRevision
+        proveedor={paso.proveedor}
+        archivo={paso.archivo}
+        lineas={paso.lineas}
+        listaIncluyeIva={conIva}
+        config={config}
+        onVolver={onVolver}
+      />
+    );
   }
 
   if (paso.tipo === 'resultado') {
@@ -131,7 +162,7 @@ export function PantallaSubirLista({ onVolver }: Props) {
             deteccion: { mapeo: paso.mapeo, confianza: 'alta' },
           })
         }
-        onComparar={() => setPaso({ tipo: 'vinculacion', proveedor: paso.proveedor, lineas: resultado.lineas })}
+        onComparar={() => setPaso({ tipo: 'vinculacion', proveedor: paso.proveedor, archivo: paso.archivo, lineas: resultado.lineas })}
         onVolver={onVolver}
       />
     );

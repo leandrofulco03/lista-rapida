@@ -29,7 +29,7 @@ export function App() {
   if (estado.pantalla === 'config') {
     return <PantallaConfig inicial={estado.config} onGuardar={guardar} onCancelar={() => ir('inicio')} />;
   }
-  if (estado.pantalla === 'subir') return <PantallaSubirLista onVolver={() => ir('inicio')} />;
+  if (estado.pantalla === 'subir') return <PantallaSubirLista config={estado.config} onVolver={() => ir('inicio')} />;
   if (estado.pantalla === 'catalogo') return <PantallaCatalogo config={estado.config} onVolver={() => ir('inicio')} />;
   if (estado.pantalla === 'proveedores') return <PantallaProveedores onVolver={() => ir('inicio')} />;
   return <PantallaInicio config={estado.config} onIr={ir} />;

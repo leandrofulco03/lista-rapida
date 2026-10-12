@@ -61,16 +61,18 @@ test('F07: la primera lista se confirma con un toque y la segunda se vincula sol
   const leche = page.getByTestId('grupo-dudosas').getByTestId('linea-vinculo').filter({ hasText: 'Leche La Serenísima entera 500 ml' });
   await expect(leche.getByRole('button', { name: 'Leche La Serenísima entera 1 l' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Guardar 31 vínculos' }).click();
-  await expect(page.getByTestId('titulo-vinculos-guardados')).toHaveText('31 de 40 productos vinculados');
-  await page.getByRole('button', { name: 'Listo' }).click();
+  await page.getByRole('button', { name: 'Guardar 31 vínculos y revisar precios' }).click();
+  // Sigue la revisión de precios (F09): todos los costos suben 23,45%. La yerba de 1 kg viene dos veces en la lista
+  // (vale la primera), así que sin vincular quedan las 9 que no están más la repetida.
+  await expect(page.getByTestId('resumen-revision')).toHaveText(/30\s*suben\s*0\s*bajan\s*0\s*sin cambios\s*10\s*sin vincular/);
+  await page.getByRole('button', { name: 'Salir' }).click();
 
   // Segunda lista del mismo proveedor: lo confirmado se reconoce solo.
   await subirLista(page);
   await expect(page.getByTestId('aviso-automatico')).toBeVisible();
   await page.getByRole('button', { name: 'Comparar con mi catálogo' }).click();
   await expect(page.getByTestId('resumen-vinculos')).toHaveText(/31\s*ya vinculados\s*0\s*sugeridos\s*5\s*para elegir\s*4\s*no están/);
-  await expect(page.getByRole('button', { name: 'Seguir' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Revisar precios' })).toBeVisible();
 });
 
 test('F07: sin catálogo, avisa que hay que cargarlo', async ({ page }) => {
