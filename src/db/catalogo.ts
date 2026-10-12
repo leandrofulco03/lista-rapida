@@ -5,11 +5,12 @@ import type { Porcentaje } from '../domain/dinero';
 import { calcularPrecioVenta, RECARGO_MAXIMO } from '../domain/precio';
 import { resolverRecargo } from '../domain/recargo';
 import { normalizarTexto } from '../domain/texto';
-import type { BaseListaRapida, Producto, Rubro } from './esquema';
+import { claveVinculo, normalizarDescripcion } from '../domain/vinculacion';
+import type { BaseListaRapida, Producto, Rubro, Vinculo } from './esquema';
 
 /**
  * F03: catálogo propio del comercio (productos y rubros).
- * La descripción normalizada se guarda para buscar y, en F07, para vincular con las listas.
+ * La descripción normalizada (con unidades unificadas) se guarda para buscar y para vincular con las listas (F07).
  */
 
 export const LARGO_MAXIMO_RUBRO = 40;
@@ -57,7 +58,7 @@ export async function listarProductos(db: BaseListaRapida): Promise<Producto[]> 
 
 /** Busca por código o por palabras de la descripción ("yerba 1 kg" encuentra "Yerba mate Playadito 1 kg"). */
 export function filtrarProductos(productos: readonly Producto[], busqueda: string): Producto[] {
-  const palabras = normalizarTexto(busqueda).split(' ').filter(Boolean);
+  const palabras = normalizarDescripcion(busqueda).split(' ').filter(Boolean);
   if (palabras.length === 0) return [...productos];
   return productos.filter((p) => {
     const texto = `${p.codigoInterno.toLowerCase()} ${p.descripcionNormalizada}`;
@@ -83,7 +84,7 @@ export async function guardarProducto(
     if (limpio.rubroId !== null && !(await db.rubros.get(limpio.rubroId))) throw new Error('No encontramos el rubro.');
     const producto = {
       ...limpio,
-      descripcionNormalizada: normalizarTexto(limpio.descripcion),
+      descripcionNormalizada: normalizarDescripcion(limpio.descripcion),
       actualizado: ahora.toISOString(),
     };
     if (id === undefined) return { ...producto, id: await db.productos.add(producto) };
@@ -155,7 +156,7 @@ export async function importarCatalogo(
     const guardar: Producto[] = [];
     const nuevos: Omit<Producto, 'id'>[] = [];
     for (const p of productos) {
-      const descripcionNormalizada = normalizarTexto(p.descripcion);
+      const descripcionNormalizada = normalizarDescripcion(p.descripcion);
       const existente = p.codigo ? porCodigo.get(clave(p.codigo)) : porDescripcion.get(descripcionNormalizada);
       const rubroId = p.rubro ? rubroPara(p.rubro).id : (existente?.rubroId ?? null);
       const recargoRubro = rubroId === null ? null : (recargoDeRubro.get(rubroId) ?? null);
@@ -200,5 +201,33 @@ export async function importarCatalogo(
     await db.productos.bulkPut(guardar);
     await db.productos.bulkAdd(nuevos as Producto[]);
     return { creados: nuevos.length, actualizados: guardar.length, rubrosCreados: nuevosRubros.length };
+  });
+}
+
+/** F07: vínculos confirmados de un proveedor, como clave de la línea → producto. */
+export async function vinculosDeProveedor(db: BaseListaRapida, proveedorId: number): Promise<Map<string, number>> {
+  const vinculos = await db.vinculos.where('[proveedorId+codigoProveedor]').between([proveedorId, ''], [proveedorId, '￿']).toArray();
+  return new Map(vinculos.map((v) => [v.codigoProveedor, v.productoId]));
+}
+
+export interface VinculoNuevo {
+  codigo: string | null;
+  descripcion: string;
+  productoId: number;
+}
+
+/** F07: guarda (o cambia) los vínculos que confirmó el comerciante. La próxima lista los usa solos. */
+export async function guardarVinculos(db: BaseListaRapida, proveedorId: number, vinculos: readonly VinculoNuevo[]): Promise<void> {
+  await db.transaction('rw', db.vinculos, async () => {
+    const existentes = await db.vinculos.where('[proveedorId+codigoProveedor]').between([proveedorId, ''], [proveedorId, '￿']).toArray();
+    const porClave = new Map(existentes.map((v) => [v.codigoProveedor, v.id]));
+    // Si la lista repite una línea, vale la última elección.
+    const porClaveNueva = new Map(vinculos.map((v) => [claveVinculo(v.codigo, v.descripcion), v]));
+    const filas = [...porClaveNueva].map(([codigoProveedor, v]) => {
+      const id = porClave.get(codigoProveedor);
+      const fila = { proveedorId, codigoProveedor, descripcionProveedor: v.descripcion, productoId: v.productoId, confirmado: true };
+      return id === undefined ? fila : { ...fila, id };
+    });
+    await db.vinculos.bulkPut(filas as Vinculo[]);
   });
 }

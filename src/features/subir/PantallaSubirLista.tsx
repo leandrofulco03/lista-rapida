@@ -5,11 +5,13 @@ import type { Proveedor } from '../../db';
 import { detectarColumnas } from '../../domain/columnas';
 import type { Deteccion, MapeoColumnas } from '../../domain/columnas';
 import { aplicarMapeoGuardado, extraerLineas } from '../../domain/lectura';
+import type { LineaLista } from '../../domain/lineaLista';
 import type { Tabla } from '../../parsers/tabla';
 import { EXTENSIONES_LISTA } from '../../parsers/tabla';
 import { Boton } from '../../ui/Boton';
 import { leerArchivoEnSegundoPlano } from '../../workers/leerArchivoEnSegundoPlano';
 import { PantallaMapeo } from '../mapeo/PantallaMapeo';
+import { PantallaVinculacion } from '../vinculacion/PantallaVinculacion';
 import { ResumenLectura } from './ResumenLectura';
 
 interface Props {
@@ -28,9 +30,10 @@ type Paso =
   | { tipo: 'elegir' }
   | { tipo: 'leyendo' }
   | ({ tipo: 'mapeo'; deteccion: Deteccion } & Leida)
-  | ({ tipo: 'resultado'; mapeo: MapeoColumnas; automatico: boolean } & Leida);
+  | ({ tipo: 'resultado'; mapeo: MapeoColumnas; automatico: boolean } & Leida)
+  | { tipo: 'vinculacion'; proveedor: Proveedor; lineas: LineaLista[] };
 
-/** F04 + F06: subir la lista de un proveedor y leerla. Todavía no cambia ningún precio. */
+/** F04 + F06 + F07: subir la lista de un proveedor, leerla y unirla con el catálogo. Todavía no cambia ningún precio. */
 export function PantallaSubirLista({ onVolver }: Props) {
   const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
   const [elegido, setElegido] = useState<string>(NUEVO);
@@ -106,12 +109,17 @@ export function PantallaSubirLista({ onVolver }: Props) {
     );
   }
 
+  if (paso.tipo === 'vinculacion') {
+    return <PantallaVinculacion proveedor={paso.proveedor} lineas={paso.lineas} onVolver={onVolver} />;
+  }
+
   if (paso.tipo === 'resultado') {
+    const resultado = extraerLineas(paso.tabla.filas, paso.mapeo);
     return (
       <ResumenLectura
         proveedor={paso.proveedor.nombre}
         archivo={paso.archivo}
-        resultado={extraerLineas(paso.tabla.filas, paso.mapeo)}
+        resultado={resultado}
         listaIncluyeIva={conIva}
         automatico={paso.automatico}
         onCorregir={() =>
@@ -123,6 +131,7 @@ export function PantallaSubirLista({ onVolver }: Props) {
             deteccion: { mapeo: paso.mapeo, confianza: 'alta' },
           })
         }
+        onComparar={() => setPaso({ tipo: 'vinculacion', proveedor: paso.proveedor, lineas: resultado.lineas })}
         onVolver={onVolver}
       />
     );

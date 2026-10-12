@@ -59,7 +59,7 @@ describe('rubros', () => {
 describe('productos', () => {
   it('guarda limpio, con la descripción normalizada, y no repite códigos', async () => {
     const guardado = await guardarProducto(db, yerba, undefined, AHORA);
-    expect(guardado).toMatchObject({ codigoInterno: 'A1', descripcion: 'Yerba Playadito 1 kg', descripcionNormalizada: 'yerba playadito 1 kg' });
+    expect(guardado).toMatchObject({ codigoInterno: 'A1', descripcion: 'Yerba Playadito 1 kg', descripcionNormalizada: 'yerba playadito 1000g' });
     await expect(guardarProducto(db, { ...yerba, codigoInterno: 'a1', descripcion: 'Otra' })).rejects.toThrow(
       'El código a1 ya es de Yerba Playadito 1 kg.',
     );

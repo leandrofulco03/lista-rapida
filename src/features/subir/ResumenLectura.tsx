@@ -12,13 +12,14 @@ interface Props {
   /** true si se usaron las columnas recordadas del proveedor sin preguntar. */
   automatico: boolean;
   onCorregir: () => void;
+  onComparar: () => void;
   onVolver: () => void;
 }
 
 const MOSTRAR = 100;
 
-/** F04: lo que se leyó de la lista. Comparar con el catálogo y actualizar precios llega con F07 y F09. */
-export function ResumenLectura({ proveedor, archivo, resultado, listaIncluyeIva, automatico, onCorregir, onVolver }: Props) {
+/** F04: lo que se leyó de la lista. Desde acá se compara con el catálogo (F07); actualizar precios llega con F09. */
+export function ResumenLectura({ proveedor, archivo, resultado, listaIncluyeIva, automatico, onCorregir, onComparar, onVolver }: Props) {
   const { lineas, salteadas } = resultado;
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
@@ -67,16 +68,15 @@ export function ResumenLectura({ proveedor, archivo, resultado, listaIncluyeIva,
       </ul>
       {lineas.length > MOSTRAR && <p className="mt-2 text-sm text-stone-600">Y {lineas.length - MOSTRAR} más.</p>}
 
-      <p className="mt-6 rounded-xl border border-dashed border-stone-300 bg-white p-4 text-stone-600">
-        Pronto vas a poder comparar esta lista con tu catálogo y actualizar los precios.
-      </p>
-
       <div className="mt-6 space-y-3">
-        <Boton type="button" onClick={onVolver}>
-          Listo
+        <Boton type="button" onClick={onComparar} disabled={lineas.length === 0}>
+          Comparar con mi catálogo
         </Boton>
         <Boton type="button" variante="secundario" onClick={onCorregir}>
           Corregir columnas
+        </Boton>
+        <Boton type="button" variante="secundario" onClick={onVolver}>
+          Volver
         </Boton>
       </div>
     </main>
