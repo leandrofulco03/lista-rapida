@@ -11,6 +11,8 @@ import { IVA_GENERAL, IVA_REDUCIDO, formatearPorcentaje, parsearPorcentaje } fro
 import { calcularPrecioVenta } from '../../domain/precio';
 import { resolverRecargo } from '../../domain/recargo';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoCatalogo } from '../../ui/Iconos';
 import { CampoTexto } from '../../ui/CampoTexto';
 import { Opciones } from '../../ui/Opciones';
 
@@ -92,7 +94,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">{producto ? 'Editar producto' : 'Producto nuevo'}</h1>
+      <Encabezado Icono={IconoCatalogo} titulo={producto ? 'Editar producto' : 'Producto nuevo'} />
 
       <form onSubmit={guardar} noValidate className="mt-6 space-y-6">
         <CampoTexto etiqueta="Descripción" valor={descripcion} onCambiar={setDescripcion} placeholder="Ej.: Yerba Playadito 1 kg" error={errores.descripcion} />
@@ -106,7 +108,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
             id={idRubro}
             value={rubroId ?? ''}
             onChange={(e) => setRubroId(e.target.value === '' ? null : Number(e.target.value))}
-            className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg"
+            className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
           >
             <option value="">Sin rubro</option>
             {rubros.map((r) => (

@@ -8,6 +8,8 @@ import type { LineaLista } from '../../domain/lineaLista';
 import { claveVinculo, IndiceCatalogo, vincularLinea } from '../../domain/vinculacion';
 import type { ResultadoVinculo } from '../../domain/vinculacion';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoCatalogo, IconoVincular } from '../../ui/Iconos';
 
 interface Props {
   proveedor: Proveedor;
@@ -125,10 +127,11 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
   if (todos.length === 0) {
     return (
       <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-        <h1 className="text-2xl font-bold">Tu catálogo está vacío</h1>
-        <p className="mt-2 text-lg text-stone-700">
-          Para comparar la lista hace falta tu catálogo. Cargalo desde Inicio → Catálogo y volvé a subir la lista.
-        </p>
+        <Encabezado
+          Icono={IconoCatalogo}
+          titulo="Tu catálogo está vacío"
+          descripcion="Para comparar la lista hace falta tu catálogo. Cargalo desde Inicio → Catálogo y volvé a subir la lista."
+        />
         <Boton type="button" onClick={onVolver} className="mt-6">
           Volver
         </Boton>
@@ -159,7 +162,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
       type="button"
       disabled={creando}
       onClick={() => darDeAlta([i])}
-      className="min-h-11 rounded-xl border border-stone-300 bg-white px-3 font-semibold text-green-800 disabled:opacity-50"
+      className="min-h-11 rounded-xl border border-stone-200 bg-white shadow-sm px-3 font-semibold text-green-800 disabled:opacity-50"
     >
       Dar de alta
     </button>
@@ -199,8 +202,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <p className="text-sm font-semibold text-green-800">{proveedor.nombre}</p>
-      <h1 className="mt-1 text-2xl font-bold">Comparamos con tu catálogo</h1>
+      <Encabezado Icono={IconoVincular} antetitulo={proveedor.nombre} titulo="Comparamos con tu catálogo" />
       <ul className="mt-4 grid grid-cols-2 gap-2 text-center" data-testid="resumen-vinculos">
         {[
           { n: grupos.vinculada.length, texto: 'ya vinculados' },
@@ -208,7 +210,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
           { n: grupos.dudosa.length, texto: 'para elegir' },
           { n: grupos.nueva.length, texto: 'no están' },
         ].map(({ n, texto }) => (
-          <li key={texto} className="rounded-xl border border-stone-300 bg-white p-2">
+          <li key={texto} className="rounded-xl border border-stone-200 bg-white shadow-sm p-2">
             <span className="block text-2xl font-bold">{n}</span>
             {texto}
           </li>
@@ -219,7 +221,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
         <section className="mt-6">
           <h2 className="text-lg font-semibold">¿Con cuál va? ({grupos.dudosa.length})</h2>
           <p className="text-sm text-stone-600">Se parecen a más de un producto, o el contenido no coincide.</p>
-          <ul className="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-300 bg-white" data-testid="grupo-dudosas">
+          <ul className="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white shadow-sm" data-testid="grupo-dudosas">
             {grupos.dudosa.map((i) =>
               fila(
                 i,
@@ -250,14 +252,14 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
         <section className="mt-6">
           <h2 className="text-lg font-semibold">Sugeridos ({grupos.sugerida.length})</h2>
           <p className="text-sm text-stone-600">Revisalos una vez; al guardar quedan vinculados para siempre.</p>
-          <ul className="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-300 bg-white" data-testid="grupo-sugeridas">
+          <ul className="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white shadow-sm" data-testid="grupo-sugeridas">
             {grupos.sugerida.map((i) => fila(i, elecciones[i] != null ? elegido(i) : sinProducto(i, 'Buscar en el catálogo')))}
           </ul>
         </section>
       )}
 
       {grupos.nueva.length > 0 && (
-        <details className="mt-6 rounded-xl border border-stone-300 bg-white p-3" data-testid="grupo-nuevas">
+        <details className="mt-6 rounded-xl border border-stone-200 bg-white shadow-sm p-3" data-testid="grupo-nuevas">
           <summary className="min-h-11 cursor-pointer content-center font-semibold">
             No están en tu catálogo ({grupos.nueva.length})
           </summary>
@@ -285,7 +287,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
       )}
 
       {grupos.vinculada.length > 0 && (
-        <details className="mt-4 rounded-xl border border-stone-300 bg-white p-3" data-testid="grupo-vinculadas">
+        <details className="mt-4 rounded-xl border border-stone-200 bg-white shadow-sm p-3" data-testid="grupo-vinculadas">
           <summary className="min-h-11 cursor-pointer content-center font-semibold">Ya vinculados ({grupos.vinculada.length})</summary>
           <ul className="mt-2 divide-y divide-stone-200">
             {grupos.vinculada.map((i) =>
@@ -337,12 +339,12 @@ function BuscarProducto({ productos, onElegir, onCancelar }: PropsBuscar) {
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
         placeholder="Código o palabras"
-        className="mt-1 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg"
+        className="mt-1 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
       />
       <ul className="mt-2 space-y-1">
         {encontrados.map((p) => (
           <li key={p.id}>
-            <button type="button" onClick={() => onElegir(p.id)} className="min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-left">
+            <button type="button" onClick={() => onElegir(p.id)} className="min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 py-2 text-left">
               {p.descripcion} <span className="text-sm text-stone-500">{p.codigoInterno}</span>
             </button>
           </li>

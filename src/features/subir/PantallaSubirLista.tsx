@@ -10,6 +10,8 @@ import type { LineaLista } from '../../domain/lineaLista';
 import type { Tabla } from '../../parsers/tabla';
 import { EXTENSIONES_LISTA } from '../../parsers/tabla';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoSubir } from '../../ui/Iconos';
 import { leerArchivoEnSegundoPlano } from '../../workers/leerArchivoEnSegundoPlano';
 import { PantallaMapeo } from '../mapeo/PantallaMapeo';
 import { PantallaRevision } from '../revision/PantallaRevision';
@@ -179,8 +181,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">Subí una lista</h1>
-      <p className="mt-1 text-stone-600">Excel, CSV o PDF. Los precios no cambian hasta que los revises.</p>
+      <Encabezado Icono={IconoSubir} titulo="Subí una lista" descripcion="Excel, CSV o PDF. Los precios no cambian hasta que los revises." />
 
       <form onSubmit={leer} noValidate className="mt-6 space-y-6">
         <div>
@@ -191,7 +192,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
             id={ids.proveedor}
             value={elegido}
             onChange={(e) => elegirProveedor(e.target.value)}
-            className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg"
+            className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
           >
             {proveedores.map((p) => (
               <option key={p.id} value={p.id}>
@@ -210,7 +211,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
                 value={nombreNuevo}
                 onChange={(e) => setNombreNuevo(e.target.value)}
                 placeholder="Ej.: Distribuidora El Sol"
-                className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg"
+                className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
               />
             </>
           )}
@@ -229,7 +230,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
                 aria-pressed={conIva === valor}
                 onClick={() => setConIva(valor)}
                 className={`min-h-11 rounded-xl border px-3 text-base font-medium ${
-                  conIva === valor ? 'border-green-700 bg-green-50 text-green-900' : 'border-stone-300 bg-white'
+                  conIva === valor ? 'border-green-600 bg-green-600 text-white shadow-md shadow-green-800/20' : 'border-stone-200 bg-white shadow-sm hover:border-green-300 hover:bg-green-50'
                 }`}
               >
                 {etiqueta}

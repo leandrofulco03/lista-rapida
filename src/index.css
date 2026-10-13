@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+/* Base visual: fondo suave con un toque del verde de la marca, tipografía del sistema y foco visible. */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--color-stone-50);
+    background-image: radial-gradient(120% 60% at 50% 0%, var(--color-green-100) 0%, transparent 60%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1 {
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 3px solid color-mix(in oklab, var(--color-green-600) 60%, transparent);
+    outline-offset: 2px;
+  }
+}

@@ -8,6 +8,8 @@ import { desglosarPrecio } from '../../domain/desglose';
 import type { DesglosePrecio } from '../../domain/desglose';
 import { DESCRIPCION_APP, NOMBRE_APP } from '../../marca';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoConfig } from '../../ui/Iconos';
 
 interface Props {
   inicial?: ConfigComercio;
@@ -72,12 +74,16 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
       {primeraVez ? (
         <header className="mb-6">
-          <h1 className="text-3xl font-bold text-green-800">{NOMBRE_APP}</h1>
-          <p className="mt-1 text-stone-600">{DESCRIPCION_APP}</p>
-          <p className="mt-4 text-lg">Contanos de tu comercio. Lo podés cambiar cuando quieras.</p>
+          <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-green-600 via-green-700 to-emerald-800 p-6 text-white shadow-xl shadow-green-900/20">
+            <div aria-hidden="true" className="absolute -top-12 -right-12 size-44 rounded-full bg-white/10" />
+            <img src="/icono.svg" alt="" className="relative size-12 rounded-xl shadow-sm ring-1 ring-white/30" />
+            <h1 className="relative mt-4 text-3xl font-bold">{NOMBRE_APP}</h1>
+            <p className="relative mt-1 text-green-50/90">{DESCRIPCION_APP}</p>
+          </div>
+          <p className="mt-6 text-lg">Contanos de tu comercio. Lo podés cambiar cuando quieras.</p>
         </header>
       ) : (
-        <h1 className="mb-6 text-2xl font-bold">Configuración</h1>
+        <Encabezado Icono={IconoConfig} titulo="Configuración" className="mb-6" />
       )}
 
       <form onSubmit={enviar} noValidate className="space-y-6">
@@ -91,7 +97,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Ej.: Almacén Don José"
             autoComplete="organization"
-            className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg"
+            className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
           />
           {errores.nombreComercio && <p className="mt-1 text-red-700">{errores.nombreComercio}</p>}
         </div>
@@ -106,7 +112,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
               value={recargoTexto}
               onChange={(e) => setRecargoTexto(e.target.value)}
               inputMode="decimal"
-              className="min-h-11 w-28 rounded-xl border border-stone-300 bg-white px-3 text-right text-lg"
+              className="min-h-11 w-28 rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-right text-lg"
             />
             <span className="text-lg">%</span>
           </div>
@@ -129,7 +135,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
                   aria-pressed={elegido}
                   onClick={() => setRedondeo(regla)}
                   className={`min-h-11 rounded-xl border px-3 text-base font-medium ${
-                    elegido ? 'border-green-700 bg-green-50 text-green-900' : 'border-stone-300 bg-white'
+                    elegido ? 'border-green-600 bg-green-600 text-white shadow-md shadow-green-800/20' : 'border-stone-200 bg-white shadow-sm hover:border-green-300 hover:bg-green-50'
                   }`}
                 >
                   {etiqueta}
@@ -141,7 +147,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
 
         {ejemplo !== null && <EjemploPrecio desglose={ejemplo} etiquetaRedondeo={etiquetaRedondeo} />}
 
-        <details className="rounded-xl border border-stone-300 bg-white p-3">
+        <details className="rounded-xl border border-stone-200 bg-white shadow-sm p-3">
           <summary className="min-h-11 cursor-pointer content-center text-base font-semibold">Opciones avanzadas</summary>
           <label className="mt-3 flex min-h-11 items-center gap-3">
             <input
@@ -162,7 +168,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
                   aria-pressed={ivaDefault === iva}
                   onClick={() => setIvaDefault(iva)}
                   className={`min-h-11 flex-1 rounded-xl border px-3 ${
-                    ivaDefault === iva ? 'border-green-700 bg-green-50 text-green-900' : 'border-stone-300 bg-white'
+                    ivaDefault === iva ? 'border-green-600 bg-green-600 text-white shadow-md shadow-green-800/20' : 'border-stone-200 bg-white shadow-sm hover:border-green-300 hover:bg-green-50'
                   }`}
                 >
                   {formatearPorcentaje(iva)}%

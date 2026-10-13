@@ -26,7 +26,7 @@ export function CampoTexto({ etiqueta, valor, onCambiar, error, ayuda, sufijo, c
           value={valor}
           onChange={(e) => onCambiar(e.target.value)}
           aria-invalid={error ? true : undefined}
-          className={`min-h-11 rounded-xl border border-stone-300 bg-white px-3 text-lg ${sufijo ? 'w-32 text-right' : 'w-full'} ${className}`}
+          className={`min-h-11 rounded-xl border border-stone-200 bg-white px-3 text-lg shadow-sm transition outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15 aria-invalid:border-red-500 ${sufijo ? 'w-32 text-right' : 'w-full'} ${className}`}
         />
         {sufijo && <span className="text-lg">{sufijo}</span>}
       </div>

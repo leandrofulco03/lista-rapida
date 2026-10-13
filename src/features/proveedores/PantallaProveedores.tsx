@@ -4,6 +4,8 @@ import { crearProveedor, db, listarProveedores } from '../../db';
 import type { Proveedor } from '../../db';
 import { formatearDescuentos } from '../../domain/proveedor';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoProveedores } from '../../ui/Iconos';
 import { CampoTexto } from '../../ui/CampoTexto';
 import { PantallaProveedor } from './PantallaProveedor';
 
@@ -51,13 +53,12 @@ export function PantallaProveedores({ onVolver }: Props) {
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">Proveedores</h1>
-      <p className="mt-1 text-stone-600">Cada proveedor recuerda cómo viene su lista.</p>
+      <Encabezado Icono={IconoProveedores} titulo="Proveedores" descripcion="Cada proveedor recuerda cómo viene su lista." />
 
       {proveedores.length === 0 ? (
         <p className="mt-6 rounded-xl bg-stone-100 p-3">Todavía no cargaste proveedores. También se crean al subir una lista.</p>
       ) : (
-        <ul className="mt-6 divide-y divide-stone-200 rounded-xl border border-stone-300 bg-white" data-testid="lista-proveedores">
+        <ul className="mt-6 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white shadow-sm" data-testid="lista-proveedores">
           {proveedores.map((p) => (
             <li key={p.id}>
               <button type="button" onClick={() => setAbierto(p)} className="flex min-h-11 w-full flex-col items-start p-3 text-left">

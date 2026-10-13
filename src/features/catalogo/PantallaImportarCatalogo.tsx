@@ -10,6 +10,8 @@ import type { FilaSalteada } from '../../domain/lectura';
 import { EXTENSIONES_LISTA } from '../../parsers/tabla';
 import type { Tabla } from '../../parsers/tabla';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoColumnas, IconoListo, IconoSubir } from '../../ui/Iconos';
 import { leerArchivoEnSegundoPlano } from '../../workers/leerArchivoEnSegundoPlano';
 import { SelectorColumnas } from '../mapeo/SelectorColumnas';
 import type { Seleccion } from '../mapeo/SelectorColumnas';
@@ -64,16 +66,14 @@ export function PantallaImportarCatalogo({ config, onVolver }: Props) {
     const { creados, actualizados, rubrosCreados } = paso.resultado;
     return (
       <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-        <h1 className="text-2xl font-bold" data-testid="titulo-importacion">
-          Importamos {creados + actualizados} productos
-        </h1>
+        <Encabezado Icono={IconoListo} titulo={`Importamos ${creados + actualizados} productos`} testIdTitulo="titulo-importacion" />
         <ul className="mt-4 space-y-1 text-lg" data-testid="resumen-importacion">
           <li>{creados} nuevos</li>
           <li>{actualizados} actualizados</li>
           {rubrosCreados > 0 && <li>{rubrosCreados} rubros nuevos</li>}
         </ul>
         {paso.salteadas.length > 0 && (
-          <details className="mt-4 rounded-xl border border-stone-300 bg-white p-3">
+          <details className="mt-4 rounded-xl border border-stone-200 bg-white shadow-sm p-3">
             <summary className="min-h-11 cursor-pointer content-center font-semibold">
               {paso.salteadas.length} {paso.salteadas.length === 1 ? 'fila salteada' : 'filas salteadas'}
             </summary>
@@ -96,11 +96,11 @@ export function PantallaImportarCatalogo({ config, onVolver }: Props) {
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">Importar catálogo</h1>
-      <p className="mt-1 text-stone-600">
-        Subí la planilla con tus productos: descripción y, si los tenés, código, rubro, costo, precio de venta e IVA. Los productos
-        que ya están (mismo código) se actualizan.
-      </p>
+      <Encabezado
+        Icono={IconoSubir}
+        titulo="Importar catálogo"
+        descripcion="Subí la planilla con tus productos: descripción y, si los tenés, código, rubro, costo, precio de venta e IVA. Los productos que ya están (mismo código) se actualizan."
+      />
       <form onSubmit={leer} noValidate className="mt-6 space-y-6">
         <div>
           <label htmlFor={idArchivo} className="block text-lg font-semibold">
@@ -163,8 +163,7 @@ function ElegirColumnasCatalogo({ archivo, tabla, deteccion, onConfirmar, onCanc
 
   return (
     <main className="mx-auto max-w-2xl px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">¿Qué columna es cada dato?</h1>
-      <p className="mt-1 break-words text-stone-600">{archivo}</p>
+      <Encabezado Icono={IconoColumnas} titulo="¿Qué columna es cada dato?" descripcion={archivo} />
       <p
         className={`mt-4 rounded-xl p-3 ${deteccion.confianza === 'alta' ? 'bg-green-50 text-green-900' : 'bg-amber-50 text-amber-900'}`}
         data-testid="aviso-mapeo"

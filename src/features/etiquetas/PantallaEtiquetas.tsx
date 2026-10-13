@@ -4,6 +4,8 @@ import type { Producto } from '../../db';
 import { FORMATOS, FORMATO_INICIAL, LIMITES_FORMATO, fechaEtiqueta, medidaEtiqueta, precioEtiqueta, validarFormato } from '../../domain/etiquetas';
 import type { FormatoEtiqueta } from '../../domain/etiquetas';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoEtiqueta } from '../../ui/Iconos';
 import { descargar } from '../../ui/descargar';
 
 interface Props {
@@ -98,15 +100,14 @@ export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
         max={limites[1]}
         value={Number.isNaN(valor) ? '' : valor}
         onChange={(e) => cambiar(e.target.valueAsNumber)}
-        className="mt-1 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg"
+        className="mt-1 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
       />
     </div>
   );
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">Etiquetas</h1>
-      <p className="mt-1 text-stone-600">Un PDF A4 con descripción, precio y fecha de cada producto.</p>
+      <Encabezado Icono={IconoEtiqueta} titulo="Etiquetas" descripcion="Un PDF A4 con descripción, precio y fecha de cada producto." />
 
       <section className="mt-6">
         <h2 className="text-lg font-semibold">Tamaño</h2>
@@ -119,14 +120,14 @@ export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
                 type="button"
                 aria-pressed={elegido}
                 onClick={() => elegirFormato(f.formato)}
-                className={`min-h-11 rounded-xl border px-3 text-base font-medium ${elegido ? 'border-green-700 bg-green-50 text-green-900' : 'border-stone-300 bg-white'}`}
+                className={`min-h-11 rounded-xl border px-3 text-base font-medium ${elegido ? 'border-green-600 bg-green-600 text-white shadow-md shadow-green-800/20' : 'border-stone-200 bg-white shadow-sm hover:border-green-300 hover:bg-green-50'}`}
               >
                 {f.nombre}
               </button>
             );
           })}
         </div>
-        <details className="mt-3 rounded-xl border border-stone-300 bg-white p-3">
+        <details className="mt-3 rounded-xl border border-stone-200 bg-white shadow-sm p-3">
           <summary className="min-h-11 cursor-pointer content-center font-semibold">Medidas a mano</summary>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {campoNumero(ids.columnas, 'Columnas', formato.columnas, (n) => elegirFormato({ ...formato, columnas: n }), LIMITES_FORMATO.columnas)}
@@ -149,7 +150,7 @@ export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
       <section className="mt-6">
         <h2 className="text-lg font-semibold">Productos ({seleccion.length})</h2>
         {seleccion.length === 0 && <p className="mt-1 text-stone-600">Buscá los productos o revisá una lista: los que cambian de precio aparecen acá.</p>}
-        <ul className="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-300 bg-white empty:hidden" data-testid="productos-etiquetas">
+        <ul className="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white shadow-sm empty:hidden" data-testid="productos-etiquetas">
           {seleccion.map((id) => {
             const p = productos.get(id)!;
             return (
@@ -178,7 +179,7 @@ export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           placeholder="Código o palabras"
-          className="mt-1 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg"
+          className="mt-1 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
         />
         <ul className="mt-2 space-y-1">
           {encontrados.map((p) => (
@@ -186,7 +187,7 @@ export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
               <button
                 type="button"
                 onClick={() => setSeleccion((s) => [...s, p.id])}
-                className="min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-left"
+                className="min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 py-2 text-left"
               >
                 + {p.descripcion} <span className="text-sm text-stone-500">{p.codigoInterno}</span>
               </button>

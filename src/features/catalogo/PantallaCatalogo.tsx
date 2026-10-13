@@ -4,6 +4,8 @@ import type { Producto, Rubro } from '../../db';
 import type { ConfigComercio } from '../../domain/config';
 import { formatearPesos } from '../../domain/dinero';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoCatalogo } from '../../ui/Iconos';
 import { PantallaImportarCatalogo } from './PantallaImportarCatalogo';
 import { PantallaProducto } from './PantallaProducto';
 import { PantallaRubros } from './PantallaRubros';
@@ -50,10 +52,12 @@ export function PantallaCatalogo({ config, onVolver }: Props) {
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">Catálogo</h1>
-      <p className="mt-1 text-stone-600" data-testid="cantidad-productos">
-        {productos.length === 1 ? '1 producto' : `${productos.length} productos`}
-      </p>
+      <Encabezado
+        Icono={IconoCatalogo}
+        titulo="Catálogo"
+        descripcion={productos.length === 1 ? '1 producto' : `${productos.length} productos`}
+        testIdDescripcion="cantidad-productos"
+      />
 
       <div className="mt-4 space-y-3">
         <Boton type="button" onClick={() => setVista({ tipo: 'producto', producto: null })}>
@@ -75,9 +79,9 @@ export function PantallaCatalogo({ config, onVolver }: Props) {
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar por descripción o código"
             aria-label="Buscar producto"
-            className="mt-6 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg"
+            className="mt-6 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
           />
-          <ul className="mt-3 divide-y divide-stone-200 rounded-xl border border-stone-300 bg-white" data-testid="lista-productos">
+          <ul className="mt-3 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white shadow-sm" data-testid="lista-productos">
             {filtrados.slice(0, MOSTRAR).map((p) => (
               <li key={p.id}>
                 <button

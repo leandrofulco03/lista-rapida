@@ -4,6 +4,8 @@ import { borrarRubro, db, guardarRubro, listarRubros } from '../../db';
 import type { Rubro } from '../../db';
 import { formatearPorcentaje, parsearPorcentaje } from '../../domain/porcentaje';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoCatalogo } from '../../ui/Iconos';
 import { CampoTexto } from '../../ui/CampoTexto';
 
 interface Props {
@@ -55,11 +57,14 @@ export function PantallaRubros({ onVolver }: Props) {
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">Rubros</h1>
-      <p className="mt-1 text-stone-600">Un rubro puede tener su propio recargo. Si no tiene, sus productos usan el general.</p>
+      <Encabezado
+        Icono={IconoCatalogo}
+        titulo="Rubros"
+        descripcion="Un rubro puede tener su propio recargo. Si no tiene, sus productos usan el general."
+      />
 
       {rubros.length > 0 && (
-        <ul className="mt-6 divide-y divide-stone-200 rounded-xl border border-stone-300 bg-white" data-testid="lista-rubros">
+        <ul className="mt-6 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white shadow-sm" data-testid="lista-rubros">
           {rubros.map((r) => (
             <li key={r.id}>
               <button type="button" onClick={() => editar(r)} className="flex min-h-11 w-full items-center justify-between p-3 text-left">
@@ -71,7 +76,7 @@ export function PantallaRubros({ onVolver }: Props) {
         </ul>
       )}
 
-      <form onSubmit={guardar} noValidate className="mt-6 space-y-4 rounded-xl border border-stone-300 bg-white p-3">
+      <form onSubmit={guardar} noValidate className="mt-6 space-y-4 rounded-xl border border-stone-200 bg-white shadow-sm p-3">
         <h2 className="text-lg font-semibold">{editando ? `Editar ${editando.nombre}` : 'Rubro nuevo'}</h2>
         <CampoTexto etiqueta="Nombre del rubro" valor={nombre} onCambiar={setNombre} placeholder="Ej.: Almacén" />
         <CampoTexto etiqueta="Recargo del rubro" valor={recargoTexto} onCambiar={setRecargoTexto} sufijo="%" inputMode="decimal" placeholder="General" />

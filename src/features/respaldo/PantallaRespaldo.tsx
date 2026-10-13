@@ -3,6 +3,8 @@ import { db, exportarRespaldo, restaurarRespaldo } from '../../db';
 import { diasDesdeRespaldo, leerRespaldo, nombreArchivoRespaldo } from '../../domain/respaldo';
 import type { Respaldo } from '../../domain/respaldo';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoRespaldo } from '../../ui/Iconos';
 import { descargar } from '../../ui/descargar';
 
 interface Props {
@@ -70,10 +72,11 @@ export function PantallaRespaldo({ ultimoRespaldo, onExportado, onRestaurado, on
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">Copia de seguridad</h1>
-      <p className="mt-1 text-stone-600">
-        Tus datos están sólo en este dispositivo. Guardá una copia para no perderlos y para pasarlos a otro celular o computadora.
-      </p>
+      <Encabezado
+        Icono={IconoRespaldo}
+        titulo="Copia de seguridad"
+        descripcion="Tus datos están sólo en este dispositivo. Guardá una copia para no perderlos y para pasarlos a otro celular o computadora."
+      />
 
       {configurado && (
         <section className="mt-6">

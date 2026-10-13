@@ -4,6 +4,8 @@ import type { Producto } from '../../db';
 import { fechaEtiqueta } from '../../domain/etiquetas';
 import { agruparPorRubro, armarCsvCaja } from '../../domain/exportar';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoLista } from '../../ui/Iconos';
 import { descargar } from '../../ui/descargar';
 import { Opciones } from '../../ui/Opciones';
 
@@ -58,8 +60,11 @@ export function PantallaListaPrecios({ nombreComercio, onVolver }: Props) {
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <h1 className="text-2xl font-bold">Lista de precios</h1>
-      <p className="mt-1 text-stone-600">La lista para el mostrador en PDF, y un CSV para pasar los precios al sistema de caja.</p>
+      <Encabezado
+        Icono={IconoLista}
+        titulo="Lista de precios"
+        descripcion="La lista para el mostrador en PDF, y un CSV para pasar los precios al sistema de caja."
+      />
 
       <div className="mt-6">
         <Opciones

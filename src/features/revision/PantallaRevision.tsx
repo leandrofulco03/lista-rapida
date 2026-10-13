@@ -8,6 +8,8 @@ import { formatearPorcentaje } from '../../domain/porcentaje';
 import { aprobarTodo, armarRevision, avisoPrecio, evaluarPrecioManual } from '../../domain/revision';
 import type { Cambio, Decision, Revision } from '../../domain/revision';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoLista, IconoListo } from '../../ui/Iconos';
 
 interface Props {
   proveedor: Proveedor;
@@ -68,11 +70,13 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
   if (actualizados !== null) {
     return (
       <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-        <p className="text-sm font-semibold text-green-800">{proveedor.nombre}</p>
-        <h1 className="mt-1 text-2xl font-bold" data-testid="titulo-precios-guardados">
-          {actualizados === 0 ? 'No cambiamos ningún precio' : `Actualizamos ${actualizados} ${actualizados === 1 ? 'precio' : 'precios'}`}
-        </h1>
-        <p className="mt-2 text-lg text-stone-700">Los cambios quedan en el historial de cada producto.</p>
+        <Encabezado
+          Icono={IconoListo}
+          antetitulo={proveedor.nombre}
+          titulo={actualizados === 0 ? 'No cambiamos ningún precio' : `Actualizamos ${actualizados} ${actualizados === 1 ? 'precio' : 'precios'}`}
+          testIdTitulo="titulo-precios-guardados"
+          descripcion="Los cambios quedan en el historial de cada producto."
+        />
         <div className="mt-6 space-y-3">
           {actualizados > 0 && (
             <Boton type="button" onClick={() => onEtiquetas([...decisiones.keys()])}>
@@ -127,8 +131,7 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-28">
-      <p className="text-sm font-semibold text-green-800">{proveedor.nombre}</p>
-      <h1 className="mt-1 text-2xl font-bold">Revisá los precios</h1>
+      <Encabezado Icono={IconoLista} antetitulo={proveedor.nombre} titulo="Revisá los precios" />
       <ul className="mt-4 grid grid-cols-2 gap-2 text-center" data-testid="resumen-revision">
         {[
           { n: suben, texto: 'suben' },
@@ -136,7 +139,7 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
           { n: revision.sinCambios.length, texto: 'sin cambios' },
           { n: sinVincular, texto: 'sin vincular' },
         ].map(({ n, texto }) => (
-          <li key={texto} className="rounded-xl border border-stone-300 bg-white p-2">
+          <li key={texto} className="rounded-xl border border-stone-200 bg-white shadow-sm p-2">
             <span className="block text-2xl font-bold">{n}</span>
             {texto}
           </li>
@@ -163,7 +166,7 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
       </ul>
 
       {sinVincular > 0 && (
-        <details className="mt-6 rounded-xl border border-stone-300 bg-white p-3" data-testid="grupo-sin-vincular">
+        <details className="mt-6 rounded-xl border border-stone-200 bg-white shadow-sm p-3" data-testid="grupo-sin-vincular">
           <summary className="min-h-11 cursor-pointer content-center font-semibold">Sin vincular ({sinVincular})</summary>
           <p className="text-sm text-stone-600">No se cambia nada de estas líneas.</p>
           <ul className="mt-2 space-y-1">
@@ -182,7 +185,7 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
       )}
 
       {revision.noVinieron.length > 0 && (
-        <details className="mt-4 rounded-xl border border-stone-300 bg-white p-3" data-testid="grupo-no-vinieron">
+        <details className="mt-4 rounded-xl border border-stone-200 bg-white shadow-sm p-3" data-testid="grupo-no-vinieron">
           <summary className="min-h-11 cursor-pointer content-center font-semibold">No vinieron en esta lista ({revision.noVinieron.length})</summary>
           <p className="text-sm text-stone-600">Son de {proveedor.nombre} pero no están en esta lista. No se cambian.</p>
           <ul className="mt-2 space-y-1">
@@ -275,7 +278,7 @@ function TarjetaCambio({ cambio: c, decision, onDecidir }: PropsTarjeta) {
               value={aMano}
               onChange={(e) => setAMano(e.target.value)}
               aria-invalid={manual && 'error' in manual && aMano.trim() !== '' ? true : undefined}
-              className="min-h-11 w-40 rounded-xl border border-stone-300 bg-white px-3 text-right text-lg"
+              className="min-h-11 w-40 rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-right text-lg"
             />
           </div>
           <p className="mt-1 text-sm text-stone-600">
@@ -307,7 +310,7 @@ function TarjetaCambio({ cambio: c, decision, onDecidir }: PropsTarjeta) {
             <button
               type="button"
               onClick={() => onDecidir({ precio: c.precioAnterior })}
-              className="min-h-11 rounded-xl border border-stone-300 bg-white px-3 font-semibold"
+              className="min-h-11 rounded-xl border border-stone-200 bg-white shadow-sm px-3 font-semibold"
             >
               Mantener {formatearPesos(c.precioAnterior)}
             </button>
@@ -315,7 +318,7 @@ function TarjetaCambio({ cambio: c, decision, onDecidir }: PropsTarjeta) {
           <button
             type="button"
             onClick={() => setAMano(c.precioSugerido > 0 ? pesosParaEditar(c.precioSugerido) : '')}
-            className="min-h-11 rounded-xl border border-stone-300 bg-white px-3 font-semibold"
+            className="min-h-11 rounded-xl border border-stone-200 bg-white shadow-sm px-3 font-semibold"
           >
             Otro precio
           </button>

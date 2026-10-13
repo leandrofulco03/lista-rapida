@@ -6,6 +6,8 @@ import { descuentoEfectivo, formatearDescuentos, parsearDescuentos } from '../..
 import { formatearPorcentaje } from '../../domain/porcentaje';
 import { NOMBRE_CAMPO } from '../mapeo/PantallaMapeo';
 import { Boton } from '../../ui/Boton';
+import { Encabezado } from '../../ui/Encabezado';
+import { IconoProveedores } from '../../ui/Iconos';
 import { CampoTexto } from '../../ui/CampoTexto';
 import { Opciones } from '../../ui/Opciones';
 
@@ -50,8 +52,7 @@ export function PantallaProveedor({ proveedor, onVolver }: Props) {
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <p className="text-sm font-semibold text-green-800">Proveedor</p>
-      <h1 className="mt-1 text-2xl font-bold">{proveedor.nombre}</h1>
+      <Encabezado Icono={IconoProveedores} antetitulo="Proveedor" titulo={proveedor.nombre} />
 
       <form onSubmit={guardar} noValidate className="mt-6 space-y-6">
         <CampoTexto etiqueta="Nombre" valor={nombre} onCambiar={setNombre} />
@@ -81,7 +82,7 @@ export function PantallaProveedor({ proveedor, onVolver }: Props) {
           }
         />
 
-        <section className="rounded-xl border border-stone-300 bg-white p-3" data-testid="columnas-recordadas">
+        <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-3" data-testid="columnas-recordadas">
           <h2 className="font-semibold">Columnas de su lista</h2>
           {columnas ? (
             <>

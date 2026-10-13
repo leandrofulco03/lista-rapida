@@ -18,8 +18,10 @@ export function Opciones<T>({ legend, opciones, valor, onElegir, ayuda }: Props<
             type="button"
             aria-pressed={o.valor === valor}
             onClick={() => onElegir(o.valor)}
-            className={`min-h-11 rounded-xl border px-3 text-base font-medium ${
-              o.valor === valor ? 'border-green-700 bg-green-50 text-green-900' : 'border-stone-300 bg-white'
+            className={`min-h-11 rounded-xl border px-3 text-base font-medium transition active:scale-[0.98] ${
+              o.valor === valor
+                ? 'border-green-600 bg-green-600 text-white shadow-md shadow-green-800/20'
+                : 'border-stone-200 bg-white shadow-sm hover:border-green-300 hover:bg-green-50'
             }`}
           >
             {o.etiqueta}
