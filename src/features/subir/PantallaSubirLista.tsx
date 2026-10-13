@@ -122,6 +122,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
       <PantallaVinculacion
         proveedor={paso.proveedor}
         lineas={paso.lineas}
+        ivaDefault={config.ivaDefault}
         onSeguir={(elecciones) =>
           setPaso({
             tipo: 'revision',

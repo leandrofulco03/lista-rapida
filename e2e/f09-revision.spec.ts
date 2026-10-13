@@ -61,6 +61,20 @@ test('F09/F10: se revisan los precios con los controles de seguridad, se guardan
   await expect(tarjetas.nth(0)).not.toContainText('Queda en');
   await expect(page.getByRole('button', { name: 'Guardar 3 precios' })).toBeVisible();
 
+  // Los fideos (+20%): el precio se escribe a mano. Costo 1200 + IVA = 1452.
+  await tarjetas.nth(1).getByRole('button', { name: 'Deshacer' }).click();
+  await tarjetas.nth(1).getByRole('button', { name: 'Otro precio' }).click();
+  const precio = tarjetas.nth(1).getByLabel('Precio de venta');
+  await precio.fill('0');
+  await expect(tarjetas.nth(1)).toContainText('El precio tiene que ser mayor que cero.');
+  await expect(tarjetas.nth(1).getByRole('button', { name: 'Aprobar', exact: true })).toBeDisabled();
+  await precio.fill('1.400');
+  await expect(tarjetas.nth(1)).toContainText('Queda por debajo del costo');
+  await precio.fill('1.990');
+  await expect(tarjetas.nth(1)).not.toContainText('Queda por debajo del costo');
+  await tarjetas.nth(1).getByRole('button', { name: 'Aprobar $ 1.990,00' }).click();
+  await expect(tarjetas.nth(1)).toContainText('Queda en $ 1.990,00');
+
   // La baja: mejor mantener el precio de hoy.
   await tarjetas.nth(2).getByRole('button', { name: 'Deshacer' }).click();
   await tarjetas.nth(2).getByRole('button', { name: /Mantener/ }).click();
@@ -86,6 +100,7 @@ test('F09/F10: se revisan los precios con los controles de seguridad, se guardan
   await page.getByRole('button', { name: 'Catálogo' }).click();
   const productos = page.getByTestId('lista-productos');
   await expect(productos.getByRole('button', { name: /Aceite Natura/ })).toContainText('$ 3.150,00');
+  await expect(productos.getByRole('button', { name: /Fideos Matarazzo/ })).toContainText('$ 1.990,00');
   // 1000 · 1,21 · 1,30 = 1573 → $1580, el precio que tenía el azúcar y se mantuvo.
   await expect(productos.getByRole('button', { name: /Azúcar Ledesma/ })).toContainText('$ 1.580,00');
 });

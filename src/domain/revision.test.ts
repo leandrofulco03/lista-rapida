@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CONFIG_SUGERIDA } from './config';
 import type { LineaLista } from './lineaLista';
-import { aprobarTodo, armarRevision, costoNeto, variacion } from './revision';
+import { aprobarTodo, armarRevision, avisoPrecio, costoNeto, decisionValida, evaluarPrecioManual, piso, variacion } from './revision';
 import type { DatosRevision, ProductoRevision } from './revision';
 
 const config = { ...CONFIG_SUGERIDA, nombreComercio: 'Almacén' }; // recargo 30%, redondeo a $10, venta con IVA
@@ -136,5 +136,60 @@ describe('armarRevision', () => {
     expect(r.sinVincular.map((l) => l.filaOrigen)).toEqual([2, 4]);
     expect(r.repetidas.map((l) => l.filaOrigen)).toEqual([3]);
     expect(r.noVinieron).toEqual([2, 3]);
+  });
+});
+
+describe('piso (lo que cuesta, medido como el precio de venta)', () => {
+  it('suma el IVA sólo si F08 lo suma, con descuentos, redondeando hacia arriba', () => {
+    expect(piso(100_000, [], 2100)).toBe(121_000);
+    expect(piso(100_000, [1000], 0)).toBe(90_000);
+    expect(piso(333, [], 1050)).toBe(368); // 367,965 → 368
+  });
+
+  it('armarRevision lo calcula con el IVA de la lista y de la venta', () => {
+    const sinIva = revisar([{ linea: linea(1, 100_000), productoId: 1 }], [producto(1, 80_000)], { descuentos: [1000] });
+    expect(sinIva.cambios[0]!.piso).toBe(108_900); // 1000 − 10% + 21%
+    // Lista con IVA: el IVA ya está en el costo.
+    const conIva = revisar([{ linea: linea(1, 121_000), productoId: 1 }], [producto(1, 90_000)], { listaIncluyeIva: true });
+    expect(conIva.cambios[0]!.piso).toBe(121_000);
+    // Vende sin IVA y la lista no lo trae: el piso es el costo.
+    const ventaSinIva = revisar([{ linea: linea(1, 100_000), productoId: 1 }], [producto(1, 90_000)], {
+      config: { ...config, ventaIncluyeIva: false },
+    });
+    expect(ventaSinIva.cambios[0]!.piso).toBe(100_000);
+  });
+});
+
+describe('evaluarPrecioManual (F09: precio escrito a mano)', () => {
+  const cambio = { piso: 121_000 };
+
+  it('lee el precio como lo escribe un comerciante', () => {
+    expect(evaluarPrecioManual('1.580', cambio)).toEqual({ precio: 158_000, aviso: null });
+    expect(evaluarPrecioManual('1580,50', cambio)).toEqual({ precio: 158_050, aviso: null });
+    expect(evaluarPrecioManual('$ 1.580', cambio)).toEqual({ precio: 158_000, aviso: null });
+    expect(evaluarPrecioManual('1210', cambio)).toEqual({ precio: 121_000, aviso: null });
+  });
+
+  it('tiene que ser mayor que cero y un número', () => {
+    expect(evaluarPrecioManual('', cambio)).toEqual({ error: 'Escribí el precio.' });
+    expect(evaluarPrecioManual('0', cambio)).toEqual({ error: 'El precio tiene que ser mayor que cero.' });
+    expect(evaluarPrecioManual('0,00', cambio)).toEqual({ error: 'El precio tiene que ser mayor que cero.' });
+    expect(evaluarPrecioManual('-100', cambio)).toHaveProperty('error');
+    expect(evaluarPrecioManual('mil', cambio)).toHaveProperty('error');
+    expect(evaluarPrecioManual('1.000.000.000', cambio)).toHaveProperty('error');
+  });
+
+  it('por debajo del costo se acepta, con aviso', () => {
+    expect(evaluarPrecioManual('1.209,99', cambio)).toEqual({ precio: 120_999, aviso: 'Queda por debajo del costo: vendés a pérdida.' });
+    expect(avisoPrecio(120_999, cambio)).not.toBeNull();
+    expect(avisoPrecio(121_000, cambio)).toBeNull();
+  });
+
+  it('decisionValida: sólo precios enteros mayores que cero', () => {
+    expect(decisionValida(null)).toBe(true);
+    expect(decisionValida({ precio: 1 })).toBe(true);
+    expect(decisionValida({ precio: 0 })).toBe(false);
+    expect(decisionValida({ precio: 10.5 })).toBe(false);
+    expect(decisionValida({ precio: -100 })).toBe(false);
   });
 });
