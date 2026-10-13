@@ -1,5 +1,5 @@
-import { normalizarProducto, siguienteCodigo, validarProducto } from '../domain/catalogo';
-import type { DatosProducto, ProductoArchivo } from '../domain/catalogo';
+import { normalizarProducto, planearAltas, siguienteCodigo, validarProducto } from '../domain/catalogo';
+import type { DatosProducto, LineaAlta, ProductoArchivo } from '../domain/catalogo';
 import type { ConfigComercio } from '../domain/config';
 import type { Porcentaje } from '../domain/dinero';
 import { calcularPrecioVenta, RECARGO_MAXIMO } from '../domain/precio';
@@ -230,5 +230,41 @@ export async function guardarVinculos(db: BaseListaRapida, proveedorId: number, 
       return id === undefined ? fila : { ...fila, id };
     });
     await db.vinculos.bulkPut(filas as Vinculo[]);
+  });
+}
+
+/**
+ * F07/F03: da de alta en el catálogo las líneas de la lista que el comercio no tiene, y las deja vinculadas
+ * a este proveedor (la próxima lista las reconoce solas). Todo en una transacción.
+ * Los productos quedan sin costo ni precio: no se guarda ningún precio fuera de la revisión (F09), donde
+ * aparecen como "sin costo anterior" y se aprueban de a uno.
+ * Devuelve el producto creado para cada línea, en el mismo orden (una línea repetida va con el mismo producto).
+ */
+export async function darDeAltaDesdeLista(
+  db: BaseListaRapida,
+  proveedorId: number,
+  lineas: readonly LineaAlta[],
+  ivaPct: Porcentaje,
+  ahora = new Date(),
+): Promise<Producto[]> {
+  return db.transaction('rw', db.productos, db.vinculos, async () => {
+    const usados = new Set((await db.productos.toArray()).map((p) => clave(p.codigoInterno)));
+    const altas = planearAltas(lineas, usados, ivaPct);
+    const productos = altas.map(({ datos }) => {
+      const limpio = normalizarProducto(datos);
+      const errores = Object.values(validarProducto(limpio));
+      if (errores.length > 0) throw new Error(`${limpio.descripcion || 'Una línea'}: ${errores[0]}`);
+      return { ...limpio, descripcionNormalizada: normalizarDescripcion(limpio.descripcion), actualizado: ahora.toISOString() };
+    });
+    const ids = await db.productos.bulkAdd(productos as Producto[], { allKeys: true });
+    const creados = productos.map((p, i) => ({ ...p, id: ids[i]! }));
+    await guardarVinculos(
+      db,
+      proveedorId,
+      altas.flatMap((alta, i) => alta.lineas.map((n) => ({ ...lineas[n]!, productoId: creados[i]!.id }))),
+    );
+    const porLinea: Producto[] = [];
+    altas.forEach((alta, i) => alta.lineas.forEach((n) => (porLinea[n] = creados[i]!)));
+    return porLinea;
   });
 }

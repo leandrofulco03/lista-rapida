@@ -1,16 +1,19 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { db, filtrarProductos, guardarVinculos, listarProductos, vinculosDeProveedor } from '../../db';
+import { borrarProducto, darDeAltaDesdeLista, db, filtrarProductos, guardarVinculos, listarProductos, vinculosDeProveedor } from '../../db';
 import type { Producto, Proveedor } from '../../db';
 import { formatearPesos } from '../../domain/dinero';
+import type { Porcentaje } from '../../domain/dinero';
 import type { LineaLista } from '../../domain/lineaLista';
-import { IndiceCatalogo, vincularLinea } from '../../domain/vinculacion';
+import { claveVinculo, IndiceCatalogo, vincularLinea } from '../../domain/vinculacion';
 import type { ResultadoVinculo } from '../../domain/vinculacion';
 import { Boton } from '../../ui/Boton';
 
 interface Props {
   proveedor: Proveedor;
   lineas: LineaLista[];
+  /** IVA de los productos que se dan de alta desde la lista (el de productos nuevos de la configuración). */
+  ivaDefault: Porcentaje;
   /** Sigue a la revisión de precios (F09) con el producto de cada línea (null: sin vincular). */
   onSeguir: (elecciones: (number | null)[]) => void;
   onVolver: () => void;
@@ -25,12 +28,19 @@ interface Comparacion {
 /** Producto elegido para cada línea (por posición). null: sin vincular. */
 type Elecciones = (number | null)[];
 
-/** F07: une cada línea de la lista con un producto del catálogo. Lo confirmado queda guardado para la próxima lista; después sigue la revisión de precios (F09). */
-export function PantallaVinculacion({ proveedor, lineas, onSeguir, onVolver }: Props) {
+/**
+ * F07: une cada línea de la lista con un producto del catálogo. Lo confirmado queda guardado para la próxima lista; después sigue la revisión de precios (F09).
+ * Lo que el comercio no tiene se puede dar de alta en el catálogo (sin precio: el precio se aprueba en la revisión).
+ */
+export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, onVolver }: Props) {
   const [comparacion, setComparacion] = useState<Comparacion | null>(null);
   const [elecciones, setElecciones] = useState<Elecciones>([]);
   const [buscando, setBuscando] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
+  /** Productos dados de alta desde esta lista (se pueden deshacer mientras se está acá). */
+  const [creados, setCreados] = useState<ReadonlySet<number>>(new Set());
+  const [creando, setCreando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([listarProductos(db), vinculosDeProveedor(db, proveedor.id)]).then(([todos, vinculados]) => {
@@ -56,13 +66,51 @@ export function PantallaVinculacion({ proveedor, lineas, onSeguir, onVolver }: P
   /** Lo que cambia respecto de lo ya guardado: sugeridas aceptadas, dudosas y nuevas elegidas, vinculadas cambiadas. */
   const cambios = lineas.flatMap((l, i) => {
     const productoId = elecciones[i];
-    if (productoId == null || productoId === (resultados[i]!.estado === 'vinculada' ? resultados[i]!.productoId : undefined)) return [];
+    // Los dados de alta ya quedaron vinculados al crearlos.
+    if (productoId == null || creados.has(productoId) || productoId === (resultados[i]!.estado === 'vinculada' ? resultados[i]!.productoId : undefined)) return [];
     return [{ codigo: l.codigo, descripcion: l.descripcion, presentacion: l.presentacion, productoId }];
   });
   const elegir = (i: number, productoId: number | null) => {
     setElecciones((actuales) => actuales.map((e, j) => (j === i ? productoId : e)));
     setBuscando(null);
   };
+
+  /** Líneas sin producto que se pueden dar de alta: las que no están, las dudosas y las sugeridas rechazadas. */
+  const sinElegir = (i: number) => elecciones[i] == null && resultados[i]!.estado !== 'vinculada';
+  const nuevasPendientes = grupos.nueva.filter(sinElegir);
+
+  async function darDeAlta(indices: number[]) {
+    // La misma línea repetida en la lista va con el mismo producto.
+    const clave = (i: number) => claveVinculo(lineas[i]!.codigo, lineas[i]!.descripcion, lineas[i]!.presentacion);
+    const claves = new Set(indices.map(clave));
+    const todas = lineas.flatMap((_, i) => (sinElegir(i) && claves.has(clave(i)) ? [i] : []));
+    setCreando(true);
+    setError(null);
+    try {
+      const nuevos = await darDeAltaDesdeLista(db, proveedor.id, todas.map((i) => lineas[i]!), ivaDefault);
+      const distintos = [...new Map(nuevos.map((p) => [p.id, p])).values()];
+      setComparacion((c) => c && { ...c, productos: new Map([...c.productos, ...distintos.map((p) => [p.id, p] as const)]), todos: [...c.todos, ...distintos] });
+      setCreados((actuales) => new Set([...actuales, ...distintos.map((p) => p.id)]));
+      setElecciones((actuales) => actuales.map((e, j) => (todas.includes(j) ? nuevos[todas.indexOf(j)]!.id : e)));
+      setBuscando(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No pudimos darlos de alta.');
+    } finally {
+      setCreando(false);
+    }
+  }
+
+  async function deshacerAlta(productoId: number) {
+    setCreando(true);
+    try {
+      await borrarProducto(db, productoId); // también borra su vínculo con esta lista
+      setComparacion((c) => c && { ...c, todos: c.todos.filter((p) => p.id !== productoId) });
+      setCreados((actuales) => new Set([...actuales].filter((id) => id !== productoId)));
+      setElecciones((actuales) => actuales.map((e) => (e === productoId ? null : e)));
+    } finally {
+      setCreando(false);
+    }
+  }
 
   async function guardar() {
     setGuardando(true);
@@ -106,15 +154,48 @@ export function PantallaVinculacion({ proveedor, lineas, onSeguir, onVolver }: P
         {texto}
       </button>
     );
+  const botonAlta = (i: number) => (
+    <button
+      type="button"
+      disabled={creando}
+      onClick={() => darDeAlta([i])}
+      className="min-h-11 rounded-xl border border-stone-300 bg-white px-3 font-semibold text-green-800 disabled:opacity-50"
+    >
+      Dar de alta
+    </button>
+  );
+  /** Sin producto elegido: buscar en el catálogo o darlo de alta como producto nuevo. */
+  const sinProducto = (i: number, texto?: string) => (
+    <div className="flex flex-wrap items-center gap-2">
+      {botonAlta(i)}
+      {botonBuscar(i, texto)}
+    </div>
+  );
   const elegido = (i: number) =>
-    elecciones[i] != null && (
+    elecciones[i] != null &&
+    (creados.has(elecciones[i]!) ? (
+      <div className="text-green-900">
+        <p className="flex flex-wrap items-center gap-x-2">
+          <span aria-hidden>✓</span> Alta en tu catálogo como <span className="font-semibold">{productos.get(elecciones[i]!)?.codigoInterno}</span>
+          <button
+            type="button"
+            disabled={creando}
+            onClick={() => deshacerAlta(elecciones[i]!)}
+            className="min-h-11 rounded-lg px-2 font-semibold text-stone-700 underline"
+          >
+            Deshacer
+          </button>
+        </p>
+        <p className="text-sm text-stone-600">Todavía sin precio: lo aprobás en la revisión.</p>
+      </div>
+    ) : (
       <p className="flex flex-wrap items-center gap-x-2 text-green-900">
         <span aria-hidden>✓</span> Va con <span className="font-semibold">{nombre(elecciones[i]!)}</span>
         <button type="button" onClick={() => elegir(i, null)} className="min-h-11 rounded-lg px-2 font-semibold text-stone-700 underline">
           {resultados[i]!.estado === 'sugerida' ? 'No es este' : 'Deshacer'}
         </button>
       </p>
-    );
+    ));
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
@@ -156,7 +237,7 @@ export function PantallaVinculacion({ proveedor, lineas, onSeguir, onVolver }: P
                         {nombre(o.productoId)}
                       </button>
                     ))}
-                    {botonBuscar(i)}
+                    {sinProducto(i)}
                   </div>
                 ),
               ),
@@ -170,7 +251,7 @@ export function PantallaVinculacion({ proveedor, lineas, onSeguir, onVolver }: P
           <h2 className="text-lg font-semibold">Sugeridos ({grupos.sugerida.length})</h2>
           <p className="text-sm text-stone-600">Revisalos una vez; al guardar quedan vinculados para siempre.</p>
           <ul className="mt-2 divide-y divide-stone-200 rounded-xl border border-stone-300 bg-white" data-testid="grupo-sugeridas">
-            {grupos.sugerida.map((i) => fila(i, elecciones[i] != null ? elegido(i) : botonBuscar(i, 'Buscar en el catálogo')))}
+            {grupos.sugerida.map((i) => fila(i, elecciones[i] != null ? elegido(i) : sinProducto(i, 'Buscar en el catálogo')))}
           </ul>
         </section>
       )}
@@ -181,9 +262,26 @@ export function PantallaVinculacion({ proveedor, lineas, onSeguir, onVolver }: P
             No están en tu catálogo ({grupos.nueva.length})
           </summary>
           <ul className="mt-2 divide-y divide-stone-200">
-            {grupos.nueva.map((i) => fila(i, elecciones[i] != null ? elegido(i) : botonBuscar(i, 'Buscar en el catálogo')))}
+            {grupos.nueva.map((i) => fila(i, elecciones[i] != null ? elegido(i) : sinProducto(i, 'Buscar en el catálogo')))}
           </ul>
         </details>
+      )}
+      {nuevasPendientes.length > 0 && (
+        <div className="mt-2">
+          <Boton type="button" variante="secundario" disabled={creando} onClick={() => darDeAlta(nuevasPendientes)}>
+            {creando
+              ? 'Dando de alta…'
+              : nuevasPendientes.length === 1
+                ? 'Dar de alta la que no está'
+                : `Dar de alta las ${nuevasPendientes.length} que no están`}
+          </Boton>
+          <p className="mt-1 text-sm text-stone-600">Quedan en tu catálogo sin precio; el precio lo aprobás en la revisión.</p>
+        </div>
+      )}
+      {error && (
+        <p role="alert" className="mt-2 text-red-700">
+          {error}
+        </p>
       )}
 
       {grupos.vinculada.length > 0 && (

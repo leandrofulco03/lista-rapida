@@ -2,6 +2,22 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 13/10/2026 · Alta desde la lista (F07/F03) y precio a mano en la revisión (F09)
+
+Dos pendientes de la Fase 3 y la Fase 4, antes del piloto con comercios reales.
+
+- **Alta en el catálogo desde la vinculación:** en las líneas que no están, en las dudosas y en las sugeridas rechazadas hay un botón "Dar de alta"; debajo de las que no están, "Dar de alta las N que no están" para todas juntas.
+  - **Qué se carga:** la descripción de la línea (con la presentación si la lista la trae en otra columna y la descripción no la dice), el código de la línea como código interno, sin rubro, sin recargo propio y con el IVA de productos nuevos de la configuración. Si el código ya es de otro producto, está vacío o tiene más de 30 letras, va uno automático (P0001…).
+  - **Sin rubro:** las líneas de la lista no traen el rubro (los títulos de rubro de la lista se saltean al leerla), así que lo más simple es dejarlo vacío; usa el recargo general hasta que el comerciante le ponga uno. Descartado: guardar el rubro de cada línea al leer la lista y crearlo si no existe; se suma si el piloto lo pide.
+  - **Sin costo ni precio:** el producto se crea con costo y precio en cero, y en la revisión (F09) aparece como "sin costo anterior": en rojo, fuera de "Aprobar todo", se aprueba de a uno. Así se respeta que ningún precio se guarde fuera de la revisión.
+  - **Queda vinculado en el momento:** el producto y su vínculo con la línea del proveedor se guardan juntos (una transacción), así la próxima lista lo reconoce solo aunque se salga sin guardar la vinculación. "Deshacer" borra el producto y su vínculo. Una línea repetida en la lista va con un solo producto.
+  - **Descartado:** dar de alta desde un catálogo vacío (con 300 líneas serían 300 aprobaciones de a una en la revisión; para eso está importar el catálogo).
+- **Precio a mano en la revisión:** cada cambio tiene "Otro precio", que abre un campo con el sugerido para corregir. Se aprueba con ese precio y el historial y la línea de la importación guardan el precio elegido (y el sugerido, para comparar).
+  - **Validación** (`evaluarPrecioManual`, en `src/domain/revision.ts`): tiene que ser un número mayor que cero y hasta $ 100.000.000. Si queda por debajo de lo que cuesta, se acepta con un aviso en rojo ("vendés a pérdida"): lo decide el comerciante. El aviso sigue a la vista después de aprobar, también si se eligió mantener el precio de antes.
+  - **"Lo que cuesta"** se mide como el precio de venta: el costo de la lista con los descuentos y, si el cálculo de F08 le suma el IVA, con IVA (redondeado hacia arriba al centavo). Comparar con el costo sin IVA del catálogo dejaba pasar precios que pierden el IVA.
+  - **`aplicarRevision` rechaza** cualquier precio que no sea un entero de centavos mayor que cero, sin guardar nada. Por eso un cambio con costo en cero ya no ofrece "Pasar a $ 0,00": se mantiene o se escribe el precio.
+  - **Descartado:** cambiar también el recargo del producto desde la revisión (sería tocar el catálogo desde otra pantalla); para eso está la ficha del producto.
+
 ## 12/10/2026 · Fase 6: piloto con comercios ficticios y nombre ListaMatch
 
 - **Nombre:** la app pasa a llamarse ListaMatch (elegido por Leandro entre su lista de opciones). Cambia lo que se ve: título, manifest de la PWA y el archivo de la copia de seguridad (`listamatch-respaldo-AAAA-MM-DD.json`). No cambia lo interno: la base del navegador sigue siendo `lista-rapida` y la marca dentro de la copia también, así nadie pierde datos y las copias viejas se siguen leyendo.
@@ -59,7 +75,7 @@ Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 - **"Aprobar todo" marca, no guarda:** se ve qué quedó aprobado y después se guarda con un botón fijo abajo. Mantener el precio igual actualiza el costo.
 - **Líneas repetidas** (dos líneas con el mismo producto): vale la primera; la otra se lista como repetida y no cambia nada.
 - **Al guardar** queda un registro en el historial de cada producto y la importación con todas sus líneas (aprobadas o no). No se guarda un borrador a medio revisar: si se sale, se vuelve a subir la lista y los vínculos ya están.
-- **Pendiente:** la condición de la fase ("300 productos se revisan en menos de 5 minutos") se mide con una persona y una lista real; dar de alta en el catálogo los productos que no están; editar a mano el precio final en la revisión.
+- **Pendiente:** la condición de la fase ("300 productos se revisan en menos de 5 minutos") se mide con una persona y una lista real; dar de alta en el catálogo los productos que no están y editar a mano el precio final en la revisión (hechos el 13/10/2026).
 
 ## 12/10/2026 · Fase 3: vinculación con el catálogo (F07)
 
@@ -69,7 +85,7 @@ Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 - **Calibración:** set de 30 productos y 40 líneas escritas como las escriben los proveedores (`tests/fixtures/vinculacion/casos.json`). Resultado: 31 de 31 existentes sugeridas con el producto correcto, ninguna sugerida equivocada, las 9 que el comercio no tiene quedan dudosas o nuevas. **La medida es optimista:** ajustamos la normalización mirando los fallos de este mismo set ("Hellmann's", "3x101g", "mts", "x50"). Hay que medirlo con listas reales.
 - **Vínculo recordado por proveedor:** la clave es el código de la línea en minúsculas; si la lista no trae códigos, la descripción normalizada (`desc:…`). Desde la segunda lista, lo confirmado se vincula solo; la prueba con el set da 100% de las que existen (meta: 85%), con y sin códigos.
 - **Pantalla de vinculación** después de leer la lista ("Comparar con mi catálogo"): arriba las dudosas (elegir entre opciones o buscar), después las sugeridas (se confirman todas con el botón de guardar; "No es este" para rechazar una), y plegadas las que no están y las ya vinculadas (se pueden cambiar). Sólo se guarda lo que el comerciante confirmó.
-- **Pendiente:** dar de alta en el catálogo los productos que no están.
+- **Pendiente:** dar de alta en el catálogo los productos que no están (hecho el 13/10/2026).
 
 ## 12/10/2026 · Fase 3: proveedores (F02) y catálogo propio (F03)
 

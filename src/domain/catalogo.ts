@@ -7,6 +7,7 @@ import type { FilaSalteada, MotivoSalteo } from './lectura';
 import { ALICUOTAS_IVA, parsearPorcentaje } from './porcentaje';
 import { RECARGO_MAXIMO } from './precio';
 import { normalizarTexto } from './texto';
+import { claveVinculo } from './vinculacion';
 
 /**
  * F03: importar el catálogo propio del comercio desde un Excel o CSV.
@@ -268,4 +269,67 @@ export function siguienteCodigo(usados: ReadonlySet<string>, desde = 1): { codig
     const codigo = `P${String(n).padStart(4, '0')}`;
     if (!usados.has(codigo.toLowerCase())) return { codigo, numero: n };
   }
+}
+
+/** Lo que hace falta de una línea de la lista para darla de alta en el catálogo. */
+export interface LineaAlta {
+  codigo: string | null;
+  descripcion: string;
+  presentacion?: string | null;
+}
+
+export interface Alta {
+  /** El producto a crear: sin costo ni precio todavía (los pone la revisión, F09). */
+  datos: DatosProducto;
+  /** Posiciones de las líneas que van con este producto (una línea repetida en la lista no crea dos). */
+  lineas: number[];
+}
+
+/**
+ * F07/F03: productos del catálogo para las líneas de la lista que el comercio no tiene.
+ * - Descripción: la de la línea, con la presentación si la lista la trae aparte ("Látex Alba" + "4 l").
+ * - Código: el de la línea si no lo usa otro producto (sin importar mayúsculas) y no es muy largo; si no, uno automático (P0001…).
+ * - Sin rubro, sin recargo propio, con el IVA de productos nuevos de la configuración.
+ * - Costo y precio en cero: el precio lo aprueba el comerciante en la revisión, como "sin costo anterior".
+ * - Dos líneas con la misma clave de vínculo (la misma línea repetida) van con un solo producto.
+ * `usados`: códigos del catálogo en minúsculas.
+ */
+export function planearAltas(lineas: readonly LineaAlta[], usados: ReadonlySet<string>, ivaPct: Porcentaje): Alta[] {
+  const ocupados = new Set(usados);
+  const porClave = new Map<string, Alta>();
+  let proximo = 1;
+  lineas.forEach((linea, i) => {
+    const k = claveVinculo(linea.codigo, linea.descripcion, linea.presentacion);
+    const existente = porClave.get(k);
+    if (existente) {
+      existente.lineas.push(i);
+      return;
+    }
+    const descripcion = descripcionAlta(linea);
+    const propio = linea.codigo?.replace(/\s+/g, ' ').trim() ?? '';
+    let codigoInterno: string;
+    if (propio !== '' && propio.length <= LARGO_MAXIMO_CODIGO && !ocupados.has(propio.toLowerCase())) {
+      codigoInterno = propio;
+    } else {
+      const siguiente = siguienteCodigo(ocupados, proximo);
+      codigoInterno = siguiente.codigo;
+      proximo = siguiente.numero + 1;
+    }
+    ocupados.add(codigoInterno.toLowerCase());
+    porClave.set(k, {
+      datos: { codigoInterno, descripcion, rubroId: null, recargoPct: null, ivaPct, costoActual: 0, precioVentaActual: 0 },
+      lineas: [i],
+    });
+  });
+  return [...porClave.values()];
+}
+
+/** Descripción del producto nuevo: la de la línea más la presentación (si no la dice ya), sin pasarse del largo máximo. */
+export function descripcionAlta(linea: LineaAlta): string {
+  const limpiar = (t: string) => t.replace(/\s+/g, ' ').trim();
+  const descripcion = limpiar(linea.descripcion);
+  const presentacion = limpiar(linea.presentacion ?? '');
+  const yaLaDice = presentacion === '' || normalizarTexto(descripcion).endsWith(normalizarTexto(presentacion));
+  const completa = yaLaDice ? descripcion : `${descripcion} ${presentacion}`;
+  return completa.length <= LARGO_MAXIMO_DESCRIPCION ? completa : `${completa.slice(0, LARGO_MAXIMO_DESCRIPCION - 1).trimEnd()}…`;
 }

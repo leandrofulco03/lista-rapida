@@ -2,7 +2,8 @@ import { CIEN_POR_CIENTO } from './dinero';
 import type { Centavos, Porcentaje } from './dinero';
 import type { ConfigComercio } from './config';
 import type { LineaLista } from './lineaLista';
-import { calcularPrecioVenta, RECARGO_MAXIMO } from './precio';
+import { leerImporte } from './importe';
+import { calcularPrecioVenta, ivaAplicable, RECARGO_MAXIMO } from './precio';
 import { resolverRecargo } from './recargo';
 
 /**
@@ -56,6 +57,11 @@ export interface Cambio {
   costoNuevo: Centavos;
   precioAnterior: Centavos;
   precioSugerido: Centavos;
+  /**
+   * Lo que cuesta el producto medido como el precio de venta: el costo de la lista con los descuentos y,
+   * si el cálculo de F08 le suma IVA, con IVA. Al centavo, hacia arriba. Vender por debajo es perder plata.
+   */
+  piso: Centavos;
   /** Variación del costo en centésimos de punto (puede ser negativa); null si no había costo para comparar. */
   variacion: Porcentaje | null;
   tipo: TipoCambio;
@@ -100,6 +106,17 @@ export function costoNeto(costo: Centavos, descuentos: readonly Porcentaje[], iv
     denominador *= BASE + BigInt(ivaPct);
   }
   return Number(dividirRedondeando(numerador, denominador));
+}
+
+/** Costo de la lista con los descuentos y el IVA que se le suma (0 si no se suma), redondeado hacia arriba al centavo. */
+export function piso(costo: Centavos, descuentos: readonly Porcentaje[], ivaPct: Porcentaje): Centavos {
+  let numerador = BigInt(costo) * (BASE + BigInt(ivaPct));
+  let denominador = BASE;
+  for (const d of descuentos) {
+    numerador *= BASE - BigInt(d);
+    denominador *= BASE;
+  }
+  return Number((numerador + denominador - 1n) / denominador);
 }
 
 /** Variación de `antes` a `despues` en centésimos de punto, redondeada; null si antes es cero. */
@@ -162,6 +179,7 @@ export function armarRevision(datos: DatosRevision): Revision {
       costoNuevo,
       precioAnterior: producto.precioVentaActual,
       precioSugerido,
+      piso: piso(linea.costo, datos.descuentos, ivaAplicable(ivaIncluido, config.ventaIncluyeIva) ? producto.ivaPct : 0),
       variacion: cambio,
       tipo,
       resaltado: cambio === null || Math.abs(cambio) > VARIACION_RESALTADA,
@@ -187,4 +205,32 @@ export type Decision = { precio: Centavos } | null;
  */
 export function aprobarTodo(cambios: readonly Cambio[]): Map<number, Decision> {
   return new Map(cambios.filter((c) => !c.individual).map((c) => [c.productoId, { precio: c.precioSugerido }]));
+}
+
+/** Precio máximo que se acepta a mano: $ 100.000.000. Más es casi seguro un error de tipeo. */
+export const PRECIO_MAXIMO: Centavos = 10_000_000_000;
+
+export type PrecioManual = { precio: Centavos; aviso: string | null } | { error: string };
+
+/**
+ * F09: precio de venta escrito a mano en vez del sugerido ("1.580", "1580,50", "$ 1.580").
+ * Tiene que ser mayor que cero. Si queda por debajo del costo, se acepta con un aviso: lo decide el comerciante.
+ */
+export function evaluarPrecioManual(texto: string, cambio: Pick<Cambio, 'piso'>): PrecioManual {
+  if (texto.trim() === '') return { error: 'Escribí el precio.' };
+  const precio = leerImporte(texto, 'ar');
+  if (precio === null || precio < 0) return { error: 'Escribí un precio válido, por ejemplo 1.580 o 1580,50.' };
+  if (precio === 0) return { error: 'El precio tiene que ser mayor que cero.' };
+  if (precio > PRECIO_MAXIMO) return { error: 'Ese precio es demasiado alto. Revisá los ceros.' };
+  return { precio, aviso: avisoPrecio(precio, cambio) };
+}
+
+/** Aviso si el precio no cubre el costo; null si está bien. */
+export function avisoPrecio(precio: Centavos, cambio: Pick<Cambio, 'piso'>): string | null {
+  return precio < cambio.piso ? 'Queda por debajo del costo: vendés a pérdida.' : null;
+}
+
+/** true si la decisión se puede guardar: sin cambio, o un precio entero mayor que cero. */
+export function decisionValida(decision: Decision): boolean {
+  return decision === null || (Number.isSafeInteger(decision.precio) && decision.precio > 0 && decision.precio <= PRECIO_MAXIMO);
 }

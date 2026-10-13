@@ -1,3 +1,4 @@
+import { decisionValida } from '../domain/revision';
 import type { Cambio, Decision } from '../domain/revision';
 import type { BaseListaRapida, LineaImportacion } from './esquema';
 
@@ -5,6 +6,7 @@ import type { BaseListaRapida, LineaImportacion } from './esquema';
  * F09: guarda lo que el comerciante aprobó. Es el único lugar que cambia precios a partir de una lista.
  * Cada producto aprobado toma el costo nuevo y el precio decidido, y queda un registro en el historial.
  * La importación queda guardada con sus líneas, aprobadas o no.
+ * El precio decidido puede ser el sugerido, el de antes o uno escrito a mano; tiene que ser mayor que cero.
  */
 export interface DatosAplicar {
   proveedorId: number;
@@ -21,6 +23,9 @@ export interface ResultadoAplicar {
 
 export async function aplicarRevision(db: BaseListaRapida, datos: DatosAplicar, ahora = new Date()): Promise<ResultadoAplicar> {
   const fecha = ahora.toISOString();
+  for (const decision of datos.decisiones.values()) {
+    if (!decisionValida(decision)) throw new Error('Hay un precio que no es válido. Revisalo antes de guardar.');
+  }
   return db.transaction('rw', [db.productos, db.historialPrecios, db.importaciones, db.lineasImportacion], async () => {
     const aprobados = datos.cambios.flatMap((c) => {
       const decision = datos.decisiones.get(c.productoId);
