@@ -6,16 +6,18 @@ import { diasDesdeRespaldo, tocaRecordarRespaldo } from '../../domain/respaldo';
 import { DESCRIPCION_APP, NOMBRE_APP } from '../../marca';
 import {
   IconoAlerta,
+  IconoAyuda,
   IconoCatalogo,
   IconoConfig,
   IconoEtiqueta,
+  IconoFlecha,
   IconoLista,
   IconoProveedores,
   IconoRespaldo,
   IconoSubir,
 } from '../../ui/Iconos';
 
-type Destino = 'subir' | 'catalogo' | 'proveedores' | 'config' | 'respaldo' | 'etiquetas' | 'lista-precios';
+type Destino = 'subir' | 'catalogo' | 'proveedores' | 'config' | 'respaldo' | 'etiquetas' | 'lista-precios' | 'ayuda';
 
 interface Props {
   config: ConfigComercio;
@@ -100,6 +102,22 @@ export function PantallaInicio({ config, onIr }: Props) {
           </button>
         ))}
       </nav>
+
+      {/* El texto no repite el nombre de ninguna sección de arriba: las pruebas buscan esos botones por su nombre. */}
+      <button
+        type="button"
+        onClick={() => onIr('ayuda')}
+        className="group mt-3 flex min-h-16 w-full items-center gap-3 rounded-2xl border border-green-200 bg-green-50 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md active:scale-[0.98]"
+      >
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white text-green-700 shadow-sm transition group-hover:bg-green-600 group-hover:text-white">
+          <IconoAyuda className="size-6" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-semibold text-green-900">¿Cómo se usa?</span>
+          <span className="block text-sm text-green-800">Guía paso a paso y preguntas frecuentes</span>
+        </span>
+        <IconoFlecha className="size-5 shrink-0 text-green-700" />
+      </button>
     </main>
   );
 }

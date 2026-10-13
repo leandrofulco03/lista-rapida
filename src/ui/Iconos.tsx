@@ -95,6 +95,19 @@ export const IconoVincular = (p: Props) => (
   </Icono>
 );
 
+export const IconoAyuda = (p: Props) => (
+  <Icono {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4M12 17h.01" />
+  </Icono>
+);
+
+export const IconoFlecha = (p: Props) => (
+  <Icono {...p}>
+    <path d="m9 6 6 6-6 6" />
+  </Icono>
+);
+
 export const IconoAlerta = (p: Props) => (
   <Icono {...p}>
     <path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />

@@ -9,8 +9,9 @@ import { PantallaProveedores } from './features/proveedores/PantallaProveedores'
 import { PantallaRespaldo } from './features/respaldo/PantallaRespaldo';
 import { PantallaEtiquetas } from './features/etiquetas/PantallaEtiquetas';
 import { PantallaListaPrecios } from './features/exportar/PantallaListaPrecios';
+import { PantallaAyuda } from './features/ayuda/PantallaAyuda';
 
-type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo' | 'etiquetas' | 'lista-precios';
+type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo' | 'etiquetas' | 'lista-precios' | 'ayuda';
 
 type Estado =
   | { tipo: 'cargando' }
@@ -69,5 +70,6 @@ export function App() {
     );
   }
   if (estado.pantalla === 'proveedores') return <PantallaProveedores onVolver={() => ir('inicio')} />;
+  if (estado.pantalla === 'ayuda') return <PantallaAyuda onIr={ir} onVolver={() => ir('inicio')} />;
   return <PantallaInicio config={estado.config} onIr={ir} />;
 }
