@@ -5,3 +5,5 @@ export * from './proveedores';
 export * from './catalogo';
 export * from './revision';
 export * from './respaldo';
+export * from './ventas';
+export * from './cola';

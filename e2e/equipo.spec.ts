@@ -22,13 +22,13 @@ test('el dueño invita a un empleado con un código; el empleado entra sin ver p
   await page.getByRole('button', { name: 'Unirme' }).click();
 
   await expect(page.getByRole('heading', { name: 'Almacén Don José' })).toBeVisible();
-  await expect(page.getByText('Ya sos parte del equipo')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Mis ventas de hoy' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Catálogo' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Proveedores' })).toHaveCount(0);
 
   // Al volver a abrir la app sigue adentro.
   await page.reload();
-  await expect(page.getByText('Ya sos parte del equipo')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Mis ventas de hoy' })).toBeVisible();
   await page.getByRole('button', { name: 'Salir' }).click();
 
   // El dueño lo ve en el equipo y lo puede quitar.

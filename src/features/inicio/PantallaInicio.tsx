@@ -1,6 +1,7 @@
 import type { ComponentType, SVGProps } from 'react';
 import type { ConfigComercio } from '../../domain/config';
 import { DESCRIPCION_APP, NOMBRE_APP } from '../../marca';
+import { AvisoPendientes } from '../ventas/cola';
 import {
   IconoAyuda,
   IconoCatalogo,
@@ -12,7 +13,7 @@ import {
   IconoSubir,
 } from '../../ui/Iconos';
 
-type Destino = 'subir' | 'catalogo' | 'proveedores' | 'config' | 'equipo' | 'etiquetas' | 'lista-precios' | 'ayuda';
+type Destino = 'subir' | 'catalogo' | 'proveedores' | 'config' | 'equipo' | 'etiquetas' | 'lista-precios' | 'ayuda' | 'vender' | 'ventas';
 
 interface Props {
   config: ConfigComercio;
@@ -33,8 +34,8 @@ const SECCIONES: { destino: Destino; etiqueta: string; Icono: ComponentType<SVGP
 ];
 
 /**
- * Inicio del dueño: la acción principal es subir una lista; desde acá también se llega al catálogo,
- * a los proveedores, al equipo y a la configuración.
+ * Inicio del dueño: lo principal es vender; desde acá también se llega al resumen de ventas, a subir una lista,
+ * al catálogo, a los proveedores, al equipo y a la configuración.
  */
 export function PantallaInicio({ config, email, onIr, onSalir }: Props) {
   return (
@@ -52,13 +53,32 @@ export function PantallaInicio({ config, email, onIr, onSalir }: Props) {
 
         <button
           type="button"
-          onClick={() => onIr('subir')}
+          onClick={() => onIr('vender')}
           className="relative mt-6 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 text-lg font-bold text-green-800 shadow-lg shadow-green-950/20 transition hover:bg-green-50 active:scale-[0.98]"
         >
-          <IconoSubir className="size-6" />
-          Subí una lista
+          Nueva venta
         </button>
+        <div className="relative mt-3 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => onIr('ventas')}
+            className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/40 bg-white/10 px-3 font-semibold text-white transition hover:bg-white/20 active:scale-[0.98]"
+          >
+            <IconoLista className="size-5" />
+            Ventas
+          </button>
+          <button
+            type="button"
+            onClick={() => onIr('subir')}
+            className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/40 bg-white/10 px-3 font-semibold text-white transition hover:bg-white/20 active:scale-[0.98]"
+          >
+            <IconoSubir className="size-5" />
+            Subí una lista
+          </button>
+        </div>
       </header>
+
+      <AvisoPendientes onVer={() => onIr('ventas')} />
 
       <nav aria-label="Secciones" className="mt-6 grid grid-cols-2 gap-3">
         {SECCIONES.map(({ destino, etiqueta, Icono }) => (
