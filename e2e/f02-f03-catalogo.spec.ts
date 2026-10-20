@@ -78,7 +78,7 @@ test('F03: se carga un producto a mano con el precio sugerido', async ({ page })
   await page.getByRole('button', { name: 'Volver' }).click();
 
   await page.getByRole('button', { name: 'Agregar producto' }).click();
-  await expect(page.getByLabel('Código')).toHaveValue('P0001');
+  await expect(page.getByLabel('Código', { exact: true })).toHaveValue('P0001');
   await page.getByLabel('Descripción').fill('Yerba Playadito 1 kg');
   await page.getByLabel('Rubro').selectOption({ label: 'Almacén' });
   await page.getByLabel('Costo').fill('1.000');

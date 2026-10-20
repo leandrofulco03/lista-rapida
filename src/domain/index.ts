@@ -15,3 +15,4 @@ export * from './catalogo';
 export * from './vinculacion';
 export * from './revision';
 export * from './respaldo';
+export * from './ventas';

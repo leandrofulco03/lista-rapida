@@ -14,6 +14,7 @@ import { calcularPrecioVenta } from '../../domain/precio';
 import { resolverRecargo } from '../../domain/recargo';
 import { Boton } from '../../ui/Boton';
 import { Encabezado } from '../../ui/Encabezado';
+import { Escaner, puedeEscanear } from '../../ui/Escaner';
 import { IconoCatalogo } from '../../ui/Iconos';
 import { CampoTexto } from '../../ui/CampoTexto';
 import { Opciones } from '../../ui/Opciones';
@@ -30,6 +31,8 @@ interface Props {
 export function PantallaProducto({ producto, rubros, config, onVolver }: Props) {
   const sesion = useSesion();
   const [codigo, setCodigo] = useState(producto?.codigoInterno ?? '');
+  const [barras, setBarras] = useState(producto?.codigoBarras ?? '');
+  const [escaneando, setEscaneando] = useState(false);
   const [descripcion, setDescripcion] = useState(producto?.descripcion ?? '');
   const [rubroId, setRubroId] = useState<Id | null>(producto?.rubroId ?? null);
   const [recargoTexto, setRecargoTexto] = useState(producto?.recargoPct != null ? formatearPorcentaje(producto.recargoPct) : '');
@@ -71,6 +74,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
     const precio = vacioOCero(precioTexto);
     const datos: DatosProducto = {
       codigoInterno: codigo,
+      codigoBarras: barras.trim() === '' ? null : barras,
       descripcion,
       rubroId,
       recargoPct: recargoTexto.trim() === '' ? null : (recargoPropio ?? -1),
@@ -102,6 +106,30 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
       <form onSubmit={guardar} noValidate className="mt-6 space-y-6">
         <CampoTexto etiqueta="Descripción" valor={descripcion} onCambiar={setDescripcion} placeholder="Ej.: Yerba Playadito 1 kg" error={errores.descripcion} />
         <CampoTexto etiqueta="Código" valor={codigo} onCambiar={setCodigo} error={errores.codigoInterno} ayuda="El de tu sistema o uno automático." />
+        <div>
+          <CampoTexto
+            etiqueta="Código de barras"
+            valor={barras}
+            onCambiar={setBarras}
+            inputMode="numeric"
+            error={errores.codigoBarras}
+            ayuda="El del envase, para vender escaneando. Opcional."
+          />
+          {puedeEscanear() && (
+            <button type="button" onClick={() => setEscaneando(true)} className="mt-1 min-h-11 font-semibold text-green-800 underline underline-offset-4">
+              Escanear con la cámara
+            </button>
+          )}
+          {escaneando && (
+            <Escaner
+              onCodigo={(c) => {
+                setBarras(c);
+                setEscaneando(false);
+              }}
+              onCerrar={() => setEscaneando(false)}
+            />
+          )}
+        </div>
 
         <div>
           <label htmlFor={idRubro} className="block text-lg font-semibold">

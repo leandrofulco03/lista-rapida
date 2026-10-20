@@ -2,6 +2,22 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 21/10/2026 · v2 Fase 8: ventas
+
+Decisiones de Leandro: el empleado ve sus tickets de hoy; se permite "Varios" con importe a mano; el empleado anula sus ventas del día y el dueño cualquiera, y la venta anulada queda marcada (no se borra).
+
+- **Dos formas de cargar, que se suman:** ticket por ticket, o "Total del día" (sólo el dueño) por medio de pago. La venta total de un período es tickets + total del día; el ticket promedio y los artículos salen sólo de los tickets, y el resumen avisa cuánto vino sin detalle. Si un día tiene tickets y total, el total es "lo que no se cargó por ticket" (lo dice la pantalla). Descartado: que el total del día reemplace a los tickets de ese día (habría que decidir cuál vale y se pierde uno de los dos).
+- **Tablas `ventas` y `venta_items`** (`supabase/migrations/20261021000000_ventas.sql`). Se escriben sólo por funciones; el dueño lee todas y el empleado las suyas (RLS).
+- **El costo se guarda en cada línea al vender**, desde la base (el empleado no lo ve), para calcular la ganancia real en la Fase 9 aunque después cambie el costo.
+- **Sin conexión:** cada venta se guarda primero en el dispositivo (Dexie, `src/db/cola.ts`) con un id creado ahí, y se manda a la base; si no hay internet, se reintenta al volver la conexión y cada 30 segundos. La base no duplica una venta que llega dos veces (mismo id). Una venta que la base rechaza queda marcada con el error, a la vista, y se puede descartar. La lista de productos para vender (sin costos) y los más vendidos también se guardan en el dispositivo, para buscar y escanear sin internet. Un producto borrado mientras la venta esperaba queda como línea sin producto.
+- **El día es el de Argentina** (`America/Argentina/Buenos_Aires`): una venta a las 23:30 cuenta en ese día, no en el siguiente de UTC. La semana va de lunes a domingo.
+- **Precio de cada línea:** el del producto al momento de agregarlo al ticket (el que vio el cliente). La base calcula subtotales y total; no confía en el total que manda el dispositivo.
+- **Cantidades con hasta 3 decimales** (fiambre por kilo). Se tocan con − y + o se escriben.
+- **Escáner:** con el detector de códigos del navegador (BarcodeDetector: Chrome en Android y computadoras). Donde no existe, el botón no aparece; un lector de códigos USB/Bluetooth funciona igual porque escribe el código y Enter en el buscador. Un código que llega antes de que carguen los productos se agrega apenas cargan. Descartado por ahora: una librería de lectura propia (zxing, ~400 kB) para iPhone; se suma si el piloto lo pide.
+- **Resumen (sólo el dueño):** día, semana o mes, contra el período anterior: venta total, ventas, ticket promedio, artículos, artículos por venta y cómo pagaron. Los gráficos son de la Fase 9.
+- **Inicio:** el dueño tiene "Nueva venta" como acción principal, con "Ventas" y "Subí una lista" debajo; el empleado, "Nueva venta" y "Mis ventas de hoy".
+- **Medios de pago:** efectivo, débito, crédito, Mercado Pago/QR y transferencia (fijos por ahora).
+
 ## 20/10/2026 · v2: de "actualizar precios" a "manejar el almacén o kiosco"
 
 Cambio de rumbo decidido por Leandro. La app sigue comparando las listas de los proveedores con los precios del comercio, pero se enfoca en almacenes y kioscos y suma ventas y análisis.

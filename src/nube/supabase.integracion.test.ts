@@ -10,8 +10,13 @@ import {
   listarEquipo,
   listarProductos,
   misComercios,
+  productosParaVender,
+  registrarVenta,
+  resumenVentas,
   unirseConCodigo,
+  ventasDelDia,
 } from '../db';
+import { diaDe } from '../domain/ventas';
 import { CONFIG_SUGERIDA } from '../domain/config';
 import { backendSupabase } from './supabase';
 
@@ -19,7 +24,7 @@ import { backendSupabase } from './supabase';
  * Prueba contra el proyecto real de Supabase (el de .env.local), para ver que las migraciones están cargadas.
  * No corre con `npm test`: crea usuarios de verdad. Se corre a mano con:
  *   LISTAMATCH_PROBAR_SUPABASE=1 npx vitest run src/nube/supabase.integracion.test.ts
- * Deja dos usuarios "listamatch.prueba…@gmail.com" y un comercio de prueba: se borran desde el panel de Supabase.
+ * Deja dos usuarios "listamatch.prueba…@gmail.com" y un "Comercio de prueba" (con una venta): se borran desde el panel de Supabase.
  */
 
 function env(): Record<string, string> {
@@ -70,5 +75,16 @@ describe.skipIf(!correr)('Supabase real', () => {
     expect(await listarProductos(se)).toEqual([]);
     expect(await leerConfig(se)).toBeUndefined();
     expect((await listarEquipo(s)).miembros).toHaveLength(2);
+
+    // Ventas (Fase 8): el empleado vende y el dueño ve el resumen.
+    const [producto] = await productosParaVender(se);
+    const venta = { id: crypto.randomUUID(), fecha: new Date().toISOString(), medioPago: 'efectivo' as const, lineas: [
+      { productoId: producto!.id, descripcion: producto!.descripcion, cantidad: 2, precioUnitario: producto!.precioVentaActual },
+    ] };
+    expect((await registrarVenta(se, venta)).total).toBe(320_000);
+    await registrarVenta(se, venta);
+    expect(await ventasDelDia(se, diaDe(new Date()))).toHaveLength(1);
+    const hoy = diaDe(new Date());
+    expect(await resumenVentas(s, hoy, hoy)).toMatchObject({ totalTickets: 320_000, tickets: 1, articulos: 2 });
   });
 });

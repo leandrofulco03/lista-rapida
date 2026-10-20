@@ -110,8 +110,8 @@ export const PREGUNTAS: TemaPreguntas[] = [
       {
         pregunta: '¿Para qué sirve ListaMatch?',
         respuesta: [
-          'Para actualizar tus precios de venta cuando un proveedor te manda una lista nueva. Subís la lista, la app la compara con tus productos, calcula los precios nuevos con tu recargo y vos aprobás los cambios.',
-          'Después podés imprimir las etiquetas de lo que cambió y una lista de precios para el mostrador.',
+          'Para llevar tu almacén o kiosco: cargás las ventas del día y ves cuánto vendiste, y actualizás tus precios cuando un proveedor te manda una lista nueva.',
+          'Con la lista del proveedor, la app la compara con tus productos, calcula los precios nuevos con tu recargo y vos aprobás los cambios. Después imprimís las etiquetas de lo que cambió.',
         ],
       },
       {
@@ -263,6 +263,36 @@ export const PREGUNTAS: TemaPreguntas[] = [
         pregunta: '¿Para qué sirve el CSV para la caja?',
         respuesta: [
           'Es un archivo con código, descripción, rubro y precio de cada producto. Se abre con Excel y sirve para pasar los precios a tu sistema de caja, si tu sistema permite importar una planilla.',
+        ],
+      },
+    ],
+  },
+  {
+    tema: 'Ventas',
+    preguntas: [
+      {
+        pregunta: '¿Cómo cargo una venta?',
+        respuesta: [
+          'Tocá "Nueva venta". Buscá el producto por nombre, escribí su código o escanealo con la cámara; los más vendidos aparecen como botones. Elegí cómo pagó y tocá "Cobrar".',
+          'Si algo no está en el catálogo, usá "Varios" y escribí el importe.',
+        ],
+      },
+      {
+        pregunta: '¿Y si se corta internet?',
+        respuesta: ['Podés seguir vendiendo: las ventas quedan guardadas en el dispositivo y se suben solas cuando vuelve la conexión.'],
+      },
+      {
+        pregunta: 'No quiero cargar cada venta. ¿Puedo anotar el total del día?',
+        respuesta: [
+          'Sí. En Ventas, elegí el día y tocá "Total del día": anotás cuánto entró en efectivo, débito, QR y lo demás. Suma a la venta total.',
+          'Esas ventas no cuentan en el ticket promedio ni en los artículos vendidos, porque no tienen detalle.',
+        ],
+      },
+      {
+        pregunta: 'Me equivoqué en una venta. ¿Cómo la corrijo?',
+        respuesta: [
+          'Abrí las ventas del día, tocá la venta y "Anular venta". Después cargala de nuevo bien. La venta anulada queda a la vista, tachada, pero no cuenta.',
+          'Un empleado puede anular sus ventas del mismo día; el dueño, cualquiera.',
         ],
       },
     ],

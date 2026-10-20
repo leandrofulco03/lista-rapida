@@ -20,8 +20,32 @@ import { PantallaSubirLista } from './features/subir/PantallaSubirLista';
 import { crearBackend } from './nube';
 import type { Backend, Usuario } from './nube';
 import { ContextoSesion } from './sesion';
+import { diaDe } from './domain/ventas';
+import type { Dia } from './domain/ventas';
+import { ProveedorCola } from './features/ventas/cola';
+import { PantallaResumen } from './features/ventas/PantallaResumen';
+import { PantallaTotalDia } from './features/ventas/PantallaTotalDia';
+import { PantallaVender } from './features/ventas/PantallaVender';
+import { PantallaVentasDelDia } from './features/ventas/PantallaVentasDelDia';
 
-type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo' | 'etiquetas' | 'lista-precios' | 'ayuda' | 'equipo';
+type Pantalla =
+  | 'inicio'
+  | 'config'
+  | 'subir'
+  | 'catalogo'
+  | 'proveedores'
+  | 'respaldo'
+  | 'etiquetas'
+  | 'lista-precios'
+  | 'ayuda'
+  | 'equipo'
+  | 'vender'
+  | 'ventas'
+  | 'ventas-dia'
+  | 'total-dia';
+
+/** Pantallas del empleado: sólo vende y ve sus ventas de hoy. */
+type PantallaEmpleadoNav = 'inicio' | 'vender' | 'mis-ventas';
 
 /** Qué se muestra: depende de la conexión, de la sesión, del comercio y del rol. */
 type Estado =
@@ -29,8 +53,8 @@ type Estado =
   | { tipo: 'sin-conexion'; error: string }
   | { tipo: 'sin-sesion' }
   | { tipo: 'sin-comercio'; paso: 'elegir' | 'crear' | 'unirse' }
-  | { tipo: 'empleado'; comercio: MiComercio }
-  | { tipo: 'admin'; comercio: MiComercio; config: ConfigComercio; pantalla: Pantalla; etiquetas?: Id[] };
+  | { tipo: 'empleado'; comercio: MiComercio; pantalla: PantallaEmpleadoNav }
+  | { tipo: 'admin'; comercio: MiComercio; config: ConfigComercio; pantalla: Pantalla; etiquetas?: Id[]; dia?: Dia };
 
 export function App() {
   const [backend, setBackend] = useState<Backend | null>(null);
@@ -58,7 +82,7 @@ export function App() {
     try {
       const [comercio] = await misComercios(b);
       if (!comercio) return setEstado({ tipo: 'sin-comercio', paso: 'elegir' });
-      if (comercio.rol === 'empleado') return setEstado({ tipo: 'empleado', comercio });
+      if (comercio.rol === 'empleado') return setEstado({ tipo: 'empleado', comercio, pantalla: 'inicio' });
       const config = await leerConfig({ backend: b, comercioId: comercio.id });
       if (!config) throw new Error('No pudimos leer la configuración del comercio.');
       setEstado({ tipo: 'admin', comercio, config, pantalla });
@@ -132,14 +156,29 @@ export function App() {
   }
 
   if (!sesion) return null;
-  if (estado.tipo === 'empleado') {
-    return <PantallaEmpleado nombreComercio={estado.comercio.nombre} email={usuario.email} onSalir={salir} />;
+  return (
+    <ContextoSesion.Provider value={sesion}>
+      <ProveedorCola>{estado.tipo === 'empleado' ? pantallaEmpleado(estado) : pantallaAdmin(estado)}</ProveedorCola>
+    </ContextoSesion.Provider>
+  );
+
+  function pantallaEmpleado(e: Extract<Estado, { tipo: 'empleado' }>) {
+    const ir = (pantalla: PantallaEmpleadoNav) => setEstado({ ...e, pantalla });
+    if (e.pantalla === 'vender') return <PantallaVender onVolver={() => ir('inicio')} onMisVentas={() => ir('mis-ventas')} />;
+    if (e.pantalla === 'mis-ventas') return <PantallaVentasDelDia esDueno={false} onVolver={() => ir('inicio')} />;
+    return (
+      <PantallaEmpleado
+        nombreComercio={e.comercio.nombre}
+        email={usuario!.email}
+        onVender={() => ir('vender')}
+        onMisVentas={() => ir('mis-ventas')}
+        onSalir={salir}
+      />
+    );
   }
 
-  return <ContextoSesion.Provider value={sesion}>{pantallaAdmin(estado)}</ContextoSesion.Provider>;
-
   function pantallaAdmin(e: Extract<Estado, { tipo: 'admin' }>) {
-    const ir = (pantalla: Pantalla) => setEstado({ ...e, pantalla, etiquetas: undefined });
+    const ir = (pantalla: Pantalla, dia?: Dia) => setEstado({ ...e, pantalla, etiquetas: undefined, dia });
     const recargar = (pantalla: Pantalla = 'inicio') => cargarComercio(backend!, pantalla);
     switch (e.pantalla) {
       case 'config':
@@ -176,9 +215,24 @@ export function App() {
       case 'equipo':
         return <PantallaEquipo onVolver={() => ir('inicio')} />;
       case 'ayuda':
-        return <PantallaAyuda onIr={ir} onVolver={() => ir('inicio')} />;
+        return <PantallaAyuda onIr={(p) => ir(p)} onVolver={() => ir('inicio')} />;
+      case 'vender':
+        return <PantallaVender onVolver={() => ir('ventas')} onMisVentas={() => ir('ventas-dia')} />;
+      case 'ventas':
+        return (
+          <PantallaResumen
+            onVender={() => ir('vender')}
+            onVerTickets={(dia) => ir('ventas-dia', dia)}
+            onTotalDia={(dia) => ir('total-dia', dia)}
+            onVolver={() => ir('inicio')}
+          />
+        );
+      case 'ventas-dia':
+        return <PantallaVentasDelDia esDueno diaInicial={e.dia} onVolver={() => ir('ventas')} />;
+      case 'total-dia':
+        return <PantallaTotalDia dia={e.dia ?? diaDe(new Date())} onGuardado={() => ir('ventas')} onVolver={() => ir('ventas')} />;
       default:
-        return <PantallaInicio config={e.config} email={usuario!.email} onIr={ir} onSalir={salir} />;
+        return <PantallaInicio config={e.config} email={usuario!.email} onIr={(p) => ir(p)} onSalir={salir} />;
     }
   }
 }
