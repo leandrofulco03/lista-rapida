@@ -1,3 +1,4 @@
+import { entrarComoDueno } from './ayudas';
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { PDFDocument } from 'pdf-lib';
@@ -6,10 +7,7 @@ import type { Page } from '@playwright/test';
 const csv = (nombre: string, filas: string[]) => ({ name: nombre, mimeType: 'text/csv', buffer: Buffer.from(filas.join('\r\n')) });
 
 async function configurar(page: Page) {
-  await page.goto('/');
-  await page.getByLabel('Nombre del comercio').fill('Almacén Don José');
-  await page.getByRole('button', { name: 'Guardar y empezar' }).click();
-  await expect(page.getByRole('heading', { name: 'Almacén Don José' })).toBeVisible();
+  await entrarComoDueno(page);
 }
 
 test('F09/F10: se revisan los precios con los controles de seguridad, se guardan y se imprimen sus etiquetas', async ({ page }) => {

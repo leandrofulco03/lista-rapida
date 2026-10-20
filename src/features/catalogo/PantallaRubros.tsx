@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import { borrarRubro, db, guardarRubro, listarRubros } from '../../db';
+import { borrarRubro, guardarRubro, listarRubros } from '../../db';
+import { useSesion } from '../../sesion';
 import type { Rubro } from '../../db';
 import { formatearPorcentaje, parsearPorcentaje } from '../../domain/porcentaje';
 import { Boton } from '../../ui/Boton';
@@ -14,13 +15,14 @@ interface Props {
 
 /** F03: rubros del catálogo, cada uno con un recargo propio opcional. */
 export function PantallaRubros({ onVolver }: Props) {
+  const sesion = useSesion();
   const [rubros, setRubros] = useState<Rubro[] | null>(null);
   const [editando, setEditando] = useState<Rubro | null>(null);
   const [nombre, setNombre] = useState('');
   const [recargoTexto, setRecargoTexto] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const cargar = () => listarRubros(db).then(setRubros);
+  const cargar = () => listarRubros(sesion).then(setRubros);
   useEffect(() => {
     cargar();
   }, []);
@@ -38,7 +40,7 @@ export function PantallaRubros({ onVolver }: Props) {
     const recargoPct = recargoTexto.trim() === '' ? null : parsearPorcentaje(recargoTexto);
     if (recargoTexto.trim() !== '' && recargoPct === null) return setError('Escribí el recargo como "35" o "12,5", o dejalo vacío.');
     try {
-      await guardarRubro(db, { nombre, recargoPct }, editando?.id);
+      await guardarRubro(sesion, { nombre, recargoPct }, editando?.id);
       editar(null);
       await cargar();
     } catch (err) {
@@ -48,7 +50,7 @@ export function PantallaRubros({ onVolver }: Props) {
 
   async function borrar() {
     if (!editando) return;
-    await borrarRubro(db, editando.id);
+    await borrarRubro(sesion, editando.id);
     editar(null);
     await cargar();
   }

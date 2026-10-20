@@ -3,3 +3,7 @@ dist/
 coverage/
 test-results/
 playwright-report/
+
+# Variables locales (Supabase) y carpeta de Vercel
+.env*.local
+.vercel

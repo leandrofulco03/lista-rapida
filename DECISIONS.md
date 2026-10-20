@@ -2,6 +2,51 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 20/10/2026 · v2: de "actualizar precios" a "manejar el almacén o kiosco"
+
+Cambio de rumbo decidido por Leandro. La app sigue comparando las listas de los proveedores con los precios del comercio, pero se enfoca en almacenes y kioscos y suma ventas y análisis.
+
+- **Tres secciones:** Ventas (carga y KPIs), Precios (todo lo de la v1) y Análisis (gráficos).
+- **Carga de ventas: las dos formas.** Ticket por ticket con productos (búsqueda, código de barras con la cámara y botones de los más vendidos) o sólo el total del día para quien no quiera cargar el detalle. Los días cargados con total suman a la venta total, pero no al ticket promedio ni a los productos más vendidos; los KPIs avisan cuántos días no tienen detalle.
+- **Ideas que entran** (de la lista propuesta): ganancia y margen real; medios de pago; cierre y arqueo de caja; fiado de clientes; alerta de precios atrasados; stock simple y sugerencia de pedido; ventas por día y hora; productos sin movimiento; gastos fijos y resultado neto. Queda afuera por ahora: comparar el mismo producto entre proveedores.
+- **Usuarios:** el admin (dueño) hace todo; el empleado sólo carga ventas. El empleado no ve costos, márgenes, proveedores ni análisis.
+- **Fases:**
+  - **Fase 7, base en la nube:** Supabase, cuentas, roles, invitaciones, pasar los datos de la v1 desde la copia de seguridad y publicar en Vercel. La sección Precios funciona igual que hoy, pero en la nube.
+  - **Fase 8, ventas:** carga por ticket y por total del día, medios de pago, ventas sin conexión y KPIs (venta total, tickets, ticket promedio, artículos, artículos por ticket; por día, semana y mes, contra el período anterior).
+  - **Fase 9, análisis:** ingresos por día, más vendidos, ventas por rubro, ganancia y margen, mapa de día y hora, sin movimiento y precios atrasados.
+  - **Fase 10, caja y clientes:** arqueo, fiado, stock y sugerencia de pedido, gastos fijos y resultado neto.
+
+### Fase 7: base en la nube
+
+- **Supabase (Postgres) como fuente de verdad.** Los datos dejan de vivir sólo en el navegador: el dueño y el empleado ven lo mismo desde distintos dispositivos y ya no depende de la copia de seguridad manual.
+- **Sin conexión, sólo para vender.** La sección Precios necesita internet (subir listas ya lo pedía en la práctica). Las ventas se guardan primero en el dispositivo (Dexie) y suben cuando hay conexión, para que un corte no frene el mostrador (Fase 8). Descartado: sincronizar toda la base en los dos sentidos (resolver conflictos entre dispositivos es mucho trabajo para lo que se gana).
+- **Ids uuid** en vez de números autoincrementales: la app puede crear una venta sin conexión sin chocar con la de otro dispositivo.
+- **Cada tabla lleva `comercio_id`** y las claves foráneas lo incluyen (`(comercio_id, rubro_id)` → `rubros (comercio_id, id)`), así una fila nunca apunta a datos de otro comercio, aunque la app tenga un error.
+- **Reglas de acceso (RLS)** en `supabase/migrations/20261020000000_base.sql`:
+  - Sin sesión no se ve nada.
+  - El admin hace todo dentro de su comercio. Cambia roles y da de baja miembros, pero no a sí mismo (un comercio no se queda sin dueño por error).
+  - El empleado no ve la tabla de productos: ve la vista `productos_venta` (código, código de barras, descripción, rubro y precio, sin costo ni recargo), de sólo lectura. Una vista simple de Postgres acepta escrituras; sin quitarle ese permiso, un empleado podría cambiar precios por ella.
+  - Los comercios y los miembros se crean sólo por funciones: `crear_comercio` (quien lo crea queda como admin, con su configuración) y `unirse_con_codigo`.
+- **Invitaciones con código:** el admin genera un código de 12 letras que dura 7 días y se usa una vez; el empleado se registra con su email y lo escribe. Descartado por ahora: que el dueño cree la cuenta del empleado con usuario y PIN (necesita una función del lado del servidor con la clave de administración de Supabase); se suma si en el piloto los empleados no tienen email a mano.
+- **Código de barras** en el producto (6 a 14 dígitos, no se repite en el comercio), para escanear al vender.
+- **Las pruebas de la base corren sin Docker:** `supabase/pruebas/base.test.ts` levanta un Postgres embebido (PGlite) con lo mínimo de Supabase (`auth.uid()` y los roles `anon` y `authenticated`) y prueba como el dueño, el empleado y otro comercio. Corren con `npm test`.
+- **Vercel, plan gratis (Hobby).** Elegido por Leandro. **El plan Hobby es sólo para uso no comercial:** cuando se cobre a los comercios hay que pasar a Pro o volver a Cloudflare, que permite uso comercial gratis. `vercel.json` compila con `npm run build`, sirve `dist/`, manda cualquier ruta a la app y pone las cabeceras de seguridad (antes en `public/_headers`); `vite preview` las lee de ahí para las pruebas e2e. Se borran `wrangler.jsonc` y `public/_headers`.
+- **Cabeceras nuevas:** la app se conecta a `*.supabase.co` (también por websocket) y puede usar la cámara del propio sitio (escanear códigos en la Fase 8).
+- **Supabase gratis:** alcanza para el piloto (500 MB). Un proyecto gratis se pausa tras 7 días sin uso; un comercio que vende todos los días no llega a eso.
+
+### Fase 7: la app en la nube (20/10/2026)
+
+- **La app lee y escribe sólo con funciones de la base (RPC)**, en `supabase/migrations/20261020010000_funciones_precios.sql` y `20261020020000_equipo.sql`. Corren con los permisos de quien llama (`security invoker`), así que las reglas de acceso se aplican igual, y cada una es una transacción: importar el catálogo, dar de alta desde la lista o aplicar una revisión se guardan enteros o no se guarda nada (como hacía Dexie). Los mensajes de error para el comerciante salen de la base, en castellano.
+- **Dos backends con la misma interfaz** (`src/nube/backend.ts`): Supabase en producción y Postgres embebido (PGlite) con las mismas migraciones para las pruebas y los recorridos e2e. Así las pruebas no necesitan internet ni Docker, y prueban también las reglas de acceso. Descartado: probar contra el Supabase real en cada `npm test` (crea usuarios de verdad y depende de la red); queda `src/nube/supabase.integracion.test.ts` para correr a mano.
+- **Recorridos e2e:** `npm run build:e2e` compila con la base embebida (`.env.e2e`). Cada prueba arranca creando la cuenta del dueño y su comercio. El build de producción no la incluye (17 MB): la elección se resuelve al compilar. La base embebida necesita WebAssembly: la política de seguridad suma `'wasm-unsafe-eval'` (permite compilar WebAssembly, no `eval` de JavaScript).
+- **La lógica de precios no cambió de lugar:** vinculación, revisión, cálculo de precios e importación del catálogo se siguen decidiendo en la app (`src/domain`); la base sólo guarda. Los ids pasan de números a uuid en todo el dominio; los uuid de lo nuevo se crean en la app (`crypto.randomUUID`) para guardar varias tablas de una vez.
+- **Entrada:** email y contraseña, iguales para dueños y empleados. Quien no tiene comercio elige "Crear mi comercio" (la configuración de F01) o "Tengo un código". El empleado, por ahora, ve sólo una pantalla que confirma que está en el equipo: la carga de ventas es la Fase 8.
+- **Equipo** (desde el inicio, sólo el admin): lista de miembros con su email (se guarda en `miembros` al entrar, porque la app no puede leer los usuarios de Supabase), códigos vigentes, "Generar código", "Anular" y "Quitar".
+- **Sin copia de seguridad:** con los datos en la nube se sacan la copia manual, su recordatorio y "Tengo una copia de seguridad". Queda "Traer datos de la versión anterior" (en Configuración), que lee la copia JSON de la v1, pasa sus ids a uuid y reemplaza la sección Precios del comercio en una transacción; se queda con el nombre del comercio de ahora. Vínculos o líneas que apuntan a filas que no existen en la copia se dejan afuera.
+- **Lista de productos de una vez:** las funciones de lectura devuelven un solo JSON con todo el catálogo, porque Supabase corta en 1000 filas las respuestas de una función que devuelve filas.
+- **Código de barras** en el producto (todavía no se edita en pantalla: llega con la Fase 8). Si la app no lo manda al editar, la base deja el que tenía. La búsqueda del catálogo también lo encuentra.
+- **Pendiente:** cargar las migraciones 2 y 3 en el Supabase real, cargar las variables en Vercel y conectar el repo; mails propios (Resend u otro) antes de usarla con comercios reales; varios comercios por cuenta (hoy se abre el primero).
+
 ## 13/10/2026 · Alta desde la lista (F07/F03) y precio a mano en la revisión (F09)
 
 Dos pendientes de la Fase 3 y la Fase 4, antes del piloto con comercios reales.

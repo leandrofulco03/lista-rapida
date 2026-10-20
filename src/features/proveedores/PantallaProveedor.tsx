@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { actualizarProveedor, borrarProveedor, db, olvidarColumnas } from '../../db';
+import { actualizarProveedor, borrarProveedor, olvidarColumnas } from '../../db';
+import { useSesion } from '../../sesion';
 import type { Proveedor } from '../../db';
 import { descuentoEfectivo, formatearDescuentos, parsearDescuentos } from '../../domain/proveedor';
 import { formatearPorcentaje } from '../../domain/porcentaje';
@@ -18,6 +19,7 @@ interface Props {
 
 /** F02: ficha del proveedor: nombre, si su lista trae IVA, descuentos y columnas recordadas. */
 export function PantallaProveedor({ proveedor, onVolver }: Props) {
+  const sesion = useSesion();
   const [nombre, setNombre] = useState(proveedor.nombre);
   const [conIva, setConIva] = useState(proveedor.listaIncluyeIva);
   const [descuentosTexto, setDescuentosTexto] = useState(formatearDescuentos(proveedor.descuentosPct));
@@ -33,7 +35,7 @@ export function PantallaProveedor({ proveedor, onVolver }: Props) {
     setError(null);
     if (descuentos === null) return setError('Escribí los descuentos como "10" o "10 + 5".');
     try {
-      await actualizarProveedor(db, proveedor.id, { nombre, listaIncluyeIva: conIva, descuentosPct: descuentos });
+      await actualizarProveedor(sesion, proveedor.id, { nombre, listaIncluyeIva: conIva, descuentosPct: descuentos });
       onVolver();
     } catch (err) {
       setError((err as Error).message);
@@ -41,12 +43,12 @@ export function PantallaProveedor({ proveedor, onVolver }: Props) {
   }
 
   async function olvidar() {
-    await olvidarColumnas(db, proveedor.id);
+    await olvidarColumnas(sesion, proveedor.id);
     setColumnas(null);
   }
 
   async function darDeBaja() {
-    await borrarProveedor(db, proveedor.id);
+    await borrarProveedor(sesion, proveedor.id);
     onVolver();
   }
 

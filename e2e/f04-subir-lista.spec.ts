@@ -1,3 +1,4 @@
+import { entrarComoDueno } from './ayudas';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
@@ -7,10 +8,7 @@ const LISTAS = fileURLToPath(new URL('../tests/fixtures/sinteticas/', import.met
 const LISTAS_PDF = fileURLToPath(new URL('../tests/fixtures/sinteticas-pdf/', import.meta.url));
 
 async function configurar(page: Page) {
-  await page.goto('/');
-  await page.getByLabel('Nombre del comercio').fill('Almacén Don José');
-  await page.getByRole('button', { name: 'Guardar y empezar' }).click();
-  await expect(page.getByRole('heading', { name: 'Almacén Don José' })).toBeVisible();
+  await entrarComoDueno(page);
 }
 
 test('F04/F06: la primera lista pide confirmar columnas y la segunda del mismo proveedor se lee sola', async ({ page }) => {

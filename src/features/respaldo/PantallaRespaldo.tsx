@@ -1,105 +1,67 @@
 import { useId, useState } from 'react';
-import { db, exportarRespaldo, restaurarRespaldo } from '../../db';
-import { diasDesdeRespaldo, leerRespaldo, nombreArchivoRespaldo } from '../../domain/respaldo';
+import { importarRespaldo, resumirRespaldo } from '../../db';
+import { leerRespaldo } from '../../domain/respaldo';
 import type { Respaldo } from '../../domain/respaldo';
+import { useSesion } from '../../sesion';
 import { Boton } from '../../ui/Boton';
 import { Encabezado } from '../../ui/Encabezado';
 import { IconoRespaldo } from '../../ui/Iconos';
-import { descargar } from '../../ui/descargar';
 
 interface Props {
-  /** Fecha del último respaldo; undefined si el comercio todavía no se configuró (primera vez en este dispositivo). */
-  ultimoRespaldo?: string | null;
-  /** Después de guardar una copia (cambia la fecha del último respaldo). */
-  onExportado?: () => void;
+  nombreComercio: string;
   onRestaurado: () => void;
   onVolver: () => void;
 }
 
-function textoUltimo(ultimo: string | null): string {
-  const dias = diasDesdeRespaldo(ultimo, new Date());
-  if (dias === null) return 'Todavía no hiciste ninguna copia.';
-  if (dias === 0) return 'La última copia es de hoy.';
-  return `La última copia es de hace ${dias} ${dias === 1 ? 'día' : 'días'}.`;
-}
-
 const fechaLegible = (iso: string) => new Date(iso).toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' });
 
-/** F12: guardar todos los datos en un archivo y restaurarlos en este u otro dispositivo. */
-export function PantallaRespaldo({ ultimoRespaldo, onExportado, onRestaurado, onVolver }: Props) {
+/**
+ * Traer los datos de la versión anterior: la v1 guardaba todo en el navegador y hacía copias en un archivo.
+ * Ahora los datos viven en la nube, así que no hace falta hacer más copias.
+ */
+export function PantallaRespaldo({ nombreComercio, onRestaurado, onVolver }: Props) {
+  const sesion = useSesion();
   const [error, setError] = useState<string | null>(null);
-  const [aRestaurar, setARestaurar] = useState<Respaldo | null>(null);
+  const [aTraer, setATraer] = useState<Respaldo | null>(null);
   const [trabajando, setTrabajando] = useState(false);
-  const [exportado, setExportado] = useState(false);
   const idArchivo = useId();
-  const configurado = ultimoRespaldo !== undefined;
-
-  async function guardarCopia() {
-    setError(null);
-    setTrabajando(true);
-    try {
-      const respaldo = await exportarRespaldo(db);
-      descargar(nombreArchivoRespaldo(new Date(respaldo.fecha)), JSON.stringify(respaldo), 'application/json');
-      setExportado(true);
-      onExportado?.();
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setTrabajando(false);
-    }
-  }
 
   async function elegirArchivo(archivo: File | undefined) {
     setError(null);
-    setARestaurar(null);
+    setATraer(null);
     if (!archivo) return;
-    const lectura = leerRespaldo(await archivo.text(), db.verno);
-    if (lectura.ok) setARestaurar(lectura.respaldo);
+    const lectura = leerRespaldo(await archivo.text());
+    if (lectura.ok) setATraer(lectura.respaldo);
     else setError(lectura.error);
   }
 
-  async function restaurar() {
-    if (!aRestaurar) return;
+  async function traer() {
+    if (!aTraer) return;
     setTrabajando(true);
     try {
-      await restaurarRespaldo(db, aRestaurar);
+      await importarRespaldo(sesion, aTraer, nombreComercio);
       onRestaurado();
     } catch (err) {
-      setError(`No pudimos restaurar la copia: ${(err as Error).message}`);
+      setError(`No pudimos traer los datos: ${(err as Error).message}`);
       setTrabajando(false);
     }
   }
+
+  const resumen = aTraer ? resumirRespaldo(aTraer) : null;
 
   return (
     <main className="mx-auto max-w-md px-4 pt-8 pb-12">
       <Encabezado
         Icono={IconoRespaldo}
-        titulo="Copia de seguridad"
-        descripcion="Tus datos están sólo en este dispositivo. Guardá una copia para no perderlos y para pasarlos a otro celular o computadora."
+        titulo="Datos de la versión anterior"
+        descripcion="Si usabas ListaMatch antes, traé tu catálogo, tus proveedores y tus precios con el archivo de la copia de seguridad que guardaste."
       />
 
-      {configurado && (
-        <section className="mt-6">
-          <h2 className="text-lg font-semibold">Guardar una copia</h2>
-          <p className="mt-1 text-stone-700" data-testid="ultimo-respaldo">
-            {textoUltimo(ultimoRespaldo)}
-          </p>
-          <Boton type="button" onClick={guardarCopia} disabled={trabajando} className="mt-3">
-            Guardar copia en un archivo
-          </Boton>
-          {exportado && (
-            <p className="mt-2 rounded-xl bg-green-50 p-3 text-green-900" role="status">
-              Listo. Guardá el archivo en un lugar seguro: tu correo, Google Drive o un pendrive.
-            </p>
-          )}
-        </section>
-      )}
-
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold">Restaurar una copia</h2>
-        <label htmlFor={idArchivo} className="mt-1 block text-stone-700">
+      <section className="mt-6">
+        <label htmlFor={idArchivo} className="block text-lg font-semibold">
           Archivo de la copia
         </label>
+        <p className="text-stone-600">Se llama listamatch-respaldo-… o lista-rapida-respaldo-… y termina en .json.</p>
         <input
           id={idArchivo}
           type="file"
@@ -107,15 +69,14 @@ export function PantallaRespaldo({ ultimoRespaldo, onExportado, onRestaurado, on
           onChange={(e) => elegirArchivo(e.target.files?.[0])}
           className="mt-2 block w-full text-base file:mr-3 file:min-h-11 file:rounded-xl file:border file:border-stone-300 file:bg-white file:px-4 file:font-semibold"
         />
-        {aRestaurar && (
+        {aTraer && resumen && (
           <div className="mt-3 rounded-xl bg-amber-50 p-3 text-amber-950" role="alert" data-testid="confirmar-restaurar">
             <p>
-              Copia del {fechaLegible(aRestaurar.fecha)}, con {aRestaurar.tablas.productos.length} productos y{' '}
-              {aRestaurar.tablas.proveedores.length} proveedores.
+              Copia del {fechaLegible(aTraer.fecha)}, con {resumen.productos} productos y {resumen.proveedores} proveedores.
             </p>
-            {configurado && <p className="mt-1 font-semibold">Se reemplaza todo lo que hay en este dispositivo.</p>}
-            <Boton type="button" variante={configurado ? 'peligro' : 'principal'} onClick={restaurar} disabled={trabajando} className="mt-3">
-              Restaurar esta copia
+            <p className="mt-1 font-semibold">Reemplaza el catálogo, los rubros y los proveedores que cargaste en este comercio.</p>
+            <Boton type="button" variante="peligro" onClick={traer} disabled={trabajando} className="mt-3">
+              Traer estos datos
             </Boton>
           </div>
         )}

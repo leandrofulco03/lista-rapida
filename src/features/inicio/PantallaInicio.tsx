@@ -1,11 +1,7 @@
-import { useEffect, useState } from 'react';
 import type { ComponentType, SVGProps } from 'react';
-import { db, hayDatos } from '../../db';
 import type { ConfigComercio } from '../../domain/config';
-import { diasDesdeRespaldo, tocaRecordarRespaldo } from '../../domain/respaldo';
 import { DESCRIPCION_APP, NOMBRE_APP } from '../../marca';
 import {
-  IconoAlerta,
   IconoAyuda,
   IconoCatalogo,
   IconoConfig,
@@ -13,15 +9,17 @@ import {
   IconoFlecha,
   IconoLista,
   IconoProveedores,
-  IconoRespaldo,
   IconoSubir,
 } from '../../ui/Iconos';
 
-type Destino = 'subir' | 'catalogo' | 'proveedores' | 'config' | 'respaldo' | 'etiquetas' | 'lista-precios' | 'ayuda';
+type Destino = 'subir' | 'catalogo' | 'proveedores' | 'config' | 'equipo' | 'etiquetas' | 'lista-precios' | 'ayuda';
 
 interface Props {
   config: ConfigComercio;
+  /** Cuenta con la que se entró. */
+  email: string;
   onIr: (pantalla: Destino) => void;
+  onSalir: () => void;
 }
 
 /** Accesos secundarios. El texto es el nombre accesible del botón (el ícono es decorativo). */
@@ -30,21 +28,15 @@ const SECCIONES: { destino: Destino; etiqueta: string; Icono: ComponentType<SVGP
   { destino: 'lista-precios', etiqueta: 'Lista de precios', Icono: IconoLista },
   { destino: 'catalogo', etiqueta: 'Catálogo', Icono: IconoCatalogo },
   { destino: 'proveedores', etiqueta: 'Proveedores', Icono: IconoProveedores },
-  { destino: 'respaldo', etiqueta: 'Copia de seguridad', Icono: IconoRespaldo },
+  { destino: 'equipo', etiqueta: 'Equipo', Icono: IconoProveedores },
   { destino: 'config', etiqueta: 'Configuración', Icono: IconoConfig },
 ];
 
 /**
- * Inicio: la acción principal es subir una lista; desde acá también se llega al catálogo, a los proveedores
- * y a la copia de seguridad, que se recuerda cada 7 días (F12).
+ * Inicio del dueño: la acción principal es subir una lista; desde acá también se llega al catálogo,
+ * a los proveedores, al equipo y a la configuración.
  */
-export function PantallaInicio({ config, onIr }: Props) {
-  const [recordar, setRecordar] = useState(false);
-  useEffect(() => {
-    hayDatos(db).then((hay) => setRecordar(tocaRecordarRespaldo(config.ultimoRespaldo, hay, new Date())));
-  }, [config.ultimoRespaldo]);
-  const dias = diasDesdeRespaldo(config.ultimoRespaldo, new Date());
-
+export function PantallaInicio({ config, email, onIr, onSalir }: Props) {
   return (
     <main className="mx-auto max-w-md px-4 pt-6 pb-12">
       <header className="relative overflow-hidden rounded-3xl bg-linear-to-br from-green-600 via-green-700 to-emerald-800 p-6 text-white shadow-xl shadow-green-900/20">
@@ -67,25 +59,6 @@ export function PantallaInicio({ config, onIr }: Props) {
           Subí una lista
         </button>
       </header>
-
-      {recordar && (
-        <div
-          className="mt-4 flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950 shadow-sm"
-          role="status"
-          data-testid="recordatorio-respaldo"
-        >
-          <IconoAlerta className="mt-0.5 size-6 shrink-0 text-amber-600" />
-          <div>
-            <p>
-              {dias === null ? 'Todavía no guardaste una copia de tus datos.' : `Hace ${dias} días que no guardás una copia de tus datos.`} Si
-              se pierde el celular, se pierden tus precios.
-            </p>
-            <button type="button" onClick={() => onIr('respaldo')} className="mt-1 min-h-11 font-semibold text-amber-900 underline underline-offset-4">
-              Guardar una copia ahora
-            </button>
-          </div>
-        </div>
-      )}
 
       <nav aria-label="Secciones" className="mt-6 grid grid-cols-2 gap-3">
         {SECCIONES.map(({ destino, etiqueta, Icono }) => (
@@ -118,6 +91,13 @@ export function PantallaInicio({ config, onIr }: Props) {
         </span>
         <IconoFlecha className="size-5 shrink-0 text-green-700" />
       </button>
+
+      <p className="mt-8 text-stone-600">
+        Entraste como <span className="font-semibold break-all">{email}</span>.{' '}
+        <button type="button" onClick={onSalir} className="min-h-11 font-semibold text-green-800 underline underline-offset-4">
+          Salir
+        </button>
+      </p>
     </main>
   );
 }

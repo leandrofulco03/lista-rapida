@@ -1,6 +1,6 @@
 # ListaMatch
 
-Web instalable (PWA) para que comercios chicos de Argentina actualicen precios a partir de las listas de sus proveedores. La especificación completa vive en el proyecto (spec.md).
+Web instalable (PWA) para almacenes y kioscos de Argentina: ventas del día, precios actualizados desde las listas de los proveedores y análisis. La especificación de la v1 vive en el proyecto (spec.md); el rumbo de la v2 está en DECISIONS.md (20/10/2026).
 
 ## Estado
 
@@ -9,15 +9,19 @@ Web instalable (PWA) para que comercios chicos de Argentina actualicen precios a
 - Fase 3 (Catálogo y vinculación): F02 (proveedores), F03 (catálogo propio) y F07 (vinculación) hechos, con alta en el catálogo de lo que trae la lista y el comercio no tiene; la vinculación está medida sólo con un set sintético.
 - Fase 4 (Revisión): F09 (revisión de precios con los controles de seguridad y precio a mano) hecho; falta medir los 5 minutos con una lista real.
 - Fase 5 (Salidas y respaldo): F12 (copia de seguridad), F10 (etiquetas) y F11 (lista de precios y CSV) hechos. Las etiquetas falta probarlas en una impresora.
+- **v2 · Fase 7 (Base en la nube), en curso:** datos en Supabase con roles (dueño y empleado), cuentas con email, equipo con códigos de invitación y "Traer datos de la versión anterior". La sección Precios funciona igual que antes, pero en la nube. Falta: cargar las migraciones en el Supabase real y publicar en Vercel.
 - Fase 6 (Piloto): listas ficticias de un kiosco, una ferretería y un almacén en `tests/fixtures/comercios` (se arman con `python3 scripts/generar-comercios.py`), medidas de punta a punta. Ya está publicada; falta probar con listas reales.
 
 ## Comandos
+
+Para correr la app con la nube: copiá `.env.example` como `.env.local` y completá los datos del proyecto de Supabase. El esquema se carga con las migraciones de `supabase/migrations` (en el panel de Supabase, SQL Editor, o con `npx supabase db push`).
 
 ```bash
 npm install
 npm run dev       # app en modo desarrollo
 npm run build     # sitio estático en dist/
-npm test          # pruebas unitarias (Vitest)
-npm run test:e2e  # recorrido completo (Playwright)
+npm test          # pruebas unitarias y de la base (Vitest + Postgres embebido, sin internet)
+npm run test:e2e  # recorrido completo (Playwright), con la base embebida en el navegador
+npm run build:e2e # build de los recorridos (base embebida, sin Supabase)
 npm run typecheck # chequeo de tipos
 ```

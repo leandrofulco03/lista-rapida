@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import { crearProveedor, db, listarProveedores } from '../../db';
+import { crearProveedor, listarProveedores } from '../../db';
+import { useSesion } from '../../sesion';
 import type { Proveedor } from '../../db';
 import { formatearDescuentos } from '../../domain/proveedor';
 import { Boton } from '../../ui/Boton';
@@ -15,12 +16,13 @@ interface Props {
 
 /** F02: lista de proveedores; desde acá se crean y se abre la ficha de cada uno. */
 export function PantallaProveedores({ onVolver }: Props) {
+  const sesion = useSesion();
   const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
   const [abierto, setAbierto] = useState<Proveedor | null>(null);
   const [nombreNuevo, setNombreNuevo] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const cargar = () => listarProveedores(db).then(setProveedores);
+  const cargar = () => listarProveedores(sesion).then(setProveedores);
   useEffect(() => {
     cargar();
   }, []);
@@ -29,7 +31,7 @@ export function PantallaProveedores({ onVolver }: Props) {
     e.preventDefault();
     setError(null);
     try {
-      const proveedor = await crearProveedor(db, nombreNuevo, false);
+      const proveedor = await crearProveedor(sesion, nombreNuevo, false);
       setNombreNuevo('');
       await cargar();
       setAbierto(proveedor);

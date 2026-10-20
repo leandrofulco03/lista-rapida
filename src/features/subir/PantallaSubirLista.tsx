@@ -1,6 +1,8 @@
 import { useEffect, useId, useState } from 'react';
 import type { FormEvent } from 'react';
-import { crearProveedor, db, guardarLecturaProveedor, listarProveedores } from '../../db';
+import { crearProveedor, guardarLecturaProveedor, listarProveedores } from '../../db';
+import type { Id } from '../../domain/id';
+import { useSesion } from '../../sesion';
 import type { Proveedor } from '../../db';
 import type { ConfigComercio } from '../../domain/config';
 import { detectarColumnas } from '../../domain/columnas';
@@ -21,7 +23,7 @@ import { ResumenLectura } from './ResumenLectura';
 interface Props {
   config: ConfigComercio;
   /** Imprimir las etiquetas de los productos que cambiaron de precio (F10). */
-  onEtiquetas: (productos: number[]) => void;
+  onEtiquetas: (productos: Id[]) => void;
   /** Lista de precios para el mostrador y CSV para la caja (F11). */
   onListaPrecios: () => void;
   onVolver: () => void;
@@ -41,10 +43,11 @@ type Paso =
   | ({ tipo: 'mapeo'; deteccion: Deteccion } & Leida)
   | ({ tipo: 'resultado'; mapeo: MapeoColumnas; automatico: boolean } & Leida)
   | { tipo: 'vinculacion'; proveedor: Proveedor; archivo: string; lineas: LineaLista[] }
-  | { tipo: 'revision'; proveedor: Proveedor; archivo: string; lineas: { linea: LineaLista; productoId: number | null }[] };
+  | { tipo: 'revision'; proveedor: Proveedor; archivo: string; lineas: { linea: LineaLista; productoId: Id | null }[] };
 
 /** F04 + F06 + F07 + F09: subir la lista de un proveedor, leerla, unirla con el catálogo y revisar los precios nuevos. */
 export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolver }: Props) {
+  const sesion = useSesion();
   const [proveedores, setProveedores] = useState<Proveedor[] | null>(null);
   const [elegido, setElegido] = useState<string>(NUEVO);
   const [nombreNuevo, setNombreNuevo] = useState('');
@@ -55,7 +58,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
   const ids = { proveedor: useId(), nombre: useId(), archivo: useId() };
 
   useEffect(() => {
-    listarProveedores(db).then((lista) => {
+    listarProveedores(sesion).then((lista) => {
       setProveedores(lista);
       const primero = lista[0];
       if (primero) {
@@ -79,7 +82,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
     try {
       proveedor =
         elegido === NUEVO
-          ? await crearProveedor(db, nombreNuevo, conIva)
+          ? await crearProveedor(sesion, nombreNuevo, conIva)
           : proveedores!.find((p) => String(p.id) === elegido)!;
     } catch (err) {
       return setError((err as Error).message);
@@ -90,7 +93,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
       const leida = { proveedor, archivo: archivo.name, tabla };
       const reusado = proveedor.mapeoColumnas ? aplicarMapeoGuardado(tabla.filas, proveedor.mapeoColumnas) : null;
       if (reusado) {
-        await guardarLecturaProveedor(db, proveedor.id, reusado, conIva);
+        await guardarLecturaProveedor(sesion, proveedor.id, reusado, conIva);
         setPaso({ tipo: 'resultado', mapeo: reusado, automatico: true, ...leida });
       } else {
         setPaso({ tipo: 'mapeo', deteccion: detectarColumnas(tabla.filas), ...leida });
@@ -102,7 +105,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
   }
 
   async function confirmarMapeo(leida: Leida, mapeo: MapeoColumnas) {
-    await guardarLecturaProveedor(db, leida.proveedor.id, mapeo, conIva);
+    await guardarLecturaProveedor(sesion, leida.proveedor.id, mapeo, conIva);
     setPaso({ proveedor: leida.proveedor, archivo: leida.archivo, tabla: leida.tabla, tipo: 'resultado', mapeo, automatico: false });
   }
 

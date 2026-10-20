@@ -13,8 +13,6 @@ export interface ConfigComercio {
   ventaIncluyeIva: boolean;
   /** IVA que se asigna a los productos nuevos. */
   ivaDefault: Porcentaje;
-  /** Fecha ISO del último respaldo (F12); null si nunca se hizo. */
-  ultimoRespaldo: string | null;
 }
 
 export const LARGO_MAXIMO_NOMBRE = 60;
@@ -26,7 +24,6 @@ export const CONFIG_SUGERIDA: ConfigComercio = {
   redondeo: { tipo: 'multiplo', pesos: 10 },
   ventaIncluyeIva: true,
   ivaDefault: IVA_GENERAL,
-  ultimoRespaldo: null,
 };
 
 export const REGLAS_REDONDEO: readonly { regla: ReglaRedondeo; etiqueta: string }[] = [

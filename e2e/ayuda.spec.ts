@@ -1,9 +1,8 @@
+import { entrarComoDueno } from './ayudas';
 import { expect, test } from '@playwright/test';
 
 test('Ayuda: se llega desde el inicio, muestra la guía y las preguntas, y lleva a las pantallas', async ({ page }) => {
-  await page.goto('/');
-  await page.getByLabel('Nombre del comercio').fill('Almacén Don José');
-  await page.getByRole('button', { name: 'Guardar y empezar' }).click();
+  await entrarComoDueno(page);
 
   await page.getByRole('button', { name: '¿Cómo se usa?' }).click();
   await expect(page.getByRole('heading', { name: 'Ayuda', exact: true })).toBeVisible();
@@ -13,12 +12,12 @@ test('Ayuda: se llega desde el inicio, muestra la guía y las preguntas, y lleva
   const pasos = page.getByTestId('guia-pasos').getByRole('heading', { level: 2 });
   await expect(pasos).toHaveCount(8);
   await expect(pasos.first()).toHaveText('Paso 1: Configurá tu comercio');
-  await expect(pasos.last()).toHaveText('Paso 8: Guardá una copia de seguridad');
+  await expect(pasos.last()).toHaveText('Paso 8: Sumá a tu equipo');
 
   // Las preguntas están plegadas y se abren al tocarlas.
   await page.getByRole('button', { name: 'Preguntas frecuentes' }).click();
   const preguntas = page.getByTestId('preguntas-frecuentes');
-  const respuesta = preguntas.getByText('Se guardan sólo en este dispositivo', { exact: false });
+  const respuesta = preguntas.getByText('Se guardan en la nube, en tu cuenta', { exact: false });
   await expect(respuesta).toBeHidden();
   await preguntas.getByText('¿Dónde se guardan mis datos? ¿Alguien más los ve?').click();
   await expect(respuesta).toBeVisible();

@@ -84,25 +84,25 @@ describe('vincularLinea', () => {
       'Yerba mate Playadito 500 g',
       'Aceite Natura girasol 900 ml',
       'Aceite Cocinero girasol 900 ml',
-    ].map((d, id) => ({ id: id + 1, descripcionNormalizada: normalizarDescripcion(d) })),
+    ].map((d, id) => ({ id: String(id + 1), descripcionNormalizada: normalizarDescripcion(d) })),
   );
 
   it('una línea ya vinculada por código va sola, aunque cambie la descripción', () => {
-    const vinculados = new Map([['ab-12', 2]]);
+    const vinculados = new Map([['ab-12', '2']]);
     expect(vincularLinea({ codigo: ' AB-12 ', descripcion: 'cualquier cosa' }, vinculados, indice)).toEqual({
       estado: 'vinculada',
-      productoId: 2,
+      productoId: '2',
       opciones: [],
     });
   });
 
   it('sin códigos, recuerda por la descripción normalizada', () => {
-    const vinculados = new Map([[claveVinculo(null, 'YERBA PLAYADITO 1 KG'), 1]]);
+    const vinculados = new Map([[claveVinculo(null, 'YERBA PLAYADITO 1 KG'), '1']]);
     expect(vincularLinea({ codigo: null, descripcion: 'Yerba Playadito 1kg' }, vinculados, indice).estado).toBe('vinculada');
   });
 
   it('sin códigos, la presentación es parte de lo que se recuerda', () => {
-    const vinculados = new Map([[claveVinculo(null, 'Látex Alba', '4 l'), 1]]);
+    const vinculados = new Map([[claveVinculo(null, 'Látex Alba', '4 l'), '1']]);
     expect(vincularLinea({ codigo: null, descripcion: 'Latex Alba', presentacion: '4 lts' }, vinculados, indice).estado).toBe('vinculada');
     expect(vincularLinea({ codigo: null, descripcion: 'Latex Alba', presentacion: '20 lts' }, vinculados, indice).estado).not.toBe('vinculada');
     // Si la lista no tiene presentación aparte, la clave no cambia con lo que había antes.
@@ -111,28 +111,28 @@ describe('vincularLinea', () => {
 
   it('otra variedad del mismo producto no se sugiere sola', () => {
     const lacteos = new IndiceCatalogo(
-      ['Yogur bebible Ser frutilla 900 g', 'Coca-Cola 500 ml'].map((d, id) => ({ id: id + 1, descripcionNormalizada: normalizarDescripcion(d) })),
+      ['Yogur bebible Ser frutilla 900 g', 'Coca-Cola 500 ml'].map((d, id) => ({ id: String(id + 1), descripcionNormalizada: normalizarDescripcion(d) })),
     );
     expect(vincularLinea({ codigo: null, descripcion: 'YOGUR BEBIBLE SER VAINILLA 900GR' }, new Map(), lacteos).estado).toBe('dudosa');
     expect(vincularLinea({ codigo: null, descripcion: 'Coca Cola Light 500cc' }, new Map(), lacteos).estado).toBe('dudosa');
-    expect(vincularLinea({ codigo: null, descripcion: 'COCA COLA 500CC' }, new Map(), lacteos)).toMatchObject({ estado: 'sugerida', productoId: 2 });
+    expect(vincularLinea({ codigo: null, descripcion: 'COCA COLA 500CC' }, new Map(), lacteos)).toMatchObject({ estado: 'sugerida', productoId: '2' });
   });
 
   it('sugiere cuando se parece mucho y el contenido coincide', () => {
     const r = vincularLinea({ codigo: 'X1', descripcion: 'YERBA PLAYADITO X 1 KG' }, new Map(), indice);
-    expect(r).toMatchObject({ estado: 'sugerida', productoId: 1 });
+    expect(r).toMatchObject({ estado: 'sugerida', productoId: '1' });
   });
 
   it('usa la presentación de su columna', () => {
     const r = vincularLinea({ codigo: null, descripcion: 'Yerba Playadito', presentacion: '500 grs' }, new Map(), indice);
-    expect(r).toMatchObject({ estado: 'sugerida', productoId: 2 });
+    expect(r).toMatchObject({ estado: 'sugerida', productoId: '2' });
   });
 
   it('con otro contenido no sugiere: queda dudosa con opciones', () => {
     const r = vincularLinea({ codigo: null, descripcion: 'Yerba mate Playadito 2 kg' }, new Map(), indice);
     expect(r.estado).toBe('dudosa');
     expect(r.productoId).toBeNull();
-    expect(r.opciones.map((o) => o.productoId)).toEqual(expect.arrayContaining([1, 2]));
+    expect(r.opciones.map((o) => o.productoId)).toEqual(expect.arrayContaining(['1', '2']));
   });
 
   it('si dos productos empatan, que elija el comerciante', () => {

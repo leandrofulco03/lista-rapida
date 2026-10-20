@@ -1,7 +1,8 @@
+import { empezarComercio } from './ayudas';
 import { expect, test } from '@playwright/test';
 
 test('F01: primera configuración, queda guardada al recargar y se puede editar', async ({ page }) => {
-  await page.goto('/');
+  await empezarComercio(page);
   await expect(page.getByRole('heading', { name: 'ListaMatch' })).toBeVisible();
 
   // Sin nombre no deja avanzar

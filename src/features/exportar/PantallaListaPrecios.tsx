@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { db, listarProductos, listarRubros, productosUltimaRevision } from '../../db';
+import { listarProductos, listarRubros, productosUltimaRevision } from '../../db';
+import type { Id } from '../../domain/id';
+import { useSesion } from '../../sesion';
 import type { Producto } from '../../db';
 import { fechaEtiqueta } from '../../domain/etiquetas';
 import { agruparPorRubro, armarCsvCaja } from '../../domain/exportar';
@@ -18,19 +20,20 @@ type Alcance = 'todos' | 'cambiados';
 
 interface Datos {
   productos: Producto[];
-  rubros: Map<number, string>;
-  cambiados: Set<number>;
+  rubros: Map<Id, string>;
+  cambiados: Set<Id>;
 }
 
 /** F11: lista de precios para el mostrador (PDF) y CSV para el sistema de caja. */
 export function PantallaListaPrecios({ nombreComercio, onVolver }: Props) {
+  const sesion = useSesion();
   const [datos, setDatos] = useState<Datos | null>(null);
   const [alcance, setAlcance] = useState<Alcance>('todos');
   const [generando, setGenerando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([listarProductos(db), listarRubros(db), productosUltimaRevision(db)]).then(([productos, rubros, cambiados]) =>
+    Promise.all([listarProductos(sesion), listarRubros(sesion), productosUltimaRevision(sesion)]).then(([productos, rubros, cambiados]) =>
       setDatos({ productos, rubros: new Map(rubros.map((r) => [r.id, r.nombre])), cambiados: new Set(cambiados) }),
     );
   }, []);

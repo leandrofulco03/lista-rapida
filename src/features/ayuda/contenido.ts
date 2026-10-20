@@ -5,7 +5,7 @@
  */
 
 /** Pantallas a las que la guía puede llevar con un botón. */
-export type DestinoAyuda = 'config' | 'catalogo' | 'subir' | 'proveedores' | 'etiquetas' | 'lista-precios' | 'respaldo';
+export type DestinoAyuda = 'config' | 'catalogo' | 'subir' | 'proveedores' | 'etiquetas' | 'lista-precios' | 'equipo';
 
 export interface PasoGuia {
   titulo: string;
@@ -96,10 +96,10 @@ export const PASOS_GUIA: PasoGuia[] = [
     accion: { etiqueta: 'Ir a Etiquetas', destino: 'etiquetas' },
   },
   {
-    titulo: 'Guardá una copia de seguridad',
-    texto: 'Tus datos están sólo en este dispositivo. Guardá una copia cada semana y dejala en un lugar tuyo: tu correo, Google Drive o un pendrive.',
-    detalles: ['La app te lo recuerda en el inicio cuando pasan 7 días sin copia.'],
-    accion: { etiqueta: 'Ir a la copia', destino: 'respaldo' },
+    titulo: 'Sumá a tu equipo',
+    texto: 'Si alguien te ayuda en el mostrador, generá un código en Equipo y pasáselo. Entra con su propia cuenta y sólo carga ventas.',
+    detalles: ['No ve tus costos, tus proveedores ni los números del comercio.', 'El código sirve una vez y dura 7 días.'],
+    accion: { etiqueta: 'Ir a Equipo', destino: 'equipo' },
   },
 ];
 
@@ -119,16 +119,19 @@ export const PREGUNTAS: TemaPreguntas[] = [
         respuesta: [
           'En Android (Chrome): tocá los tres puntitos de arriba a la derecha y elegí "Instalar app" o "Agregar a la pantalla principal".',
           'En iPhone (Safari): tocá el botón de compartir (el cuadrado con la flecha) y elegí "Agregar a inicio".',
-          'Queda con su ícono como cualquier otra app. Conviene instalarla: así es menos probable que el celular borre tus datos por falta de uso.',
+          'Queda con su ícono como cualquier otra app.',
         ],
       },
       {
         pregunta: '¿Funciona sin internet?',
-        respuesta: ['Sí. Después de abrirla una vez con conexión, funciona sin internet: leer listas, revisar precios y armar los PDF se hace todo en tu dispositivo.'],
+        respuesta: ['Para ver y guardar tus precios necesita internet: tus datos están en la nube. Leer la lista del proveedor y armar los PDF se hace en tu dispositivo.'],
       },
       {
         pregunta: '¿Necesito crear una cuenta?',
-        respuesta: ['No hace falta cuenta ni contraseña. Abrís la app y la usás.'],
+        respuesta: [
+          'Sí: entrás con tu email y una contraseña. Así ves tus datos desde el celular o la computadora, y no se pierden si se rompe el dispositivo.',
+          'Cada empleado entra con su propia cuenta.',
+        ],
       },
     ],
   },
@@ -265,37 +268,34 @@ export const PREGUNTAS: TemaPreguntas[] = [
     ],
   },
   {
-    tema: 'Tus datos y la copia de seguridad',
+    tema: 'Tus datos y tu equipo',
     preguntas: [
       {
         pregunta: '¿Dónde se guardan mis datos? ¿Alguien más los ve?',
         respuesta: [
-          'Se guardan sólo en este dispositivo, dentro del navegador. No se envían a internet ni a ningún servidor: nadie más puede ver tus costos ni tus precios.',
-          'Por eso mismo, si se rompe o se pierde el dispositivo y no tenés una copia, los datos se pierden.',
+          'Se guardan en la nube, en tu cuenta. Los ves desde cualquier celular o computadora entrando con tu email y tu contraseña.',
+          'Nadie de otro comercio puede verlos. Tus empleados sólo ven los productos y su precio de venta: no ven costos, proveedores ni los números del comercio.',
         ],
       },
       {
-        pregunta: '¿Cada cuánto conviene guardar una copia?',
+        pregunta: '¿Tengo que guardar copias de seguridad?',
+        respuesta: ['No. Tus datos quedan guardados en la nube cada vez que cambiás algo. Si se rompe o se pierde el celular, entrás desde otro y está todo.'],
+      },
+      {
+        pregunta: 'Usaba la versión anterior. ¿Cómo traigo mis datos?',
         respuesta: [
-          'Una vez por semana, o después de cargar muchos cambios. Entrá a Copia de seguridad y tocá "Guardar copia en un archivo".',
-          'Guardá ese archivo fuera del celular: mandátelo por correo, subilo a tu Google Drive o pasalo a un pendrive. Tiene tus costos, así que no lo compartas con otros.',
+          'Si guardaste una copia de seguridad con la versión anterior (un archivo que termina en .json), entrá a Configuración y tocá "Traer datos de la versión anterior".',
+          'Se reemplazan el catálogo, los rubros y los proveedores del comercio por los de la copia.',
         ],
       },
       {
-        pregunta: '¿Cómo paso mis datos a otro celular o a la computadora?',
+        pregunta: '¿Cómo sumo a un empleado?',
         respuesta: [
-          'Guardá una copia en el dispositivo viejo y pasá el archivo al nuevo. En el nuevo, abrí ListaMatch y en la primera pantalla tocá "Tengo una copia de seguridad".',
-          'Los datos no se sincronizan solos entre dispositivos: cada uno tiene los suyos.',
+          'En Equipo, tocá "Generar código" y pasáselo. El empleado crea su cuenta, toca "Tengo un código" y lo escribe. El código sirve una vez y dura 7 días.',
+          'Si deja de trabajar con vos, quitalo desde Equipo y ya no puede entrar.',
         ],
-      },
-      {
-        pregunta: '¿Qué pasa al restaurar una copia?',
-        respuesta: ['Se reemplaza todo lo que hay en ese dispositivo por lo que trae la copia. Antes de hacerlo, la app te muestra la fecha de la copia y cuántos productos y proveedores tiene.'],
-      },
-      {
-        pregunta: 'Borré los datos del navegador o desinstalé la app. ¿Perdí todo?',
-        respuesta: ['Sí, salvo que tengas una copia de seguridad: borrar los datos de navegación del sitio borra también lo cargado en ListaMatch. Con la copia, lo recuperás en un minuto.'],
       },
     ],
   },
+
 ];

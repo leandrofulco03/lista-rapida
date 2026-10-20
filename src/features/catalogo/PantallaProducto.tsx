@@ -1,6 +1,8 @@
 import { useEffect, useId, useState } from 'react';
 import type { FormEvent } from 'react';
-import { borrarProducto, db, guardarProducto, proponerCodigo } from '../../db';
+import { borrarProducto, guardarProducto, proponerCodigo } from '../../db';
+import type { Id } from '../../domain/id';
+import { useSesion } from '../../sesion';
 import type { Producto, Rubro } from '../../db';
 import { validarProducto } from '../../domain/catalogo';
 import type { DatosProducto, ErroresProducto } from '../../domain/catalogo';
@@ -26,9 +28,10 @@ interface Props {
 
 /** F03: alta y edición de un producto del catálogo. */
 export function PantallaProducto({ producto, rubros, config, onVolver }: Props) {
+  const sesion = useSesion();
   const [codigo, setCodigo] = useState(producto?.codigoInterno ?? '');
   const [descripcion, setDescripcion] = useState(producto?.descripcion ?? '');
-  const [rubroId, setRubroId] = useState<number | null>(producto?.rubroId ?? null);
+  const [rubroId, setRubroId] = useState<Id | null>(producto?.rubroId ?? null);
   const [recargoTexto, setRecargoTexto] = useState(producto?.recargoPct != null ? formatearPorcentaje(producto.recargoPct) : '');
   const [ivaPct, setIvaPct] = useState(producto?.ivaPct ?? config.ivaDefault);
   const [costoTexto, setCostoTexto] = useState(producto ? pesosParaEditar(producto.costoActual) : '');
@@ -39,7 +42,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
   const idRubro = useId();
 
   useEffect(() => {
-    if (!producto) proponerCodigo(db).then((c) => setCodigo((actual) => actual || c));
+    if (!producto) proponerCodigo(sesion).then((c) => setCodigo((actual) => actual || c));
   }, [producto]);
 
   const vacioOCero = (texto: string) => (texto.trim() === '' ? 0 : leerImporte(texto, 'ar'));
@@ -79,7 +82,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
     setErrores(encontrados);
     if (Object.keys(encontrados).length > 0) return;
     try {
-      await guardarProducto(db, datos, producto?.id);
+      await guardarProducto(sesion, datos, producto?.id);
       onVolver();
     } catch (err) {
       setError((err as Error).message);
@@ -88,7 +91,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
 
   async function borrar() {
     if (!producto) return;
-    await borrarProducto(db, producto.id);
+    await borrarProducto(sesion, producto.id);
     onVolver();
   }
 
@@ -107,7 +110,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
           <select
             id={idRubro}
             value={rubroId ?? ''}
-            onChange={(e) => setRubroId(e.target.value === '' ? null : Number(e.target.value))}
+            onChange={(e) => setRubroId(e.target.value === '' ? null : e.target.value)}
             className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
           >
             <option value="">Sin rubro</option>

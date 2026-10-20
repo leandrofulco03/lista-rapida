@@ -1,3 +1,4 @@
+import { entrarComoDueno } from './ayudas';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
@@ -6,10 +7,7 @@ import type { Page } from '@playwright/test';
 const CATALOGO = fileURLToPath(new URL('../tests/fixtures/catalogo/', import.meta.url));
 
 async function configurar(page: Page) {
-  await page.goto('/');
-  await page.getByLabel('Nombre del comercio').fill('Almacén Don José');
-  await page.getByRole('button', { name: 'Guardar y empezar' }).click();
-  await expect(page.getByRole('heading', { name: 'Almacén Don José' })).toBeVisible();
+  await entrarComoDueno(page);
 }
 
 test('F02: se crea un proveedor, se edita su ficha y se da de baja', async ({ page }) => {

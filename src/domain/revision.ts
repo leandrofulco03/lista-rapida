@@ -1,4 +1,5 @@
 import { CIEN_POR_CIENTO } from './dinero';
+import type { Id } from './id';
 import type { Centavos, Porcentaje } from './dinero';
 import type { ConfigComercio } from './config';
 import type { LineaLista } from './lineaLista';
@@ -23,9 +24,9 @@ export const VARIACION_INDIVIDUAL: Porcentaje = 5000;
 
 /** Lo que hace falta del producto del catálogo. */
 export interface ProductoRevision {
-  id: number;
+  id: Id;
   descripcion: string;
-  rubroId: number | null;
+  rubroId: Id | null;
   recargoPct: Porcentaje | null;
   ivaPct: Porcentaje;
   costoActual: Centavos;
@@ -34,12 +35,12 @@ export interface ProductoRevision {
 
 export interface DatosRevision {
   /** Líneas de la lista con el producto que se eligió en la vinculación (null: sin vincular). */
-  lineas: readonly { linea: LineaLista; productoId: number | null }[];
-  productos: ReadonlyMap<number, ProductoRevision>;
+  lineas: readonly { linea: LineaLista; productoId: Id | null }[];
+  productos: ReadonlyMap<Id, ProductoRevision>;
   /** Recargo de cada rubro que tiene uno propio. */
-  recargosRubro: ReadonlyMap<number, Porcentaje | null>;
+  recargosRubro: ReadonlyMap<Id, Porcentaje | null>;
   /** Productos vinculados antes con este proveedor (para avisar los que no vinieron). */
-  vinculadosAntes: ReadonlySet<number>;
+  vinculadosAntes: ReadonlySet<Id>;
   /** Lo que dijo el comerciante al subir la lista; vale si el título del precio no lo aclara. */
   listaIncluyeIva: boolean;
   descuentos: readonly Porcentaje[];
@@ -49,7 +50,7 @@ export interface DatosRevision {
 export type TipoCambio = 'sube' | 'baja' | 'igual';
 
 export interface Cambio {
-  productoId: number;
+  productoId: Id;
   descripcion: string;
   linea: LineaLista;
   costoAnterior: Centavos;
@@ -83,7 +84,7 @@ export interface Revision {
   /** Líneas repetidas: el mismo producto ya vino en una línea anterior de la lista. */
   repetidas: LineaLista[];
   /** Productos vinculados con este proveedor que no vinieron en esta lista. */
-  noVinieron: number[];
+  noVinieron: Id[];
 }
 
 const BASE = BigInt(CIEN_POR_CIENTO);
@@ -129,7 +130,7 @@ export function variacion(antes: Centavos, despues: Centavos): Porcentaje | null
 
 export function armarRevision(datos: DatosRevision): Revision {
   const { config } = datos;
-  const vistos = new Set<number>();
+  const vistos = new Set<Id>();
   const revision: Revision = { cambios: [], sinCambios: [], sinVincular: [], repetidas: [], noVinieron: [] };
 
   for (const { linea, productoId } of datos.lineas) {
@@ -203,7 +204,7 @@ export type Decision = { precio: Centavos } | null;
  * "Aprobar todo": los cambios que no piden aprobación individual, con el precio sugerido.
  * Las bajas también entran con el precio nuevo; en la pantalla están marcadas para mantener el precio.
  */
-export function aprobarTodo(cambios: readonly Cambio[]): Map<number, Decision> {
+export function aprobarTodo(cambios: readonly Cambio[]): Map<Id, Decision> {
   return new Map(cambios.filter((c) => !c.individual).map((c) => [c.productoId, { precio: c.precioSugerido }]));
 }
 

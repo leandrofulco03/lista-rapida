@@ -15,7 +15,7 @@ interface Props {
   inicial?: ConfigComercio;
   onGuardar: (config: ConfigComercio) => Promise<void>;
   onCancelar?: () => void;
-  /** Primera vez: traer los datos de otro dispositivo con una copia de seguridad (F12). */
+  /** Traer los datos de la versión anterior (su copia de seguridad). */
   onRestaurar?: () => void;
 }
 
@@ -189,7 +189,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
           )}
           {onRestaurar && (
             <Boton type="button" variante="secundario" onClick={onRestaurar}>
-              Tengo una copia de seguridad
+              Traer datos de la versión anterior
             </Boton>
           )}
         </div>

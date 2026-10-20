@@ -1,3 +1,4 @@
+import { entrarComoDueno } from './ayudas';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
@@ -14,10 +15,7 @@ const CATALOGO = csv('catalogo.csv', ['Código;Descripción;Costo', ...casos.cat
 const LISTA = csv('el-sol.csv', ['Cód.;Descripción;Precio s/IVA', ...casos.lineas.map((l, i) => `E${i + 1};${l.descripcion};1.234,50`)]);
 
 async function configurar(page: Page) {
-  await page.goto('/');
-  await page.getByLabel('Nombre del comercio').fill('Almacén Don José');
-  await page.getByRole('button', { name: 'Guardar y empezar' }).click();
-  await expect(page.getByRole('heading', { name: 'Almacén Don José' })).toBeVisible();
+  await entrarComoDueno(page);
 }
 
 async function subirLista(page: Page) {

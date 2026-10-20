@@ -6,24 +6,16 @@ import { readFileSync } from 'node:fs';
 import { COLOR_TEMA, DESCRIPCION_APP, NOMBRE_APP, NOMBRE_CORTO } from './src/marca';
 
 /**
- * Lee las cabeceras del bloque `/*` de public/_headers (las que pone Cloudflare) para usarlas
- * también en `vite preview`: así las pruebas e2e corren con la misma política de seguridad que producción.
+ * Lee las cabeceras de seguridad de vercel.json (las que pone Vercel) para usarlas también en
+ * `vite preview`: así las pruebas e2e corren con la misma política de seguridad que producción.
  * En `vite dev` no se aplican, porque el modo desarrollo necesita scripts en línea.
  */
 function cabecerasDeProduccion(): Record<string, string> {
-  const texto = readFileSync(new URL('./public/_headers', import.meta.url), 'utf8');
-  const cabeceras: Record<string, string> = {};
-  let enTodas = false;
-  for (const linea of texto.split(/\r?\n/)) {
-    if (linea.trim() === '' || linea.trim().startsWith('#')) continue;
-    if (!/^\s/.test(linea)) {
-      enTodas = linea.trim() === '/*';
-      continue;
-    }
-    const dosPuntos = linea.indexOf(':');
-    if (enTodas && dosPuntos > 0) cabeceras[linea.slice(0, dosPuntos).trim()] = linea.slice(dosPuntos + 1).trim();
-  }
-  return cabeceras;
+  const vercel = JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8')) as {
+    headers: { source: string; headers: { key: string; value: string }[] }[];
+  };
+  const todas = vercel.headers.find((h) => h.source === '/(.*)');
+  return Object.fromEntries((todas?.headers ?? []).map((h) => [h.key, h.value]));
 }
 
 export default defineConfig({
@@ -34,6 +26,8 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // La base embebida (sólo en el build de los recorridos e2e) pesa 17 MB: no se guarda para usar sin conexión.
+      workbox: { globIgnores: ['**/pglite-*', '**/localNavegador-*'] },
       includeAssets: ['icono.svg', 'icono-180.png'],
       manifest: {
         name: NOMBRE_APP,

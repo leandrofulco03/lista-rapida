@@ -1,6 +1,8 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { borrarProducto, darDeAltaDesdeLista, db, filtrarProductos, guardarVinculos, listarProductos, vinculosDeProveedor } from '../../db';
+import { borrarProducto, darDeAltaDesdeLista, filtrarProductos, guardarVinculos, listarProductos, vinculosDeProveedor } from '../../db';
+import type { Id } from '../../domain/id';
+import { useSesion } from '../../sesion';
 import type { Producto, Proveedor } from '../../db';
 import { formatearPesos } from '../../domain/dinero';
 import type { Porcentaje } from '../../domain/dinero';
@@ -17,35 +19,36 @@ interface Props {
   /** IVA de los productos que se dan de alta desde la lista (el de productos nuevos de la configuración). */
   ivaDefault: Porcentaje;
   /** Sigue a la revisión de precios (F09) con el producto de cada línea (null: sin vincular). */
-  onSeguir: (elecciones: (number | null)[]) => void;
+  onSeguir: (elecciones: (Id | null)[]) => void;
   onVolver: () => void;
 }
 
 interface Comparacion {
-  productos: Map<number, Producto>;
+  productos: Map<Id, Producto>;
   todos: Producto[];
   resultados: ResultadoVinculo[];
 }
 
 /** Producto elegido para cada línea (por posición). null: sin vincular. */
-type Elecciones = (number | null)[];
+type Elecciones = (Id | null)[];
 
 /**
  * F07: une cada línea de la lista con un producto del catálogo. Lo confirmado queda guardado para la próxima lista; después sigue la revisión de precios (F09).
  * Lo que el comercio no tiene se puede dar de alta en el catálogo (sin precio: el precio se aprueba en la revisión).
  */
 export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, onVolver }: Props) {
+  const sesion = useSesion();
   const [comparacion, setComparacion] = useState<Comparacion | null>(null);
   const [elecciones, setElecciones] = useState<Elecciones>([]);
   const [buscando, setBuscando] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
   /** Productos dados de alta desde esta lista (se pueden deshacer mientras se está acá). */
-  const [creados, setCreados] = useState<ReadonlySet<number>>(new Set());
+  const [creados, setCreados] = useState<ReadonlySet<Id>>(new Set());
   const [creando, setCreando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([listarProductos(db), vinculosDeProveedor(db, proveedor.id)]).then(([todos, vinculados]) => {
+    Promise.all([listarProductos(sesion), vinculosDeProveedor(sesion, proveedor.id)]).then(([todos, vinculados]) => {
       const productos = new Map(todos.map((p) => [p.id, p]));
       // Un vínculo a un producto que se borró del catálogo ya no vale.
       const vigentes = new Map([...vinculados].filter(([, id]) => productos.has(id)));
@@ -72,7 +75,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
     if (productoId == null || creados.has(productoId) || productoId === (resultados[i]!.estado === 'vinculada' ? resultados[i]!.productoId : undefined)) return [];
     return [{ codigo: l.codigo, descripcion: l.descripcion, presentacion: l.presentacion, productoId }];
   });
-  const elegir = (i: number, productoId: number | null) => {
+  const elegir = (i: number, productoId: Id | null) => {
     setElecciones((actuales) => actuales.map((e, j) => (j === i ? productoId : e)));
     setBuscando(null);
   };
@@ -89,7 +92,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
     setCreando(true);
     setError(null);
     try {
-      const nuevos = await darDeAltaDesdeLista(db, proveedor.id, todas.map((i) => lineas[i]!), ivaDefault);
+      const nuevos = await darDeAltaDesdeLista(sesion, proveedor.id, todas.map((i) => lineas[i]!), ivaDefault);
       const distintos = [...new Map(nuevos.map((p) => [p.id, p])).values()];
       setComparacion((c) => c && { ...c, productos: new Map([...c.productos, ...distintos.map((p) => [p.id, p] as const)]), todos: [...c.todos, ...distintos] });
       setCreados((actuales) => new Set([...actuales, ...distintos.map((p) => p.id)]));
@@ -102,10 +105,10 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
     }
   }
 
-  async function deshacerAlta(productoId: number) {
+  async function deshacerAlta(productoId: Id) {
     setCreando(true);
     try {
-      await borrarProducto(db, productoId); // también borra su vínculo con esta lista
+      await borrarProducto(sesion, productoId); // también borra su vínculo con esta lista
       setComparacion((c) => c && { ...c, todos: c.todos.filter((p) => p.id !== productoId) });
       setCreados((actuales) => new Set([...actuales].filter((id) => id !== productoId)));
       setElecciones((actuales) => actuales.map((e) => (e === productoId ? null : e)));
@@ -117,7 +120,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
   async function guardar() {
     setGuardando(true);
     try {
-      await guardarVinculos(db, proveedor.id, cambios);
+      await guardarVinculos(sesion, proveedor.id, cambios);
     } finally {
       setGuardando(false);
     }
@@ -150,7 +153,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
       {buscando === i && <BuscarProducto productos={todos} onElegir={(id) => elegir(i, id)} onCancelar={() => setBuscando(null)} />}
     </li>
   );
-  const nombre = (id: number) => productos.get(id)?.descripcion ?? '';
+  const nombre = (id: Id) => productos.get(id)?.descripcion ?? '';
   const botonBuscar = (i: number, texto = 'Buscar otro') =>
     buscando !== i && (
       <button type="button" onClick={() => setBuscando(i)} className="min-h-11 rounded-lg px-2 font-semibold text-green-800 underline">
@@ -317,7 +320,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
 
 interface PropsBuscar {
   productos: Producto[];
-  onElegir: (productoId: number) => void;
+  onElegir: (productoId: Id) => void;
   onCancelar: () => void;
 }
 

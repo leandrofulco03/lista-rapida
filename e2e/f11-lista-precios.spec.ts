@@ -1,11 +1,10 @@
+import { entrarComoDueno } from './ayudas';
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { PDFDocument } from 'pdf-lib';
 
 test('F11: lista de precios en PDF y CSV para la caja que se abre bien en Excel', async ({ page }) => {
-  await page.goto('/');
-  await page.getByLabel('Nombre del comercio').fill('Almacén Don José');
-  await page.getByRole('button', { name: 'Guardar y empezar' }).click();
+  await entrarComoDueno(page);
   await page.getByRole('button', { name: 'Catálogo' }).click();
   await page.getByRole('button', { name: 'Importar desde Excel' }).click();
   await page.getByLabel('Archivo del catálogo').setInputFiles({
