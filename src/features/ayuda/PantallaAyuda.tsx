@@ -22,10 +22,10 @@ export function PantallaAyuda({ onIr, onVolver }: Props) {
   const [vista, setVista] = useState<Vista>('guia');
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-3xl">
       <Encabezado Icono={IconoAyuda} titulo="Ayuda" descripcion="Cómo usar la app, paso a paso, y las dudas más comunes." />
 
-      <div className="mt-6 grid grid-cols-2 gap-2" role="group" aria-label="Qué querés ver">
+      <div className="mt-6 grid grid-cols-2 gap-2 sm:max-w-md" role="group" aria-label="Qué querés ver">
         {VISTAS.map((v) => (
           <button
             key={v.valor}
@@ -34,8 +34,8 @@ export function PantallaAyuda({ onIr, onVolver }: Props) {
             onClick={() => setVista(v.valor)}
             className={`min-h-11 rounded-xl border px-2 text-sm font-semibold whitespace-nowrap transition active:scale-[0.98] ${
               vista === v.valor
-                ? 'border-green-600 bg-green-600 text-white shadow-md shadow-green-800/20'
-                : 'border-stone-200 bg-white shadow-sm hover:border-green-300 hover:bg-green-50'
+                ? 'border-green-600 bg-green-600 text-crema shadow-sm'
+                : 'border-stone-300 bg-white shadow-xs hover:border-green-400 hover:bg-green-50'
             }`}
           >
             {v.etiqueta}
@@ -45,13 +45,13 @@ export function PantallaAyuda({ onIr, onVolver }: Props) {
 
       {vista === 'guia' ? (
         <section className="mt-6" aria-label="Guía paso a paso" data-testid="guia-pasos">
-          <p className="text-stone-700">El recorrido completo, desde cargar tus productos hasta imprimir las etiquetas.</p>
+          <p className="text-stone-700">El recorrido completo: tus productos, las ventas, tus números y los precios de los proveedores.</p>
           <ol className="mt-4 space-y-3">
             {PASOS_GUIA.map((paso, i) => (
               <li key={paso.titulo} className="flex gap-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
                 <span
                   aria-hidden="true"
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-green-600 to-emerald-700 font-bold text-white shadow-sm"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-green-600 font-bold text-crema shadow-sm"
                 >
                   {i + 1}
                 </span>
@@ -111,7 +111,7 @@ export function PantallaAyuda({ onIr, onVolver }: Props) {
         </section>
       )}
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>

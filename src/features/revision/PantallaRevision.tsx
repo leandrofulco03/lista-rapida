@@ -72,7 +72,7 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
 
   if (actualizados !== null) {
     return (
-      <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+      <main className="mx-auto max-w-4xl">
         <Encabezado
           Icono={IconoListo}
           antetitulo={proveedor.nombre}
@@ -133,7 +133,7 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
   const sinVincular = revision.sinVincular.length + revision.repetidas.length;
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-28">
+    <main className="mx-auto max-w-4xl pb-28">
       <Encabezado Icono={IconoLista} antetitulo={proveedor.nombre} titulo="Revisá los precios" />
       <ul className="mt-4 grid grid-cols-2 gap-2 text-center" data-testid="resumen-revision">
         {[
@@ -201,13 +201,13 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
         </details>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 border-t border-stone-300 bg-stone-50 px-4 py-3">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-stone-200 bg-crema/95 px-4 py-3 backdrop-blur lg:left-64">
         {error && (
-          <p role="alert" className="mx-auto mb-2 max-w-md text-red-700">
+          <p role="alert" className="mx-auto mb-2 max-w-4xl text-red-700">
             {error}
           </p>
         )}
-        <div className="mx-auto flex max-w-md gap-3">
+        <div className="mx-auto flex max-w-4xl gap-3">
           <Boton type="button" variante="secundario" onClick={onVolver} className="basis-1/3">
             Salir
           </Boton>
@@ -281,7 +281,7 @@ function TarjetaCambio({ cambio: c, decision, onDecidir }: PropsTarjeta) {
               value={aMano}
               onChange={(e) => setAMano(e.target.value)}
               aria-invalid={manual && 'error' in manual && aMano.trim() !== '' ? true : undefined}
-              className="min-h-11 w-40 rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-right text-lg"
+              className="min-h-11 w-40 rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-right text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
             />
           </div>
           <p className="mt-1 text-sm text-stone-600">

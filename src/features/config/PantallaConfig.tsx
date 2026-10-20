@@ -6,7 +6,7 @@ import { formatearPesos } from '../../domain/dinero';
 import { IVA_GENERAL, IVA_REDUCIDO, formatearPorcentaje, parsearPorcentaje } from '../../domain/porcentaje';
 import { desglosarPrecio } from '../../domain/desglose';
 import type { DesglosePrecio } from '../../domain/desglose';
-import { DESCRIPCION_APP, NOMBRE_APP } from '../../marca';
+import { NOMBRE_APP } from '../../marca';
 import { Boton } from '../../ui/Boton';
 import { Encabezado } from '../../ui/Encabezado';
 import { IconoConfig } from '../../ui/Iconos';
@@ -71,19 +71,16 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className={primeraVez ? 'mx-auto w-full max-w-xl px-4 pt-8 pb-12' : 'mx-auto max-w-2xl'}>
       {primeraVez ? (
-        <header className="mb-6">
-          <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-green-600 via-green-700 to-emerald-800 p-6 text-white shadow-xl shadow-green-900/20">
-            <div aria-hidden="true" className="absolute -top-12 -right-12 size-44 rounded-full bg-white/10" />
-            <img src="/icono.svg" alt="" className="relative size-12 rounded-xl shadow-sm ring-1 ring-white/30" />
-            <h1 className="relative mt-4 text-3xl font-bold">{NOMBRE_APP}</h1>
-            <p className="relative mt-1 text-green-50/90">{DESCRIPCION_APP}</p>
-          </div>
-          <p className="mt-6 text-lg">Contanos de tu comercio. Lo podés cambiar cuando quieras.</p>
-        </header>
+        <Encabezado
+          antetitulo={`Bienvenido a ${NOMBRE_APP}`}
+          titulo="Creá tu comercio"
+          descripcion="Contanos de tu comercio. Lo podés cambiar cuando quieras."
+          className="mb-8"
+        />
       ) : (
-        <Encabezado Icono={IconoConfig} titulo="Configuración" className="mb-6" />
+        <Encabezado Icono={IconoConfig} titulo="Configuración" descripcion="Datos del comercio y cómo se calculan tus precios." className="mb-6" />
       )}
 
       <form onSubmit={enviar} noValidate className="space-y-6">
@@ -97,7 +94,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Ej.: Almacén Don José"
             autoComplete="organization"
-            className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
+            className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
           />
           {errores.nombreComercio && <p className="mt-1 text-red-700">{errores.nombreComercio}</p>}
         </div>
@@ -112,7 +109,7 @@ export function PantallaConfig({ inicial, onGuardar, onCancelar, onRestaurar }: 
               value={recargoTexto}
               onChange={(e) => setRecargoTexto(e.target.value)}
               inputMode="decimal"
-              className="min-h-11 w-28 rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-right text-lg"
+              className="min-h-11 w-28 rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-right text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
             />
             <span className="text-lg">%</span>
           </div>

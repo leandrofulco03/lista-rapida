@@ -58,7 +58,7 @@ export function PantallaRubros({ onVolver }: Props) {
   if (rubros === null) return null;
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-2xl">
       <Encabezado
         Icono={IconoCatalogo}
         titulo="Rubros"
@@ -101,7 +101,7 @@ export function PantallaRubros({ onVolver }: Props) {
         )}
       </form>
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-6">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-6 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>

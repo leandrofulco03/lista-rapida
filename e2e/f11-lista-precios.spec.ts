@@ -1,11 +1,11 @@
-import { entrarComoDueno } from './ayudas';
+import { entrarComoDueno, irA } from './ayudas';
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { PDFDocument } from 'pdf-lib';
 
 test('F11: lista de precios en PDF y CSV para la caja que se abre bien en Excel', async ({ page }) => {
   await entrarComoDueno(page);
-  await page.getByRole('button', { name: 'Catálogo' }).click();
+  await irA(page, 'Catálogo');
   await page.getByRole('button', { name: 'Importar desde Excel' }).click();
   await page.getByLabel('Archivo del catálogo').setInputFiles({
     name: 'catalogo.csv',
@@ -24,7 +24,7 @@ test('F11: lista de precios en PDF y CSV para la caja que se abre bien en Excel'
   await page.getByRole('button', { name: 'Ver el catálogo' }).click();
   await page.getByRole('button', { name: 'Volver' }).click();
 
-  await page.getByRole('button', { name: 'Lista de precios' }).click();
+  await irA(page, 'Lista de precios');
   await expect(page.getByRole('button', { name: 'Todos (2)' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByText('1 producto sin precio no se incluye.')).toBeVisible();
 

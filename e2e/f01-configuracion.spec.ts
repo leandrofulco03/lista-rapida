@@ -1,9 +1,9 @@
-import { empezarComercio } from './ayudas';
+import { empezarComercio, irA } from './ayudas';
 import { expect, test } from '@playwright/test';
 
 test('F01: primera configuración, queda guardada al recargar y se puede editar', async ({ page }) => {
   await empezarComercio(page);
-  await expect(page.getByRole('heading', { name: 'ListaMatch' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Creá tu comercio' })).toBeVisible();
 
   // Sin nombre no deja avanzar
   await page.getByRole('button', { name: 'Guardar y empezar' }).click();
@@ -41,17 +41,17 @@ test('F01: primera configuración, queda guardada al recargar y se puede editar'
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Almacén Don José' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Configuración' }).click();
+  await irA(page, 'Configuración');
   await expect(page.getByRole('button', { name: 'Termina en 90' })).toHaveAttribute('aria-pressed', 'true');
   await page.getByLabel('Recargo general').fill('40');
   await page.getByRole('button', { name: 'Guardar cambios' }).click();
-  await page.getByRole('button', { name: 'Configuración' }).click();
+  await irA(page, 'Configuración');
   await expect(page.getByLabel('Recargo general')).toHaveValue('40');
 });
 
 test('F01: la app ofrece instalarse (manifest)', async ({ page, request }) => {
   await page.goto('/');
   const manifest = await (await request.get('/manifest.webmanifest')).json();
-  expect(manifest).toMatchObject({ name: 'ListaMatch', lang: 'es-AR', display: 'standalone' });
+  expect(manifest).toMatchObject({ name: 'Vendia', lang: 'es-AR', display: 'standalone' });
   expect(manifest.description).toContain('proveedores');
 });

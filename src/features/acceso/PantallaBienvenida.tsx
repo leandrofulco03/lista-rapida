@@ -11,11 +11,11 @@ interface Props {
 /** Con sesión pero sin comercio: el dueño crea el suyo; el empleado se une con un código. */
 export function PantallaBienvenida({ email, onCrear, onUnirse, onSalir }: Props) {
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto w-full max-w-md px-4 pt-8 pb-12">
       <h1 className="text-3xl font-bold">Bienvenido a {NOMBRE_APP}</h1>
       <p className="mt-2 text-lg text-stone-700">¿Cómo vas a usar la app?</p>
 
-      <section className="mt-6 space-y-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+      <section className="mt-6 space-y-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold">Soy el dueño</h2>
         <p className="text-stone-600">Cargás tu comercio, tus precios y tus proveedores, y ves las ventas y los números.</p>
         <Boton type="button" onClick={onCrear}>
@@ -23,7 +23,7 @@ export function PantallaBienvenida({ email, onCrear, onUnirse, onSalir }: Props)
         </Boton>
       </section>
 
-      <section className="mt-4 space-y-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+      <section className="mt-4 space-y-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold">Trabajo en un comercio</h2>
         <p className="text-stone-600">Cargás las ventas con el código que te pasó el dueño.</p>
         <Boton type="button" variante="secundario" onClick={onUnirse}>

@@ -54,7 +54,7 @@ export function PantallaProveedores({ onVolver }: Props) {
   if (proveedores === null) return null;
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-4xl">
       <Encabezado Icono={IconoProveedores} titulo="Proveedores" descripcion="Cada proveedor recuerda cómo viene su lista." />
 
       {proveedores.length === 0 ? (
@@ -85,7 +85,7 @@ export function PantallaProveedores({ onVolver }: Props) {
         <Boton type="submit">Agregar proveedor</Boton>
       </form>
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-3">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-3 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>

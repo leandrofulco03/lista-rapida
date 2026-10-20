@@ -7,12 +7,12 @@ test('Ayuda: se llega desde el inicio, muestra la guía y las preguntas, y lleva
   await page.getByRole('button', { name: '¿Cómo se usa?' }).click();
   await expect(page.getByRole('heading', { name: 'Ayuda', exact: true })).toBeVisible();
 
-  // Arranca en la guía, con los 8 pasos del recorrido en orden.
+  // Arranca en la guía, con los 10 pasos del recorrido en orden.
   await expect(page.getByRole('button', { name: 'Paso a paso' })).toHaveAttribute('aria-pressed', 'true');
   const pasos = page.getByTestId('guia-pasos').getByRole('heading', { level: 2 });
-  await expect(pasos).toHaveCount(8);
+  await expect(pasos).toHaveCount(10);
   await expect(pasos.first()).toHaveText('Paso 1: Configurá tu comercio');
-  await expect(pasos.last()).toHaveText('Paso 8: Sumá a tu equipo');
+  await expect(pasos.last()).toHaveText('Paso 10: Sumá a tu equipo');
 
   // Las preguntas están plegadas y se abren al tocarlas.
   await page.getByRole('button', { name: 'Preguntas frecuentes' }).click();
@@ -21,6 +21,9 @@ test('Ayuda: se llega desde el inicio, muestra la guía y las preguntas, y lleva
   await expect(respuesta).toBeHidden();
   await preguntas.getByText('¿Dónde se guardan mis datos? ¿Alguien más los ve?').click();
   await expect(respuesta).toBeVisible();
+  // Están las preguntas de lo nuevo: el menú y el análisis.
+  await expect(preguntas.getByText('¿Cómo me muevo por la app?')).toBeVisible();
+  await expect(preguntas.getByText('¿Cómo se calcula la ganancia?')).toBeVisible();
 
   // Un paso de la guía lleva a su pantalla, y de ahí se vuelve al inicio.
   await page.getByRole('button', { name: 'Paso a paso' }).click();

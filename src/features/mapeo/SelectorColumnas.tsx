@@ -57,7 +57,7 @@ export function SelectorColumnas<C extends string>({ filas, campos, nombres, sel
         id={idFila}
         value={seleccion.filaEncabezado ?? ''}
         onChange={(e) => onCambiar({ ...seleccion, filaEncabezado: e.target.value === '' ? null : Number(e.target.value) })}
-        className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-base"
+        className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-base outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
       >
         <option value="">El archivo no tiene títulos</option>
         {opcionesFila.map(({ valor, texto }) => (

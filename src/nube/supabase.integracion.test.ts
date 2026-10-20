@@ -9,6 +9,7 @@ import {
   leerConfig,
   listarEquipo,
   listarProductos,
+  analisisVentas,
   misComercios,
   productosParaVender,
   registrarVenta,
@@ -86,5 +87,13 @@ describe.skipIf(!correr)('Supabase real', () => {
     expect(await ventasDelDia(se, diaDe(new Date()))).toHaveLength(1);
     const hoy = diaDe(new Date());
     expect(await resumenVentas(s, hoy, hoy)).toMatchObject({ totalTickets: 320_000, tickets: 1, articulos: 2 });
+
+    // Análisis (Fase 9): ganancia sólo para el dueño; el empleado no lee las líneas con costo.
+    const analisis = await analisisVentas(s, hoy, hoy);
+    expect(analisis.ganancia.ventasConCosto).toBe(320_000);
+    expect(analisis.productos).toHaveLength(1);
+    await expect(analisisVentas(se, hoy, hoy)).rejects.toThrow();
+    const { error } = await createClient(url!, clave!).from('venta_items').select('costo_unitario');
+    expect(error).not.toBeNull();
   });
 });

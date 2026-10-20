@@ -183,7 +183,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
   if (proveedores === null) return null;
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-3xl">
       <Encabezado Icono={IconoSubir} titulo="Subí una lista" descripcion="Excel, CSV o PDF. Los precios no cambian hasta que los revises." />
 
       <form onSubmit={leer} noValidate className="mt-6 space-y-6">
@@ -195,7 +195,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
             id={ids.proveedor}
             value={elegido}
             onChange={(e) => elegirProveedor(e.target.value)}
-            className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
+            className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
           >
             {proveedores.map((p) => (
               <option key={p.id} value={p.id}>
@@ -214,7 +214,7 @@ export function PantallaSubirLista({ config, onEtiquetas, onListaPrecios, onVolv
                 value={nombreNuevo}
                 onChange={(e) => setNombreNuevo(e.target.value)}
                 placeholder="Ej.: Distribuidora El Sol"
-                className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
+                className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
               />
             </>
           )}

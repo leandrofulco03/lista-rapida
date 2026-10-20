@@ -39,7 +39,7 @@ export function PantallaEquipo({ onVolver }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-3xl">
       <Encabezado
         Icono={IconoProveedores}
         titulo="Equipo"
@@ -122,7 +122,7 @@ export function PantallaEquipo({ onVolver }: Props) {
         </p>
       )}
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>

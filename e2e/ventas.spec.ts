@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { crearCuenta, entrarComoDueno } from './ayudas';
+import { crearCuenta, entrarComoDueno, irA, salir } from './ayudas';
 
 /** Catálogo chico importado desde un CSV. */
 async function cargarCatalogo(page: Page) {
-  await page.getByRole('button', { name: 'Catálogo' }).click();
+  await irA(page, 'Catálogo');
   await page.getByRole('button', { name: 'Importar desde Excel' }).click();
   await page.getByLabel('Archivo del catálogo').setInputFiles({
     name: 'catalogo.csv',
@@ -91,7 +91,7 @@ test('el dueño vende, ve el resumen del día, carga el total de ayer y anula un
 test('el empleado vende y ve sólo sus ventas de hoy', async ({ page }) => {
   await entrarComoDueno(page);
   await cargarCatalogo(page);
-  await page.getByRole('button', { name: 'Equipo' }).click();
+  await irA(page, 'Equipo');
   await page.getByRole('button', { name: 'Generar código' }).click();
   const codigo = (await page.getByTestId('codigo-invitacion').textContent())!;
   await page.getByRole('button', { name: 'Volver' }).click();
@@ -104,7 +104,7 @@ test('el empleado vende y ve sólo sus ventas de hoy', async ({ page }) => {
   await expect(page.getByTestId('aviso-venta')).toContainText('Venta guardada');
   await page.getByRole('button', { name: 'Volver' }).click();
   await page.getByRole('button', { name: 'Volver' }).click();
-  await page.getByRole('button', { name: 'Salir' }).click();
+  await salir(page);
 
   await crearCuenta(page, 'juan@almacen.com');
   await page.getByRole('button', { name: 'Tengo un código' }).click();

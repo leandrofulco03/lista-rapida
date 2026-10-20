@@ -40,15 +40,13 @@ export function PantallaIngreso({ backend }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <header className="relative overflow-hidden rounded-3xl bg-linear-to-br from-green-600 via-green-700 to-emerald-800 p-6 text-white shadow-xl shadow-green-900/20">
-        <div aria-hidden="true" className="absolute -top-12 -right-12 size-44 rounded-full bg-white/10" />
-        <img src="/icono.svg" alt="" className="relative size-12 rounded-xl shadow-sm ring-1 ring-white/30" />
-        <h1 className="relative mt-4 text-3xl font-bold">{NOMBRE_APP}</h1>
-        <p className="relative mt-1 text-green-50/90">{DESCRIPCION_APP}</p>
+    <main className="mx-auto w-full max-w-md px-4 pt-8 pb-12">
+      <header>
+        <h1 className="text-3xl font-bold">{modo === 'ingresar' ? `Entrá a ${NOMBRE_APP}` : 'Creá tu cuenta'}</h1>
+        <p className="mt-2 text-stone-600 lg:hidden">{DESCRIPCION_APP}</p>
       </header>
 
-      <form onSubmit={enviar} className="mt-6 space-y-5" noValidate>
+      <form onSubmit={enviar} className="mt-8 space-y-5" noValidate>
         <Opciones
           legend="¿Ya tenés cuenta?"
           valor={modo}

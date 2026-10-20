@@ -67,7 +67,7 @@ export function PantallaImportarCatalogo({ config, onVolver }: Props) {
   if (paso.tipo === 'listo') {
     const { creados, actualizados, rubrosCreados } = paso.resultado;
     return (
-      <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+      <main className="mx-auto max-w-3xl">
         <Encabezado Icono={IconoListo} titulo={`Importamos ${creados + actualizados} productos`} testIdTitulo="titulo-importacion" />
         <ul className="mt-4 space-y-1 text-lg" data-testid="resumen-importacion">
           <li>{creados} nuevos</li>
@@ -97,7 +97,7 @@ export function PantallaImportarCatalogo({ config, onVolver }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-3xl">
       <Encabezado
         Icono={IconoSubir}
         titulo="Importar catálogo"
@@ -164,7 +164,7 @@ function ElegirColumnasCatalogo({ archivo, tabla, deteccion, onConfirmar, onCanc
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-5xl">
       <Encabezado Icono={IconoColumnas} titulo="¿Qué columna es cada dato?" descripcion={archivo} />
       <p
         className={`mt-4 rounded-xl p-3 ${deteccion.confianza === 'alta' ? 'bg-green-50 text-green-900' : 'bg-amber-50 text-amber-900'}`}

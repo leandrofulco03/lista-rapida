@@ -1,4 +1,4 @@
-import { entrarComoDueno } from './ayudas';
+import { entrarComoDueno, irA } from './ayudas';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
@@ -27,7 +27,7 @@ async function subirLista(page: Page) {
 test('F07: la primera lista se confirma con un toque y la segunda se vincula sola', async ({ page }) => {
   await configurar(page);
 
-  await page.getByRole('button', { name: 'Catálogo' }).click();
+  await irA(page, 'Catálogo');
   await page.getByRole('button', { name: 'Importar desde Excel' }).click();
   await page.getByLabel('Archivo del catálogo').setInputFiles(CATALOGO);
   await page.getByRole('button', { name: 'Leer archivo' }).click();

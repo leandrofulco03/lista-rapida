@@ -27,6 +27,25 @@ import { PantallaResumen } from './features/ventas/PantallaResumen';
 import { PantallaTotalDia } from './features/ventas/PantallaTotalDia';
 import { PantallaVender } from './features/ventas/PantallaVender';
 import { PantallaVentasDelDia } from './features/ventas/PantallaVentasDelDia';
+import { PantallaAnalisis } from './features/analisis/PantallaAnalisis';
+import { Marco } from './ui/Marco';
+import type { GrupoMenu } from './ui/Marco';
+import { MarcoAcceso } from './ui/MarcoAcceso';
+import { Logo } from './ui/Logo';
+import {
+  IconoAyuda,
+  IconoCatalogo,
+  IconoConfig,
+  IconoDocumento,
+  IconoEquipo,
+  IconoEtiqueta,
+  IconoGrafico,
+  IconoInicio,
+  IconoProveedores,
+  IconoSubir,
+  IconoTicket,
+  IconoVender,
+} from './ui/Iconos';
 
 type Pantalla =
   | 'inicio'
@@ -42,10 +61,55 @@ type Pantalla =
   | 'vender'
   | 'ventas'
   | 'ventas-dia'
-  | 'total-dia';
+  | 'total-dia'
+  | 'analisis';
 
 /** Pantallas del empleado: sólo vende y ve sus ventas de hoy. */
 type PantallaEmpleadoNav = 'inicio' | 'vender' | 'mis-ventas';
+
+/** Menú del dueño, agrupado por área. */
+const MENU_DUENO: GrupoMenu<Pantalla>[] = [
+  { items: [{ id: 'inicio', etiqueta: 'Inicio', Icono: IconoInicio }] },
+  {
+    titulo: 'Ventas',
+    items: [
+      { id: 'vender', etiqueta: 'Vender', Icono: IconoVender },
+      { id: 'ventas', etiqueta: 'Ventas', Icono: IconoTicket },
+      { id: 'analisis', etiqueta: 'Análisis', Icono: IconoGrafico },
+    ],
+  },
+  {
+    titulo: 'Precios',
+    items: [
+      { id: 'subir', etiqueta: 'Subir lista', Icono: IconoSubir },
+      { id: 'catalogo', etiqueta: 'Catálogo', Icono: IconoCatalogo },
+      { id: 'proveedores', etiqueta: 'Proveedores', Icono: IconoProveedores },
+      { id: 'etiquetas', etiqueta: 'Etiquetas', Icono: IconoEtiqueta },
+      { id: 'lista-precios', etiqueta: 'Lista de precios', Icono: IconoDocumento },
+    ],
+  },
+  {
+    titulo: 'Comercio',
+    items: [
+      { id: 'equipo', etiqueta: 'Equipo', Icono: IconoEquipo },
+      { id: 'config', etiqueta: 'Configuración', Icono: IconoConfig },
+      { id: 'ayuda', etiqueta: 'Ayuda', Icono: IconoAyuda },
+    ],
+  },
+];
+
+/** Pantallas que cuelgan de una sección del menú: la marcan como actual. */
+const SECCION_DE: Partial<Record<Pantalla, Pantalla>> = { 'ventas-dia': 'ventas', 'total-dia': 'ventas', respaldo: 'config' };
+
+const MENU_EMPLEADO: GrupoMenu<PantallaEmpleadoNav>[] = [
+  {
+    items: [
+      { id: 'inicio', etiqueta: 'Inicio', Icono: IconoInicio },
+      { id: 'vender', etiqueta: 'Vender', Icono: IconoVender },
+      { id: 'mis-ventas', etiqueta: 'Mis ventas', Icono: IconoTicket },
+    ],
+  },
+];
 
 /** Qué se muestra: depende de la conexión, de la sesión, del comercio y del rol. */
 type Estado =
@@ -60,6 +124,8 @@ export function App() {
   const [backend, setBackend] = useState<Backend | null>(null);
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [estado, setEstado] = useState<Estado>({ tipo: 'cargando' });
+  /** Cambia cada vez que se elige una sección del menú: así la pantalla arranca de cero aunque sea la misma. */
+  const [visita, setVisita] = useState(0);
 
   // Conexión y sesión.
   useEffect(() => {
@@ -106,54 +172,42 @@ export function App() {
 
   if (estado.tipo === 'cargando') {
     return (
-      <p className="p-8 text-center text-stone-600" role="status">
-        Cargando…
-      </p>
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4">
+        <Logo tamano="grande" />
+        <p className="text-stone-600" role="status">
+          Cargando…
+        </p>
+      </div>
     );
   }
   if (estado.tipo === 'sin-conexion') {
     return (
-      <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-        <h1 className="text-2xl font-bold">No pudimos conectarnos</h1>
-        <p className="mt-2 text-stone-700" role="alert">
-          {estado.error}
-        </p>
-        <button type="button" onClick={() => location.reload()} className="mt-6 min-h-11 font-semibold text-green-800 underline underline-offset-4">
-          Probar de nuevo
-        </button>
-      </main>
+      <MarcoAcceso>
+        <main className="mx-auto w-full max-w-md px-4 pt-8 pb-12">
+          <h1 className="text-2xl font-bold">No pudimos conectarnos</h1>
+          <p className="mt-2 text-stone-700" role="alert">
+            {estado.error}
+          </p>
+          <button type="button" onClick={() => location.reload()} className="mt-6 min-h-11 font-semibold text-green-700 underline underline-offset-4">
+            Probar de nuevo
+          </button>
+        </main>
+      </MarcoAcceso>
     );
   }
   if (!backend) return null;
-  if (estado.tipo === 'sin-sesion' || !usuario) return <PantallaIngreso backend={backend} />;
-  const salir = () => backend.salir();
-
-  if (estado.tipo === 'sin-comercio') {
-    if (estado.paso === 'crear') {
-      return (
-        <PantallaConfig
-          onGuardar={async (config) => {
-            await crearComercio(backend, config);
-            await cargarComercio(backend);
-          }}
-          onCancelar={() => setEstado({ tipo: 'sin-comercio', paso: 'elegir' })}
-        />
-      );
-    }
-    if (estado.paso === 'unirse') {
-      return (
-        <PantallaUnirse backend={backend} onUnido={() => cargarComercio(backend)} onVolver={() => setEstado({ tipo: 'sin-comercio', paso: 'elegir' })} />
-      );
-    }
+  if (estado.tipo === 'sin-sesion' || !usuario) {
     return (
-      <PantallaBienvenida
-        email={usuario.email}
-        onCrear={() => setEstado({ tipo: 'sin-comercio', paso: 'crear' })}
-        onUnirse={() => setEstado({ tipo: 'sin-comercio', paso: 'unirse' })}
-        onSalir={salir}
-      />
+      <MarcoAcceso>
+        <PantallaIngreso backend={backend} />
+      </MarcoAcceso>
     );
   }
+  const b = backend;
+  const u = usuario;
+  const salir = () => b.salir();
+
+  if (estado.tipo === 'sin-comercio') return <MarcoAcceso>{pantallaSinComercio(estado.paso)}</MarcoAcceso>;
 
   if (!sesion) return null;
   return (
@@ -162,24 +216,81 @@ export function App() {
     </ContextoSesion.Provider>
   );
 
-  function pantallaEmpleado(e: Extract<Estado, { tipo: 'empleado' }>) {
-    const ir = (pantalla: PantallaEmpleadoNav) => setEstado({ ...e, pantalla });
-    if (e.pantalla === 'vender') return <PantallaVender onVolver={() => ir('inicio')} onMisVentas={() => ir('mis-ventas')} />;
-    if (e.pantalla === 'mis-ventas') return <PantallaVentasDelDia esDueno={false} onVolver={() => ir('inicio')} />;
+  function pantallaSinComercio(paso: 'elegir' | 'crear' | 'unirse') {
+    if (paso === 'crear') {
+      return (
+        <PantallaConfig
+          onGuardar={async (config) => {
+            await crearComercio(b, config);
+            await cargarComercio(b);
+          }}
+          onCancelar={() => setEstado({ tipo: 'sin-comercio', paso: 'elegir' })}
+        />
+      );
+    }
+    if (paso === 'unirse') {
+      return <PantallaUnirse backend={b} onUnido={() => cargarComercio(b)} onVolver={() => setEstado({ tipo: 'sin-comercio', paso: 'elegir' })} />;
+    }
     return (
-      <PantallaEmpleado
-        nombreComercio={e.comercio.nombre}
-        email={usuario!.email}
-        onVender={() => ir('vender')}
-        onMisVentas={() => ir('mis-ventas')}
+      <PantallaBienvenida
+        email={u.email}
+        onCrear={() => setEstado({ tipo: 'sin-comercio', paso: 'crear' })}
+        onUnirse={() => setEstado({ tipo: 'sin-comercio', paso: 'unirse' })}
         onSalir={salir}
       />
     );
   }
 
+  /** Elegir una sección del menú: la pantalla se arma de nuevo aunque ya estuviera abierta. */
+  function desdeMenu<T>(ir: (p: T) => void) {
+    return (p: T) => {
+      setVisita((v) => v + 1);
+      ir(p);
+    };
+  }
+
+  function pantallaEmpleado(e: Extract<Estado, { tipo: 'empleado' }>) {
+    const ir = (pantalla: PantallaEmpleadoNav) => setEstado({ ...e, pantalla });
+    let contenido;
+    if (e.pantalla === 'vender') contenido = <PantallaVender onVolver={() => ir('inicio')} onMisVentas={() => ir('mis-ventas')} />;
+    else if (e.pantalla === 'mis-ventas') contenido = <PantallaVentasDelDia esDueno={false} onVolver={() => ir('inicio')} />;
+    else contenido = <PantallaEmpleado nombreComercio={e.comercio.nombre} onVender={() => ir('vender')} onMisVentas={() => ir('mis-ventas')} />;
+    return (
+      <Marco
+        nombreComercio={e.comercio.nombre}
+        rol="Empleado"
+        email={u.email}
+        grupos={MENU_EMPLEADO}
+        activo={e.pantalla}
+        pantalla={`${e.pantalla}-${visita}`}
+        onIr={desdeMenu(ir)}
+        onSalir={salir}
+      >
+        <div key={visita}>{contenido}</div>
+      </Marco>
+    );
+  }
+
   function pantallaAdmin(e: Extract<Estado, { tipo: 'admin' }>) {
     const ir = (pantalla: Pantalla, dia?: Dia) => setEstado({ ...e, pantalla, etiquetas: undefined, dia });
-    const recargar = (pantalla: Pantalla = 'inicio') => cargarComercio(backend!, pantalla);
+    return (
+      <Marco
+        nombreComercio={e.comercio.nombre}
+        rol="Dueño"
+        email={u.email}
+        grupos={MENU_DUENO}
+        activo={SECCION_DE[e.pantalla] ?? e.pantalla}
+        pantalla={`${e.pantalla}-${visita}`}
+        onIr={desdeMenu((p: Pantalla) => ir(p))}
+        onSalir={salir}
+      >
+        <div key={visita}>{contenidoAdmin(e, ir)}</div>
+      </Marco>
+    );
+  }
+
+  function contenidoAdmin(e: Extract<Estado, { tipo: 'admin' }>, ir: (pantalla: Pantalla, dia?: Dia) => void) {
+    const recargar = (pantalla: Pantalla = 'inicio') => cargarComercio(b, pantalla);
     switch (e.pantalla) {
       case 'config':
         return (
@@ -224,15 +335,18 @@ export function App() {
             onVender={() => ir('vender')}
             onVerTickets={(dia) => ir('ventas-dia', dia)}
             onTotalDia={(dia) => ir('total-dia', dia)}
+            onAnalisis={() => ir('analisis')}
             onVolver={() => ir('inicio')}
           />
         );
+      case 'analisis':
+        return <PantallaAnalisis config={e.config} onVolver={() => ir('inicio')} />;
       case 'ventas-dia':
         return <PantallaVentasDelDia esDueno diaInicial={e.dia} onVolver={() => ir('ventas')} />;
       case 'total-dia':
         return <PantallaTotalDia dia={e.dia ?? diaDe(new Date())} onGuardado={() => ir('ventas')} onVolver={() => ir('ventas')} />;
       default:
-        return <PantallaInicio config={e.config} email={usuario!.email} onIr={(p) => ir(p)} onSalir={salir} />;
+        return <PantallaInicio config={e.config} onIr={(p) => ir(p)} />;
     }
   }
 }

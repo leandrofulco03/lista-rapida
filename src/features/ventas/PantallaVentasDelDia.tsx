@@ -61,7 +61,7 @@ export function PantallaVentasDelDia({ esDueno, diaInicial, onVolver }: Props) {
   const pendientesDelDia = cola.pendientes.filter((p) => diaDe(new Date(p.venta.fecha)) === dia);
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-3xl">
       <h1 className="text-2xl font-bold">{esDueno ? 'Ventas del día' : 'Mis ventas de hoy'}</h1>
       {esDueno && (
         <div className="mt-3 flex items-center justify-between gap-2">
@@ -188,7 +188,7 @@ export function PantallaVentasDelDia({ esDueno, diaInicial, onVolver }: Props) {
         </div>
       )}
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>

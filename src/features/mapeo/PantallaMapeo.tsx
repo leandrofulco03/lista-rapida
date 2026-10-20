@@ -44,7 +44,7 @@ export function PantallaMapeo({ filas, nombreArchivo, inicial, confianza, onConf
   const resultado = useMemo(() => (mapeo ? extraerLineas(filas, mapeo) : null), [filas, mapeo]);
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-5xl">
       <Encabezado Icono={IconoColumnas} titulo="¿Qué columna es cada dato?" descripcion={nombreArchivo} />
       <p
         className={`mt-4 rounded-xl p-3 ${confianza === 'alta' ? 'bg-green-50 text-green-900' : 'bg-amber-50 text-amber-900'}`}

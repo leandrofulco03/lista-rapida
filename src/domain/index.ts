@@ -16,3 +16,4 @@ export * from './vinculacion';
 export * from './revision';
 export * from './respaldo';
 export * from './ventas';
+export * from './analisis';

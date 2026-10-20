@@ -53,7 +53,7 @@ export function PantallaCatalogo({ config, onVolver }: Props) {
   if (productos === null) return null;
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-5xl">
       <Encabezado
         Icono={IconoCatalogo}
         titulo="Catálogo"
@@ -61,14 +61,14 @@ export function PantallaCatalogo({ config, onVolver }: Props) {
         testIdDescripcion="cantidad-productos"
       />
 
-      <div className="mt-4 space-y-3">
-        <Boton type="button" onClick={() => setVista({ tipo: 'producto', producto: null })}>
+      <div className="mt-5 grid gap-3 sm:flex sm:flex-wrap">
+        <Boton type="button" className="sm:w-auto sm:px-6" onClick={() => setVista({ tipo: 'producto', producto: null })}>
           Agregar producto
         </Boton>
-        <Boton type="button" variante="secundario" onClick={() => setVista({ tipo: 'importar' })}>
+        <Boton type="button" variante="secundario" className="sm:w-auto sm:px-6" onClick={() => setVista({ tipo: 'importar' })}>
           Importar desde Excel
         </Boton>
-        <Boton type="button" variante="secundario" onClick={() => setVista({ tipo: 'rubros' })}>
+        <Boton type="button" variante="secundario" className="sm:w-auto sm:px-6" onClick={() => setVista({ tipo: 'rubros' })}>
           Rubros
         </Boton>
       </div>
@@ -81,7 +81,7 @@ export function PantallaCatalogo({ config, onVolver }: Props) {
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar por descripción o código"
             aria-label="Buscar producto"
-            className="mt-6 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
+            className="mt-6 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
           />
           <ul className="mt-3 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white shadow-sm" data-testid="lista-productos">
             {filtrados.slice(0, MOSTRAR).map((p) => (
@@ -111,7 +111,7 @@ export function PantallaCatalogo({ config, onVolver }: Props) {
         </>
       )}
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-6">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-6 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>

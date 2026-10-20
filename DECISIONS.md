@@ -2,6 +2,31 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 20/10/2026 · v2: rediseño y nombre Vendia
+
+- **Nombre:** la app pasa a llamarse **Vendia** (decisión de Leandro). Cambian el título, el manifest, el logo (una "V" crema sobre verde) y los íconos de la PWA (`node scripts/generar-iconos.mjs`). La pantalla para traer la copia de seguridad sigue nombrando a ListaMatch, porque es la versión anterior.
+- **Pensada como web app, adaptada al celular:** menú de secciones a la izquierda, agrupado (Ventas, Precios, Comercio), fijo desde 1024 px. En el celular se esconde detrás del botón de menú de la barra de arriba y se abre como cajón: se cierra al elegir, con Escape o tocando afuera, lleva el foco adentro y lo devuelve al botón. La cuenta y "Salir" van al pie del menú.
+- **Colores:** verde #31493C (marca) y crema #FAFADE (fondo), pedidos por Leandro. Se redefinieron las escalas `green` y `stone` de Tailwind en `src/index.css`, así todas las pantallas cambiaron sin tocar sus clases; los grises de texto superan 4,5:1 sobre el crema y sobre las tarjetas. Los gráficos de una sola serie y el mapa de calor pasan al verde de la marca; la torta mantiene la paleta categórica validada.
+- **Tipografía:** Plus Jakarta Sans, incluida en la app (no desde Google Fonts), para que ande sin conexión y sin tocar la política de seguridad.
+- **Inicio como panel:** vendido hoy contra ayer, ventas, ticket promedio, la semana, las últimas 6 ventas y cómo pagaron. Los accesos a las secciones salieron del inicio porque ya están en el menú.
+- **Pantallas más anchas en la compu:** formularios medianos y listas, ventas y análisis anchos. Vender pasa a dos columnas (buscar a la izquierda, ticket y cobro a la derecha); en el celular sigue la barra de cobro fija abajo.
+- **Ingreso:** en la compu, panel de marca a la izquierda y formulario a la derecha.
+- **Pruebas:** los recorridos navegan con el menú (`irA`, `salir` en `e2e/ayudas.ts`) y hay uno nuevo (`diseno.spec.ts`) que prueba el menú en la compu y en el celular.
+
+## 22/10/2026 · v2 Fase 9: análisis
+
+- **Pantalla Análisis** (sólo el dueño, desde el inicio y desde Ventas), con un período arriba que vale para todo: 7 días, 30 días, este mes, mes pasado, 90 días. Al cambiarlo, lo anterior queda atenuado hasta que llegan los datos (sin parpadeo).
+- **Ganancia = lo cobrado − lo que costó.** El costo del catálogo está sin IVA y el recargo se aplica sobre costo + IVA cuando se vende con IVA incluido (F08); en ese caso el IVA cuenta como costo (lo que paga un monotributista, que no lo recupera). Así la ganancia coincide con el recargo: 30% de recargo = 23,1% de margen. Si el comercio vende sin IVA, la ganancia es precio − costo. Lo vendido sin costo conocido ("Varios", productos con costo 0) y el total del día no entran en la ganancia, y la pantalla lo dice con el monto. Descartado: un ajuste por condición fiscal (responsable inscripto); se suma si el piloto lo pide.
+- **El IVA de cada línea se guarda al vender** (como el costo). Las ventas anteriores usan el IVA del producto, o 21%.
+- **Gráficos hechos a mano** (SVG y HTML, `src/ui/graficos/`), sin librería: son cuatro formas simples y una librería sumaba unos 100 kB. Siguen la guía de visualización: línea de 2px con lavado suave, grilla fina, una sola serie sin leyenda, barras finas de un color con el valor en la punta, torta con hasta 5 porciones + "Otros" (con más, no se lee), mapa de calor de un solo tono (5 pasos) con escala. Cada gráfico tiene tooltip con mouse, dedo y teclado, y "Ver los datos" con la tabla.
+- **Colores de los gráficos como variables** en `src/index.css` (`--graf-*`), para cambiarlos en el rediseño. La paleta categórica (5 colores, orden fijo) pasó el validador de daltonismo; tres colores tienen poco contraste con el fondo blanco, por eso la leyenda lleva siempre el valor y el porcentaje escritos.
+- **Torta de más vendidos** (la pidió Leandro), por plata o por unidades, con los 5 primeros y "Otros". Debajo, los 10 que más facturaron en barras, con unidades y ganancia.
+- **Mapa de día y hora** en horario de Argentina, de la primera a la última hora con ventas.
+- **Precios para revisar** (se calcula en la app con F08): vende a pérdida (por debajo de costo + IVA), por debajo del precio que da su recargo (más de 2% abajo) o sin cambios hace 45 días o más. Los productos sin costo no se pueden evaluar.
+- **Sin movimiento:** productos sin ventas en los últimos 30 días (o que nunca se vendieron).
+- **Seguridad, corregido:** en la Fase 8 el empleado podía leer directo las líneas de sus ventas, que traen el costo. Ahora esa tabla no se lee directo: las ventas del día y el análisis se leen por funciones que controlan quién llama.
+- **Bug corregido:** varios códigos escritos o escaneados seguidos mientras cargaban los productos se perdían (sólo quedaba el último). Ahora esperan en fila y se agregan todos.
+
 ## 21/10/2026 · v2 Fase 8: ventas
 
 Decisiones de Leandro: el empleado ve sus tickets de hoy; se permite "Varios" con importe a mano; el empleado anula sus ventas del día y el dueño cualquiera, y la venta anulada queda marcada (no se borra).

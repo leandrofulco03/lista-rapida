@@ -7,3 +7,4 @@ export * from './revision';
 export * from './respaldo';
 export * from './ventas';
 export * from './cola';
+export * from './analisis';

@@ -129,7 +129,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
 
   if (todos.length === 0) {
     return (
-      <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+      <main className="mx-auto max-w-4xl">
         <Encabezado
           Icono={IconoCatalogo}
           titulo="Tu catálogo está vacío"
@@ -204,7 +204,7 @@ export function PantallaVinculacion({ proveedor, lineas, ivaDefault, onSeguir, o
     ));
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-4xl">
       <Encabezado Icono={IconoVincular} antetitulo={proveedor.nombre} titulo="Comparamos con tu catálogo" />
       <ul className="mt-4 grid grid-cols-2 gap-2 text-center" data-testid="resumen-vinculos">
         {[
@@ -342,7 +342,7 @@ function BuscarProducto({ productos, onElegir, onCancelar }: PropsBuscar) {
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
         placeholder="Código o palabras"
-        className="mt-1 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
+        className="mt-1 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
       />
       <ul className="mt-2 space-y-1">
         {encontrados.map((p) => (

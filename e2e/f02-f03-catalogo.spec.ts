@@ -1,4 +1,4 @@
-import { entrarComoDueno } from './ayudas';
+import { entrarComoDueno, irA } from './ayudas';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
@@ -12,7 +12,7 @@ async function configurar(page: Page) {
 
 test('F02: se crea un proveedor, se edita su ficha y se da de baja', async ({ page }) => {
   await configurar(page);
-  await page.getByRole('button', { name: 'Proveedores' }).click();
+  await irA(page, 'Proveedores');
   await page.getByLabel('Proveedor nuevo').fill('Distribuidora El Sol');
   await page.getByRole('button', { name: 'Agregar proveedor' }).click();
 
@@ -31,7 +31,7 @@ test('F02: se crea un proveedor, se edita su ficha y se da de baja', async ({ pa
   await expect(page.getByRole('button', { name: 'Sí, con IVA' })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Volver' }).click();
 
-  await page.getByRole('button', { name: 'Proveedores' }).click();
+  await irA(page, 'Proveedores');
   await page.getByRole('button', { name: /Distribuidora El Sol/ }).click();
   await page.getByRole('button', { name: 'Dar de baja' }).click();
   await page.getByRole('button', { name: 'Sí, dar de baja' }).click();
@@ -40,7 +40,7 @@ test('F02: se crea un proveedor, se edita su ficha y se da de baja', async ({ pa
 
 test('F03: se importan 500 productos desde Excel y se edita uno', async ({ page }) => {
   await configurar(page);
-  await page.getByRole('button', { name: 'Catálogo' }).click();
+  await irA(page, 'Catálogo');
   await expect(page.getByTestId('cantidad-productos')).toHaveText('0 productos');
 
   await page.getByRole('button', { name: 'Importar desde Excel' }).click();
@@ -69,7 +69,7 @@ test('F03: se importan 500 productos desde Excel y se edita uno', async ({ page 
 
 test('F03: se carga un producto a mano con el precio sugerido', async ({ page }) => {
   await configurar(page);
-  await page.getByRole('button', { name: 'Catálogo' }).click();
+  await irA(page, 'Catálogo');
   await page.getByRole('button', { name: 'Rubros' }).click();
   await page.getByLabel('Nombre del rubro').fill('Almacén');
   await page.getByLabel('Recargo del rubro').fill('40');

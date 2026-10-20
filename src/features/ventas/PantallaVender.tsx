@@ -63,8 +63,8 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
   const [aviso, setAviso] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
   const [cobrando, setCobrando] = useState(false);
   const campoBusqueda = useRef<HTMLInputElement>(null);
-  /** Un código que llegó (Enter o escáner) antes de que cargaran los productos. */
-  const codigoEnEspera = useRef<string | null>(null);
+  /** Códigos que llegaron (Enter o escáner) antes de que cargaran los productos; se agregan en orden al cargar. */
+  const codigosEnEspera = useRef<string[]>([]);
 
   // Primero lo guardado en el dispositivo (sirve sin conexión); después lo de la base, si hay internet.
   useEffect(() => {
@@ -99,8 +99,7 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
     (codigo: string) => {
       setEscaneando(false);
       if (productos === null) {
-        codigoEnEspera.current = codigo;
-        setBusqueda(codigo);
+        codigosEnEspera.current.push(codigo);
         return;
       }
       const p = porCodigo(productos, codigo);
@@ -111,17 +110,20 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
   );
 
   useEffect(() => {
-    const codigo = codigoEnEspera.current;
-    if (productos === null || codigo === null) return;
-    codigoEnEspera.current = null;
-    const p = porCodigo(productos, codigo);
-    if (p) agregar(p);
+    if (productos === null || codigosEnEspera.current.length === 0) return;
+    const codigos = codigosEnEspera.current;
+    codigosEnEspera.current = [];
+    for (const codigo of codigos) {
+      const p = porCodigo(productos, codigo);
+      if (p) agregar(p);
+    }
   }, [productos, agregar]);
 
   function alBuscar(e: FormEvent) {
     e.preventDefault();
     if (productos === null) {
-      codigoEnEspera.current = busqueda;
+      if (busqueda.trim()) codigosEnEspera.current.push(busqueda);
+      setBusqueda('');
       return;
     }
     // Un lector de códigos escribe el código y "Enter"; también vale escribir el código a mano.
@@ -168,161 +170,172 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-6 pb-40">
+    <main className="mx-auto max-w-6xl pb-40 lg:pb-0">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Nueva venta</h1>
-        <button type="button" onClick={onMisVentas} className="min-h-11 px-2 font-semibold text-green-800 underline underline-offset-4">
+        <h1 className="text-2xl font-bold lg:text-3xl">Nueva venta</h1>
+        <button type="button" onClick={onMisVentas} className="min-h-11 rounded-xl px-3 font-semibold text-green-700 hover:bg-green-600/10">
           Ventas de hoy
         </button>
       </div>
       <AvisoPendientes onVer={onMisVentas} />
 
-      <form onSubmit={alBuscar} className="mt-4 flex gap-2" role="search">
-        <label htmlFor="buscar-producto" className="sr-only">
-          Buscar producto
-        </label>
-        <input
-          id="buscar-producto"
-          ref={campoBusqueda}
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Buscá o escribí el código"
-          autoComplete="off"
-          enterKeyHint="search"
-          className="min-h-12 w-full rounded-xl border border-stone-200 bg-white px-3 text-lg shadow-sm outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
-        />
-        {puedeEscanear() && (
-          <button
-            type="button"
-            onClick={() => setEscaneando(true)}
-            className="min-h-12 shrink-0 rounded-xl bg-green-700 px-4 font-semibold text-white shadow-sm"
-          >
-            Escanear
-          </button>
-        )}
-      </form>
-
-      {productos === null && <p className="mt-3 text-stone-600">Cargando productos…</p>}
-
-      {busqueda.trim() !== '' ? (
-        <ul className="mt-2 divide-y divide-stone-200 rounded-2xl border border-stone-200 bg-white shadow-sm" data-testid="resultados">
-          {resultados.length === 0 && <li className="p-3 text-stone-600">No hay productos con “{busqueda.trim()}”.</li>}
-          {resultados.map((p) => (
-            <li key={p.id}>
-              <button type="button" onClick={() => agregar(p)} className="flex min-h-12 w-full items-center gap-3 p-3 text-left">
-                <span className="min-w-0 flex-1">{p.descripcion}</span>
-                <span className="font-semibold tabular-nums">{formatearPesos(p.precioVentaActual)}</span>
+      <div className="lg:mt-2 lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-8">
+        <div className="min-w-0">
+          <form onSubmit={alBuscar} className="mt-4 flex gap-2" role="search">
+            <label htmlFor="buscar-producto" className="sr-only">
+              Buscar producto
+            </label>
+            <input
+              id="buscar-producto"
+              ref={campoBusqueda}
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Buscá o escribí el código"
+              autoComplete="off"
+              enterKeyHint="search"
+              className="min-h-12 w-full rounded-xl border border-stone-300 bg-white px-4 text-lg shadow-xs outline-none placeholder:text-stone-500 focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
+            />
+            {puedeEscanear() && (
+              <button
+                type="button"
+                onClick={() => setEscaneando(true)}
+                className="min-h-12 shrink-0 rounded-xl bg-green-700 px-4 font-semibold text-white shadow-sm"
+              >
+                Escanear
               </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        botonesRapidos.length > 0 && (
-          <section className="mt-3" aria-label="Más vendidos">
-            <div className="grid grid-cols-2 gap-2">
-              {botonesRapidos.map((p) => (
+            )}
+          </form>
+
+          {productos === null && <p className="mt-3 text-stone-600">Cargando productos…</p>}
+
+          {busqueda.trim() !== '' ? (
+            <ul className="mt-2 divide-y divide-stone-200 rounded-2xl border border-stone-200 bg-white shadow-sm" data-testid="resultados">
+              {resultados.length === 0 && <li className="p-3 text-stone-600">No hay productos con “{busqueda.trim()}”.</li>}
+              {resultados.map((p) => (
+                <li key={p.id}>
+                  <button type="button" onClick={() => agregar(p)} className="flex min-h-12 w-full items-center gap-3 p-3 text-left">
+                    <span className="min-w-0 flex-1">{p.descripcion}</span>
+                    <span className="font-semibold tabular-nums">{formatearPesos(p.precioVentaActual)}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            botonesRapidos.length > 0 && (
+              <section className="mt-3" aria-label="Más vendidos">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
+                  {botonesRapidos.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => agregar(p)}
+                      className="min-h-14 rounded-xl border border-stone-200 bg-white p-2 text-left text-sm font-semibold shadow-sm active:scale-[0.98]"
+                    >
+                      <span className="line-clamp-2">{p.descripcion}</span>
+                      <span className="block font-normal text-stone-600 tabular-nums">{formatearPesos(p.precioVentaActual)}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )
+          )}
+
+          {varios ? (
+            <form onSubmit={agregarImporte} className="mt-3 space-y-2 rounded-2xl border border-stone-200 bg-white p-3 shadow-sm">
+              <div className="flex gap-2">
+                <label className="flex-1">
+                  <span className="block font-semibold">Importe</span>
+                  <input
+                    value={varios.monto}
+                    onChange={(e) => setVarios({ ...varios, monto: e.target.value })}
+                    inputMode="decimal"
+                    autoFocus
+                    placeholder="$"
+                    className="mt-1 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
+                  />
+                </label>
+                <label className="flex-1">
+                  <span className="block font-semibold">Qué es (opcional)</span>
+                  <input
+                    value={varios.descripcion}
+                    onChange={(e) => setVarios({ ...varios, descripcion: e.target.value })}
+                    maxLength={60}
+                    placeholder="Varios"
+                    className="mt-1 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
+                  />
+                </label>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Boton type="button" variante="secundario" onClick={() => setVarios(null)}>
+                  Cancelar
+                </Boton>
+                <Boton type="submit">Agregar</Boton>
+              </div>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setVarios({ monto: '', descripcion: '' })}
+              className="mt-3 min-h-11 font-semibold text-green-800 underline underline-offset-4"
+            >
+              + Varios (importe a mano)
+            </button>
+          )}
+        </div>
+
+        <div className="lg:sticky lg:top-10 lg:mt-4 lg:rounded-2xl lg:border lg:border-stone-200 lg:bg-white lg:p-5 lg:shadow-xs">
+          <h2 className="hidden text-lg font-bold lg:block">Ticket</h2>
+          <section className="mt-4 lg:mt-3" aria-label="Ticket">
+            {lineas.length === 0 ? (
+              <p className="rounded-2xl border border-dashed border-stone-300 p-4 text-center text-stone-600">Todavía no agregaste nada.</p>
+            ) : (
+              <ul className="divide-y divide-stone-200 rounded-2xl border border-stone-200 bg-white shadow-sm" data-testid="ticket">
+                {lineas.map((l, i) => (
+                  <LineaDelTicket key={`${l.productoId ?? 'v'}-${i}`} linea={l} onCantidad={(c) => setLineas((ls) => cambiarCantidad(ls, i, c))} />
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <fieldset className="mt-4">
+            <legend className="text-lg font-semibold">¿Cómo pagó?</legend>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {MEDIOS_PAGO.map((m) => (
                 <button
-                  key={p.id}
+                  key={m.id}
                   type="button"
-                  onClick={() => agregar(p)}
-                  className="min-h-14 rounded-xl border border-stone-200 bg-white p-2 text-left text-sm font-semibold shadow-sm active:scale-[0.98]"
+                  aria-pressed={medio === m.id}
+                  onClick={() => setMedio(m.id)}
+                  className={`min-h-11 rounded-xl border px-3 text-base font-medium transition active:scale-[0.98] ${
+                    medio === m.id ? 'border-green-600 bg-green-600 text-white shadow-md' : 'border-stone-200 bg-white shadow-sm'
+                  }`}
                 >
-                  <span className="line-clamp-2">{p.descripcion}</span>
-                  <span className="block font-normal text-stone-600 tabular-nums">{formatearPesos(p.precioVentaActual)}</span>
+                  {m.nombre}
                 </button>
               ))}
             </div>
-          </section>
-        )
-      )}
+          </fieldset>
 
-      {varios ? (
-        <form onSubmit={agregarImporte} className="mt-3 space-y-2 rounded-2xl border border-stone-200 bg-white p-3 shadow-sm">
-          <div className="flex gap-2">
-            <label className="flex-1">
-              <span className="block font-semibold">Importe</span>
-              <input
-                value={varios.monto}
-                onChange={(e) => setVarios({ ...varios, monto: e.target.value })}
-                inputMode="decimal"
-                autoFocus
-                placeholder="$"
-                className="mt-1 min-h-11 w-full rounded-xl border border-stone-200 px-3 text-lg"
-              />
-            </label>
-            <label className="flex-1">
-              <span className="block font-semibold">Qué es (opcional)</span>
-              <input
-                value={varios.descripcion}
-                onChange={(e) => setVarios({ ...varios, descripcion: e.target.value })}
-                maxLength={60}
-                placeholder="Varios"
-                className="mt-1 min-h-11 w-full rounded-xl border border-stone-200 px-3 text-lg"
-              />
-            </label>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Boton type="button" variante="secundario" onClick={() => setVarios(null)}>
-              Cancelar
-            </Boton>
-            <Boton type="submit">Agregar</Boton>
-          </div>
-        </form>
-      ) : (
-        <button type="button" onClick={() => setVarios({ monto: '', descripcion: '' })} className="mt-3 min-h-11 font-semibold text-green-800 underline underline-offset-4">
-          + Varios (importe a mano)
-        </button>
-      )}
-
-      <section className="mt-4" aria-label="Ticket">
-        {lineas.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-stone-300 p-4 text-center text-stone-600">Todavía no agregaste nada.</p>
-        ) : (
-          <ul className="divide-y divide-stone-200 rounded-2xl border border-stone-200 bg-white shadow-sm" data-testid="ticket">
-            {lineas.map((l, i) => (
-              <LineaDelTicket key={`${l.productoId ?? 'v'}-${i}`} linea={l} onCantidad={(c) => setLineas((ls) => cambiarCantidad(ls, i, c))} />
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <fieldset className="mt-4">
-        <legend className="text-lg font-semibold">¿Cómo pagó?</legend>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {MEDIOS_PAGO.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              aria-pressed={medio === m.id}
-              onClick={() => setMedio(m.id)}
-              className={`min-h-11 rounded-xl border px-3 text-base font-medium transition active:scale-[0.98] ${
-                medio === m.id ? 'border-green-600 bg-green-600 text-white shadow-md' : 'border-stone-200 bg-white shadow-sm'
-              }`}
+          {aviso && (
+            <p
+              className={`mt-4 rounded-xl p-3 ${aviso.tipo === 'ok' ? 'bg-green-50 text-green-900' : 'bg-red-50 text-red-900'}`}
+              role={aviso.tipo === 'ok' ? 'status' : 'alert'}
+              data-testid="aviso-venta"
             >
-              {m.nombre}
-            </button>
-          ))}
-        </div>
-      </fieldset>
+              {aviso.texto}
+            </p>
+          )}
 
-      {aviso && (
-        <p
-          className={`mt-4 rounded-xl p-3 ${aviso.tipo === 'ok' ? 'bg-green-50 text-green-900' : 'bg-red-50 text-red-900'}`}
-          role={aviso.tipo === 'ok' ? 'status' : 'alert'}
-          data-testid="aviso-venta"
-        >
-          {aviso.texto}
-        </p>
-      )}
-
-      <div className="fixed inset-x-0 bottom-0 border-t border-stone-200 bg-white/95 px-4 pt-3 pb-4 backdrop-blur">
-        <div className="mx-auto max-w-md space-y-2">
-          <Boton type="button" onClick={cobrar} disabled={cobrando || lineas.length === 0}>
-            Cobrar <span data-testid="total-ticket">{formatearPesos(total)}</span>
-          </Boton>
-          <Boton type="button" variante="secundario" onClick={onVolver}>
-            Volver
-          </Boton>
+          <div className="fixed inset-x-0 bottom-0 z-10 border-t border-stone-200 bg-crema/95 px-4 pt-3 pb-4 backdrop-blur lg:static lg:mt-5 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+            <div className="mx-auto max-w-md space-y-2 lg:max-w-none">
+              <Boton type="button" onClick={cobrar} disabled={cobrando || lineas.length === 0} className="min-h-12 text-lg">
+                Cobrar <span data-testid="total-ticket">{formatearPesos(total)}</span>
+              </Boton>
+              <Boton type="button" variante="secundario" onClick={onVolver}>
+                Volver
+              </Boton>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -346,7 +359,12 @@ function LineaDelTicket({ linea, onCantidad }: { linea: LineaTicket; onCantidad:
           {formatearPesos(linea.precioUnitario)} c/u · <span className="font-semibold text-stone-800">{formatearPesos(subtotal(linea))}</span>
         </p>
       </div>
-      <button type="button" aria-label={`Uno menos de ${linea.descripcion}`} onClick={() => onCantidad(linea.cantidad - 1)} className="size-11 rounded-xl border border-stone-200 text-xl font-bold">
+      <button
+        type="button"
+        aria-label={`Uno menos de ${linea.descripcion}`}
+        onClick={() => onCantidad(linea.cantidad - 1)}
+        className="size-11 rounded-xl border border-stone-200 text-xl font-bold"
+      >
         −
       </button>
       {editando === null ? (
@@ -371,7 +389,12 @@ function LineaDelTicket({ linea, onCantidad }: { linea: LineaTicket; onCantidad:
           className="h-11 w-16 rounded-xl border border-green-600 text-center text-lg"
         />
       )}
-      <button type="button" aria-label={`Uno más de ${linea.descripcion}`} onClick={() => onCantidad(linea.cantidad + 1)} className="size-11 rounded-xl border border-stone-200 text-xl font-bold">
+      <button
+        type="button"
+        aria-label={`Uno más de ${linea.descripcion}`}
+        onClick={() => onCantidad(linea.cantidad + 1)}
+        className="size-11 rounded-xl border border-stone-200 text-xl font-bold"
+      >
         +
       </button>
     </li>
