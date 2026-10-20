@@ -5,7 +5,7 @@
  */
 
 /** Pantallas a las que la guía puede llevar con un botón. */
-export type DestinoAyuda = 'config' | 'catalogo' | 'subir' | 'proveedores' | 'etiquetas' | 'lista-precios' | 'equipo';
+export type DestinoAyuda = 'config' | 'catalogo' | 'subir' | 'proveedores' | 'etiquetas' | 'lista-precios' | 'equipo' | 'vender' | 'analisis';
 
 export interface PasoGuia {
   titulo: string;
@@ -46,6 +46,27 @@ export const PASOS_GUIA: PasoGuia[] = [
       '"Rubros": cada rubro puede tener su propio recargo (por ejemplo, 40% en golosinas y 25% en almacén).',
     ],
     accion: { etiqueta: 'Ir al Catálogo', destino: 'catalogo' },
+  },
+  {
+    titulo: 'Cargá tus ventas',
+    texto: 'Tocá "Nueva venta" en el inicio o "Vender" en el menú. Buscá el producto, escribí su código o escanealo; elegí cómo pagó y tocá "Cobrar".',
+    detalles: [
+      'Los más vendidos aparecen como botones, para cargarlos con un toque.',
+      'Si algo no está en el catálogo, usá "Varios" y escribí el importe.',
+      'Anda sin internet: la venta queda en el dispositivo y se sube sola cuando vuelve la conexión.',
+      'Si no querés cargar cada venta, en Ventas podés anotar el "Total del día".',
+    ],
+    accion: { etiqueta: 'Cargar una venta', destino: 'vender' },
+  },
+  {
+    titulo: 'Mirá cómo te va',
+    texto: 'El inicio te muestra lo de hoy: cuánto vendiste, en cuántas ventas, el ticket promedio, la semana y las últimas ventas.',
+    detalles: [
+      'Ventas: el día, la semana o el mes, comparados con el período anterior, y cómo te pagaron.',
+      'Análisis: tu ganancia y tu margen, los productos más vendidos, las ventas por rubro y los días y horarios en que más vendés.',
+      'En Análisis también ves qué precios conviene revisar y qué productos hace 30 días que no se venden.',
+    ],
+    accion: { etiqueta: 'Ir a Análisis', destino: 'analisis' },
   },
   {
     titulo: 'Subí la lista del proveedor',
@@ -115,16 +136,35 @@ export const PREGUNTAS: TemaPreguntas[] = [
         ],
       },
       {
+        pregunta: '¿Cómo me muevo por la app?',
+        respuesta: [
+          'Con el menú de la izquierda, que tiene todas las secciones agrupadas: Ventas (Vender, Ventas, Análisis), Precios (Subir lista, Catálogo, Proveedores, Etiquetas, Lista de precios) y Comercio (Equipo, Configuración, Ayuda).',
+          'En el celular el menú está escondido: tocá el botón de las tres rayitas, arriba a la izquierda. Se cierra solo al elegir una sección, o tocando afuera.',
+          'Abajo del menú están tu cuenta y el botón "Salir".',
+        ],
+      },
+      {
+        pregunta: '¿Qué muestra el inicio?',
+        respuesta: [
+          'Un resumen de hoy: lo vendido (comparado con ayer), cuántas ventas hiciste, el ticket promedio, lo vendido en la semana, las últimas ventas y cómo te pagaron.',
+          'Desde ahí arrancás una venta con "Nueva venta" o subís la lista de un proveedor con "Subí una lista".',
+        ],
+      },
+      {
         pregunta: '¿Cómo la instalo en el celular?',
         respuesta: [
           'En Android (Chrome): tocá los tres puntitos de arriba a la derecha y elegí "Instalar app" o "Agregar a la pantalla principal".',
           'En iPhone (Safari): tocá el botón de compartir (el cuadrado con la flecha) y elegí "Agregar a inicio".',
+          'En la computadora (Chrome o Edge): tocá el ícono de instalar, a la derecha de la barra de direcciones.',
           'Queda con su ícono como cualquier otra app.',
         ],
       },
       {
         pregunta: '¿Funciona sin internet?',
-        respuesta: ['Para ver y guardar tus precios necesita internet: tus datos están en la nube. Leer la lista del proveedor y armar los PDF se hace en tu dispositivo.'],
+        respuesta: [
+          'Las ventas, sí: si se corta internet seguís vendiendo, y se suben solas cuando vuelve la conexión.',
+          'Para ver los números y cambiar precios necesita internet, porque tus datos están en la nube. Leer la lista del proveedor y armar los PDF se hace en tu dispositivo.',
+        ],
       },
       {
         pregunta: '¿Necesito crear una cuenta?',
@@ -249,7 +289,7 @@ export const PREGUNTAS: TemaPreguntas[] = [
       {
         pregunta: '¿Cómo imprimo las etiquetas?',
         respuesta: [
-          'Al terminar una revisión tocá "Imprimir sus etiquetas", o entrá a Etiquetas desde el inicio. Elegí el tamaño, sacá o agregá productos y bajá el PDF. Ese PDF se imprime en una hoja A4 común o autoadhesiva.',
+          'Al terminar una revisión tocá "Imprimir sus etiquetas", o entrá a Etiquetas desde el menú. Elegí el tamaño, sacá o agregá productos y bajá el PDF. Ese PDF se imprime en una hoja A4 común o autoadhesiva.',
         ],
       },
       {
@@ -278,6 +318,17 @@ export const PREGUNTAS: TemaPreguntas[] = [
         ],
       },
       {
+        pregunta: '¿Cómo veo lo que vendí en la semana o en el mes?',
+        respuesta: [
+          'En Ventas, elegí Día, Semana o Mes, y movete con las flechas. Cada número se compara con el período anterior (por ejemplo, "+12%" contra la semana pasada).',
+          'Ves la venta total, la cantidad de ventas, el ticket promedio, los artículos vendidos y cómo te pagaron.',
+        ],
+      },
+      {
+        pregunta: '¿Qué es el ticket promedio?',
+        respuesta: ['Lo que gasta en promedio cada cliente: lo vendido dividido por la cantidad de ventas. Si sube, cada cliente está llevando más.'],
+      },
+      {
         pregunta: '¿Y si se corta internet?',
         respuesta: ['Podés seguir vendiendo: las ventas quedan guardadas en el dispositivo y se suben solas cuando vuelve la conexión.'],
       },
@@ -294,6 +345,47 @@ export const PREGUNTAS: TemaPreguntas[] = [
           'Abrí las ventas del día, tocá la venta y "Anular venta". Después cargala de nuevo bien. La venta anulada queda a la vista, tachada, pero no cuenta.',
           'Un empleado puede anular sus ventas del mismo día; el dueño, cualquiera.',
         ],
+      },
+    ],
+  },
+  {
+    tema: 'Análisis',
+    preguntas: [
+      {
+        pregunta: '¿Qué período muestra el análisis?',
+        respuesta: ['El que elijas arriba: 7 días, 30 días, este mes, el mes pasado o 90 días. Vale para todos los números y gráficos de la pantalla.'],
+      },
+      {
+        pregunta: '¿Cómo se calcula la ganancia?',
+        respuesta: [
+          'Lo que cobraste menos lo que te costó cada producto vendido. Si vendés con IVA incluido, el IVA cuenta como costo, porque no lo recuperás.',
+          'El margen es la ganancia sobre lo vendido: con 30% de recargo, el margen da 23,1%.',
+          'No entran en la ganancia las ventas de "Varios", los productos sin costo cargado ni lo anotado como total del día: la pantalla te dice cuánto quedó afuera.',
+        ],
+      },
+      {
+        pregunta: '¿Qué muestran los gráficos?',
+        respuesta: [
+          'Ingresos por día: cuánto vendiste cada día del período.',
+          'Productos más vendidos: los 5 primeros y el resto en "Otros". Podés verlos por plata o por unidades. Abajo, los 10 que más facturaron, con su ganancia.',
+          'Ventas por rubro, y "Cuándo vendés más": un cuadro por día de la semana y hora, más oscuro donde más vendés. Sirve para saber cuándo reforzar el mostrador.',
+          'Cada gráfico tiene "Ver los datos" con la tabla de números.',
+        ],
+      },
+      {
+        pregunta: '¿Qué son los "Precios para revisar"?',
+        respuesta: [
+          'Productos cuyo precio quedó atrasado: "Vendés a pérdida" si el precio no cubre el costo, "Por debajo de tu recargo" si está más de 2% abajo de lo que da tu recargo, y "Hace mucho que no cambia" si no se tocó en 45 días.',
+          'Corregilos desde el Catálogo o subiendo la lista nueva del proveedor.',
+        ],
+      },
+      {
+        pregunta: '¿Y los productos sin ventas?',
+        respuesta: ['Son los que no se vendieron en los últimos 30 días: plata quieta en la góndola. Podés hacerles una promo o dejar de reponerlos.'],
+      },
+      {
+        pregunta: '¿Mis empleados ven el análisis?',
+        respuesta: ['No. El análisis, los costos y la ganancia los ve sólo el dueño.'],
       },
     ],
   },
@@ -322,10 +414,10 @@ export const PREGUNTAS: TemaPreguntas[] = [
         pregunta: '¿Cómo sumo a un empleado?',
         respuesta: [
           'En Equipo, tocá "Generar código" y pasáselo. El empleado crea su cuenta, toca "Tengo un código" y lo escribe. El código sirve una vez y dura 7 días.',
+          'El empleado ve un menú corto: Inicio, Vender y Mis ventas (las suyas de hoy).',
           'Si deja de trabajar con vos, quitalo desde Equipo y ya no puede entrar.',
         ],
       },
     ],
   },
-
 ];
