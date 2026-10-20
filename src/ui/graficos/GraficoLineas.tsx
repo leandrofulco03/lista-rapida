@@ -81,11 +81,11 @@ export function GraficoLineas({ titulo, puntos, formatear }: Props) {
                 {puntos[i]!.corto}
               </text>
             ))}
-            {area && <path d={area} fill="var(--graf-serie-1)" opacity={0.1} />}
-            <path d={linea} fill="none" stroke="var(--graf-serie-1)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+            {area && <path d={area} fill="var(--graf-unica)" opacity={0.1} />}
+            <path d={linea} fill="none" stroke="var(--graf-unica)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
             {activo !== null && <line x1={x(activo)} x2={x(activo)} y1={M.arriba} y2={y(0)} stroke="var(--graf-eje)" strokeWidth={1} />}
             {[activo ?? ultimo].map((i) => (
-              <circle key={i} cx={x(i)} cy={y(puntos[i]!.valor)} r={4} fill="var(--graf-serie-1)" stroke="var(--graf-superficie)" strokeWidth={2} />
+              <circle key={i} cx={x(i)} cy={y(puntos[i]!.valor)} r={4} fill="var(--graf-unica)" stroke="var(--graf-superficie)" strokeWidth={2} />
             ))}
           </svg>
         )}

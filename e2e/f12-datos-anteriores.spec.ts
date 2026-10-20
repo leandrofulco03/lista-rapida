@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { entrarComoDueno } from './ayudas';
+import { entrarComoDueno, irA } from './ayudas';
 
 /** Una copia de seguridad como la guardaba la v1 (ids numéricos, todo en el navegador). */
 const copiaV1 = {
@@ -24,7 +24,7 @@ const copiaV1 = {
 
 test('el dueño trae los datos de la versión anterior con su copia de seguridad', async ({ page }) => {
   await entrarComoDueno(page);
-  await page.getByRole('button', { name: 'Configuración' }).click();
+  await irA(page, 'Configuración');
   await page.getByRole('button', { name: 'Traer datos de la versión anterior' }).click();
 
   await page.getByLabel('Archivo de la copia').setInputFiles({ name: 'copia.json', mimeType: 'application/json', buffer: Buffer.from('{"no":"es"}') });
@@ -42,6 +42,6 @@ test('el dueño trae los datos de la versión anterior con su copia de seguridad
   await expect(page.getByTestId('lista-productos')).toContainText('$ 4.500,00');
   await page.getByRole('button', { name: 'Volver' }).click();
   await expect(page.getByRole('heading', { name: 'Almacén Don José' })).toBeVisible();
-  await page.getByRole('button', { name: 'Proveedores' }).click();
+  await irA(page, 'Proveedores');
   await expect(page.getByTestId('lista-proveedores')).toContainText('Distribuidora El Sol');
 });

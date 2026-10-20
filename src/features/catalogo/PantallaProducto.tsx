@@ -100,7 +100,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-2xl">
       <Encabezado Icono={IconoCatalogo} titulo={producto ? 'Editar producto' : 'Producto nuevo'} />
 
       <form onSubmit={guardar} noValidate className="mt-6 space-y-6">
@@ -139,7 +139,7 @@ export function PantallaProducto({ producto, rubros, config, onVolver }: Props) 
             id={idRubro}
             value={rubroId ?? ''}
             onChange={(e) => setRubroId(e.target.value === '' ? null : e.target.value)}
-            className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
+            className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
           >
             <option value="">Sin rubro</option>
             {rubros.map((r) => (

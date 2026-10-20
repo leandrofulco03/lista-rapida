@@ -24,7 +24,7 @@ const MOSTRAR = 100;
 export function ResumenLectura({ proveedor, archivo, resultado, listaIncluyeIva, automatico, onCorregir, onComparar, onVolver }: Props) {
   const { lineas, salteadas } = resultado;
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-3xl">
       <Encabezado
         Icono={IconoListo}
         antetitulo={proveedor}

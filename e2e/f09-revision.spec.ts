@@ -1,4 +1,4 @@
-import { entrarComoDueno } from './ayudas';
+import { entrarComoDueno, irA } from './ayudas';
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { PDFDocument } from 'pdf-lib';
@@ -13,7 +13,7 @@ async function configurar(page: Page) {
 test('F09/F10: se revisan los precios con los controles de seguridad, se guardan y se imprimen sus etiquetas', async ({ page }) => {
   await configurar(page); // recargo 30%, redondeo a $10, venta con IVA
 
-  await page.getByRole('button', { name: 'Catálogo' }).click();
+  await irA(page, 'Catálogo');
   await page.getByRole('button', { name: 'Importar desde Excel' }).click();
   await page.getByLabel('Archivo del catálogo').setInputFiles(
     csv('catalogo.csv', [
@@ -95,7 +95,7 @@ test('F09/F10: se revisan los precios con los controles de seguridad, se guardan
   expect(pdf.getPageCount()).toBe(1);
   await page.getByRole('button', { name: 'Volver' }).click();
 
-  await page.getByRole('button', { name: 'Catálogo' }).click();
+  await irA(page, 'Catálogo');
   const productos = page.getByTestId('lista-productos');
   await expect(productos.getByRole('button', { name: /Aceite Natura/ })).toContainText('$ 3.150,00');
   await expect(productos.getByRole('button', { name: /Fideos Matarazzo/ })).toContainText('$ 1.990,00');

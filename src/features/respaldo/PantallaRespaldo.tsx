@@ -50,11 +50,11 @@ export function PantallaRespaldo({ nombreComercio, onRestaurado, onVolver }: Pro
   const resumen = aTraer ? resumirRespaldo(aTraer) : null;
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-2xl">
       <Encabezado
         Icono={IconoRespaldo}
         titulo="Datos de la versión anterior"
-        descripcion="Si usabas ListaMatch antes, traé tu catálogo, tus proveedores y tus precios con el archivo de la copia de seguridad que guardaste."
+        descripcion="Si usabas la versión anterior (ListaMatch), traé tu catálogo, tus proveedores y tus precios con el archivo de la copia de seguridad que guardaste."
       />
 
       <section className="mt-6">
@@ -88,7 +88,7 @@ export function PantallaRespaldo({ nombreComercio, onRestaurado, onVolver }: Pro
         </p>
       )}
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>

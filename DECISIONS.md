@@ -2,6 +2,17 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 20/10/2026 · v2: rediseño y nombre Vendia
+
+- **Nombre:** la app pasa a llamarse **Vendia** (decisión de Leandro). Cambian el título, el manifest, el logo (una "V" crema sobre verde) y los íconos de la PWA (`node scripts/generar-iconos.mjs`). La pantalla para traer la copia de seguridad sigue nombrando a ListaMatch, porque es la versión anterior.
+- **Pensada como web app, adaptada al celular:** menú de secciones a la izquierda, agrupado (Ventas, Precios, Comercio), fijo desde 1024 px. En el celular se esconde detrás del botón de menú de la barra de arriba y se abre como cajón: se cierra al elegir, con Escape o tocando afuera, lleva el foco adentro y lo devuelve al botón. La cuenta y "Salir" van al pie del menú.
+- **Colores:** verde #31493C (marca) y crema #FAFADE (fondo), pedidos por Leandro. Se redefinieron las escalas `green` y `stone` de Tailwind en `src/index.css`, así todas las pantallas cambiaron sin tocar sus clases; los grises de texto superan 4,5:1 sobre el crema y sobre las tarjetas. Los gráficos de una sola serie y el mapa de calor pasan al verde de la marca; la torta mantiene la paleta categórica validada.
+- **Tipografía:** Plus Jakarta Sans, incluida en la app (no desde Google Fonts), para que ande sin conexión y sin tocar la política de seguridad.
+- **Inicio como panel:** vendido hoy contra ayer, ventas, ticket promedio, la semana, las últimas 6 ventas y cómo pagaron. Los accesos a las secciones salieron del inicio porque ya están en el menú.
+- **Pantallas más anchas en la compu:** formularios medianos y listas, ventas y análisis anchos. Vender pasa a dos columnas (buscar a la izquierda, ticket y cobro a la derecha); en el celular sigue la barra de cobro fija abajo.
+- **Ingreso:** en la compu, panel de marca a la izquierda y formulario a la derecha.
+- **Pruebas:** los recorridos navegan con el menú (`irA`, `salir` en `e2e/ayudas.ts`) y hay uno nuevo (`diseno.spec.ts`) que prueba el menú en la compu y en el celular.
+
 ## 22/10/2026 · v2 Fase 9: análisis
 
 - **Pantalla Análisis** (sólo el dueño, desde el inicio y desde Ventas), con un período arriba que vale para todo: 7 días, 30 días, este mes, mes pasado, 90 días. Al cambiarlo, lo anterior queda atenuado hasta que llegan los datos (sin parpadeo).

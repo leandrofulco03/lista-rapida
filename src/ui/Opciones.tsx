@@ -10,7 +10,7 @@ interface Props<T> {
 export function Opciones<T>({ legend, opciones, valor, onElegir, ayuda }: Props<T>) {
   return (
     <fieldset>
-      <legend className="text-lg font-semibold">{legend}</legend>
+      <legend className="font-semibold text-stone-800">{legend}</legend>
       <div className="mt-2 grid grid-cols-2 gap-2">
         {opciones.map((o) => (
           <button
@@ -20,8 +20,8 @@ export function Opciones<T>({ legend, opciones, valor, onElegir, ayuda }: Props<
             onClick={() => onElegir(o.valor)}
             className={`min-h-11 rounded-xl border px-3 text-base font-medium transition active:scale-[0.98] ${
               o.valor === valor
-                ? 'border-green-600 bg-green-600 text-white shadow-md shadow-green-800/20'
-                : 'border-stone-200 bg-white shadow-sm hover:border-green-300 hover:bg-green-50'
+                ? 'border-green-600 bg-green-600 text-crema shadow-sm'
+                : 'border-stone-300 bg-white shadow-xs hover:border-green-400 hover:bg-green-50'
             }`}
           >
             {o.etiqueta}

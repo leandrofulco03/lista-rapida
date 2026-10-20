@@ -31,7 +31,7 @@ export function BarrasHorizontales({ titulo, filas, formatear, tabla }: Props) {
               <span className="shrink-0 font-semibold text-stone-900 tabular-nums">{formatear(f.valor)}</span>
             </div>
             <div className="mt-1 h-3" aria-hidden="true">
-              <div className="h-3 rounded-r" style={{ width: `${Math.max(1, (f.valor / maximo) * 100)}%`, background: 'var(--graf-serie-1)' }} />
+              <div className="h-3 rounded-r" style={{ width: `${Math.max(1, (f.valor / maximo) * 100)}%`, background: 'var(--graf-unica)' }} />
             </div>
             {f.detalle && <p className="mt-0.5 text-xs text-stone-600">{f.detalle}</p>}
           </li>

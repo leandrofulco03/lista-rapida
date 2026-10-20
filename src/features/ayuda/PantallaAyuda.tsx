@@ -22,7 +22,7 @@ export function PantallaAyuda({ onIr, onVolver }: Props) {
   const [vista, setVista] = useState<Vista>('guia');
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-3xl">
       <Encabezado Icono={IconoAyuda} titulo="Ayuda" descripcion="Cómo usar la app, paso a paso, y las dudas más comunes." />
 
       <div className="mt-6 grid grid-cols-2 gap-2" role="group" aria-label="Qué querés ver">
@@ -51,7 +51,7 @@ export function PantallaAyuda({ onIr, onVolver }: Props) {
               <li key={paso.titulo} className="flex gap-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
                 <span
                   aria-hidden="true"
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-green-600 to-emerald-700 font-bold text-white shadow-sm"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-green-600 font-bold text-crema shadow-sm"
                 >
                   {i + 1}
                 </span>
@@ -111,7 +111,7 @@ export function PantallaAyuda({ onIr, onVolver }: Props) {
         </section>
       )}
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-8 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>

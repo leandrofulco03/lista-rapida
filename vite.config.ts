@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { readFileSync } from 'node:fs';
-import { COLOR_TEMA, DESCRIPCION_APP, NOMBRE_APP, NOMBRE_CORTO } from './src/marca';
+import { COLOR_FONDO, COLOR_TEMA, DESCRIPCION_APP, NOMBRE_APP, NOMBRE_CORTO } from './src/marca';
 
 /**
  * Lee las cabeceras de seguridad de vercel.json (las que pone Vercel) para usarlas también en
@@ -27,7 +27,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       // La base embebida (sólo en el build de los recorridos e2e) pesa 17 MB: no se guarda para usar sin conexión.
-      workbox: { globIgnores: ['**/pglite-*', '**/localNavegador-*'] },
+      // La tipografía también se guarda, así la app se ve igual sin conexión.
+      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'], globIgnores: ['**/pglite-*', '**/localNavegador-*'] },
       includeAssets: ['icono.svg', 'icono-180.png'],
       manifest: {
         name: NOMBRE_APP,
@@ -36,7 +37,7 @@ export default defineConfig({
         lang: 'es-AR',
         start_url: '/',
         display: 'standalone',
-        background_color: '#fafaf9',
+        background_color: COLOR_FONDO,
         theme_color: COLOR_TEMA,
         icons: [
           { src: 'icono-192.png', sizes: '192x192', type: 'image/png' },

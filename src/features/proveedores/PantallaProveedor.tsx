@@ -53,7 +53,7 @@ export function PantallaProveedor({ proveedor, onVolver }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-2xl">
       <Encabezado Icono={IconoProveedores} antetitulo="Proveedor" titulo={proveedor.nombre} />
 
       <form onSubmit={guardar} noValidate className="mt-6 space-y-6">

@@ -108,7 +108,7 @@ export const PREGUNTAS: TemaPreguntas[] = [
     tema: 'Para empezar',
     preguntas: [
       {
-        pregunta: '¿Para qué sirve ListaMatch?',
+        pregunta: '¿Para qué sirve Vendia?',
         respuesta: [
           'Para llevar tu almacén o kiosco: cargás las ventas del día y ves cuánto vendiste, y actualizás tus precios cuando un proveedor te manda una lista nueva.',
           'Con la lista del proveedor, la app la compara con tus productos, calcula los precios nuevos con tu recargo y vos aprobás los cambios. Después imprimís las etiquetas de lo que cambió.',
@@ -200,7 +200,7 @@ export const PREGUNTAS: TemaPreguntas[] = [
       {
         pregunta: '¿Recargo es lo mismo que margen?',
         respuesta: [
-          'No. El recargo se calcula sobre el costo: 30% de recargo sobre $ 1.000 da $ 1.300. El margen se calcula sobre el precio de venta. ListaMatch trabaja con recargo sobre el costo.',
+          'No. El recargo se calcula sobre el costo: 30% de recargo sobre $ 1.000 da $ 1.300. El margen se calcula sobre el precio de venta. Vendia trabaja con recargo sobre el costo.',
         ],
       },
       {

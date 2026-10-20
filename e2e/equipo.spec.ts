@@ -1,15 +1,15 @@
 import { expect, test } from '@playwright/test';
-import { crearCuenta, entrarComoDueno, ingresar } from './ayudas';
+import { crearCuenta, entrarComoDueno, ingresar, irA, salir } from './ayudas';
 
 test('el dueño invita a un empleado con un código; el empleado entra sin ver precios ni costos', async ({ page }) => {
   await entrarComoDueno(page);
-  await page.getByRole('button', { name: 'Equipo' }).click();
+  await irA(page, 'Equipo');
   await expect(page.getByTestId('miembros')).toContainText('Dueño · Vos');
   await page.getByRole('button', { name: 'Generar código' }).click();
   const codigo = (await page.getByTestId('codigo-invitacion').textContent())!;
   expect(codigo).toMatch(/^[0-9A-F]{4} [0-9A-F]{4} [0-9A-F]{4}$/);
   await page.getByRole('button', { name: 'Volver' }).click();
-  await page.getByRole('button', { name: 'Salir' }).click();
+  await salir(page);
 
   // El empleado crea su cuenta en el mismo dispositivo y entra con el código.
   await crearCuenta(page, 'juan@almacen.com');
@@ -29,11 +29,11 @@ test('el dueño invita a un empleado con un código; el empleado entra sin ver p
   // Al volver a abrir la app sigue adentro.
   await page.reload();
   await expect(page.getByRole('button', { name: 'Mis ventas de hoy' })).toBeVisible();
-  await page.getByRole('button', { name: 'Salir' }).click();
+  await salir(page);
 
   // El dueño lo ve en el equipo y lo puede quitar.
   await ingresar(page, 'dueno@almacen.com');
-  await page.getByRole('button', { name: 'Equipo' }).click();
+  await irA(page, 'Equipo');
   await expect(page.getByTestId('miembros')).toContainText('Juan');
   await expect(page.getByTestId('miembros')).toContainText('Empleado · juan@almacen.com');
   await page.getByRole('button', { name: 'Quitar' }).click();
@@ -43,7 +43,7 @@ test('el dueño invita a un empleado con un código; el empleado entra sin ver p
 
 test('una contraseña equivocada no entra', async ({ page }) => {
   await entrarComoDueno(page);
-  await page.getByRole('button', { name: 'Salir' }).click();
+  await salir(page);
   await page.getByLabel('Email').fill('dueno@almacen.com');
   await page.getByLabel('Contraseña').fill('otra-clave');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();

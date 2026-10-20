@@ -65,7 +65,7 @@ export function PantallaTotalDia({ dia: diaInicial, onGuardado, onVolver }: Prop
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-2xl">
       <Encabezado
         Icono={IconoLista}
         titulo="Total del día"
@@ -79,7 +79,7 @@ export function PantallaTotalDia({ dia: diaInicial, onGuardado, onVolver }: Prop
             value={dia}
             max={hoy}
             onChange={(e) => e.target.value && setDia(e.target.value)}
-            className="mt-2 min-h-11 w-full rounded-xl border border-stone-200 bg-white px-3 text-lg"
+            className="mt-2 min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
           />
           <span className="mt-1 block text-sm text-stone-600">{nombrePeriodo(periodoDe('dia', dia), hoy)}</span>
         </label>
@@ -93,7 +93,7 @@ export function PantallaTotalDia({ dia: diaInicial, onGuardado, onVolver }: Prop
               onChange={(e) => setTextos({ ...textos, [m.id]: e.target.value })}
               inputMode="decimal"
               placeholder="0"
-              className="min-h-11 w-40 rounded-xl border border-stone-200 bg-white px-3 text-right text-lg tabular-nums"
+              className="min-h-11 w-40 rounded-xl border border-stone-300 bg-white px-3 text-right text-lg tabular-nums outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
             />
           </label>
         ))}

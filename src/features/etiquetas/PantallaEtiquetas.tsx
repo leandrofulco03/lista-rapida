@@ -103,13 +103,13 @@ export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
         max={limites[1]}
         value={Number.isNaN(valor) ? '' : valor}
         onChange={(e) => cambiar(e.target.valueAsNumber)}
-        className="mt-1 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
+        className="mt-1 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
       />
     </div>
   );
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto max-w-3xl">
       <Encabezado Icono={IconoEtiqueta} titulo="Etiquetas" descripcion="Un PDF A4 con descripción, precio y fecha de cada producto." />
 
       <section className="mt-6">
@@ -182,7 +182,7 @@ export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           placeholder="Código o palabras"
-          className="mt-1 min-h-11 w-full rounded-xl border border-stone-200 bg-white shadow-sm px-3 text-lg"
+          className="mt-1 min-h-11 w-full rounded-xl border border-stone-300 bg-white shadow-xs px-3 text-lg outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/15"
         />
         <ul className="mt-2 space-y-1">
           {encontrados.map((p) => (

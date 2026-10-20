@@ -122,3 +122,62 @@ export const IconoGrafico = (p: Props) => (
     <path d="M7 15l4-4 3 3 5-6" />
   </Icono>
 );
+
+export const IconoInicio = (p: Props) => (
+  <Icono {...p}>
+    <rect x="3" y="3" width="7" height="9" rx="1.5" />
+    <rect x="14" y="3" width="7" height="5" rx="1.5" />
+    <rect x="14" y="12" width="7" height="9" rx="1.5" />
+    <rect x="3" y="16" width="7" height="5" rx="1.5" />
+  </Icono>
+);
+
+export const IconoVender = (p: Props) => (
+  <Icono {...p}>
+    <path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2" />
+    <circle cx="9" cy="20" r="1.3" />
+    <circle cx="17" cy="20" r="1.3" />
+  </Icono>
+);
+
+export const IconoTicket = (p: Props) => (
+  <Icono {...p}>
+    <path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" />
+    <path d="M9 8h6M9 12h6M9 16h3" />
+  </Icono>
+);
+
+export const IconoEquipo = (p: Props) => (
+  <Icono {...p}>
+    <circle cx="9" cy="8" r="3.5" />
+    <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+    <path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14a6.5 6.5 0 0 1 3 6" />
+  </Icono>
+);
+
+export const IconoDocumento = (p: Props) => (
+  <Icono {...p}>
+    <path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z" />
+    <path d="M14 3v5h5M9 13h6M9 17h6" />
+  </Icono>
+);
+
+/** Ícono del botón que abre el menú lateral en el celular. */
+export const IconoMenu = (p: Props) => (
+  <Icono {...p}>
+    <path d="M4 6h16M4 12h16M4 18h10" />
+  </Icono>
+);
+
+export const IconoCerrar = (p: Props) => (
+  <Icono {...p}>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </Icono>
+);
+
+export const IconoSalir = (p: Props) => (
+  <Icono {...p}>
+    <path d="M15 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3" />
+    <path d="M10 8l-4 4 4 4M6 12h10" />
+  </Icono>
+);

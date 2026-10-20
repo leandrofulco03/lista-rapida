@@ -34,7 +34,7 @@ export function PantallaUnirse({ backend, onUnido, onVolver }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+    <main className="mx-auto w-full max-w-md px-4 pt-8 pb-12">
       <Encabezado Icono={IconoProveedores} titulo="Unirme a un comercio" descripcion="Escribí el código que te pasó el dueño. Dura 7 días y sirve una sola vez." />
       <form onSubmit={enviar} className="mt-6 space-y-5" noValidate>
         <CampoTexto etiqueta="Código" valor={codigo} onCambiar={setCodigo} autoComplete="off" autoCapitalize="characters" placeholder="Ej.: 041C 24D4 2B33" />

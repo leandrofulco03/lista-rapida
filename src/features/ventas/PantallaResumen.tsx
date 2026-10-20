@@ -62,43 +62,55 @@ export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onAnalisis
   const variacion = (a: number | null | undefined, b: number | null | undefined) => textoVariacion(variacionKpi(a ?? null, b ?? null));
 
   return (
-    <main className="mx-auto max-w-md px-4 pt-8 pb-12">
-      <Encabezado Icono={IconoLista} titulo="Ventas" descripcion="Cuánto vendiste, en cuántas ventas y cómo te pagaron." />
+    <main className="mx-auto max-w-5xl">
+      <Encabezado
+        Icono={IconoLista}
+        titulo="Ventas"
+        descripcion="Cuánto vendiste, en cuántas ventas y cómo te pagaron."
+        acciones={
+          <Boton type="button" onClick={onVender} className="sm:w-auto sm:px-6">
+            Nueva venta
+          </Boton>
+        }
+      />
       <AvisoPendientes />
 
-      <Boton type="button" onClick={onVender} className="mt-4">
-        Nueva venta
-      </Boton>
-
-      <div className="mt-6 grid grid-cols-3 gap-2" role="group" aria-label="Período">
-        {TIPOS.map((t) => (
+      <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="grid grid-cols-3 gap-2 lg:w-96" role="group" aria-label="Período">
+          {TIPOS.map((t) => (
+            <button
+              key={t.tipo}
+              type="button"
+              aria-pressed={periodo.tipo === t.tipo}
+              onClick={() => setPeriodo(periodoDe(t.tipo, hoy))}
+              className={`min-h-11 rounded-xl border font-medium ${periodo.tipo === t.tipo ? 'border-green-600 bg-green-600 text-crema' : 'border-stone-300 bg-white hover:bg-stone-50'}`}
+            >
+              {t.nombre}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center justify-between gap-2 lg:w-96">
           <button
-            key={t.tipo}
             type="button"
-            aria-pressed={periodo.tipo === t.tipo}
-            onClick={() => setPeriodo(periodoDe(t.tipo, hoy))}
-            className={`min-h-11 rounded-xl border font-medium ${periodo.tipo === t.tipo ? 'border-green-600 bg-green-600 text-white' : 'border-stone-200 bg-white'}`}
+            aria-label="Período anterior"
+            onClick={() => setPeriodo(periodoAnterior(periodo))}
+            className="size-11 rounded-xl border border-stone-200 bg-white text-xl"
           >
-            {t.nombre}
+            ‹
           </button>
-        ))}
-      </div>
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <button type="button" aria-label="Período anterior" onClick={() => setPeriodo(periodoAnterior(periodo))} className="size-11 rounded-xl border border-stone-200 bg-white text-xl">
-          ‹
-        </button>
-        <p className="text-center font-semibold" data-testid="periodo">
-          {nombrePeriodo(periodo, hoy)}
-        </p>
-        <button
-          type="button"
-          aria-label="Período siguiente"
-          disabled={periodo.hasta >= hoy}
-          onClick={() => setPeriodo(periodoSiguiente(periodo))}
-          className="size-11 rounded-xl border border-stone-200 bg-white text-xl disabled:opacity-40"
-        >
-          ›
-        </button>
+          <p className="text-center font-semibold" data-testid="periodo">
+            {nombrePeriodo(periodo, hoy)}
+          </p>
+          <button
+            type="button"
+            aria-label="Período siguiente"
+            disabled={periodo.hasta >= hoy}
+            onClick={() => setPeriodo(periodoSiguiente(periodo))}
+            className="size-11 rounded-xl border border-stone-200 bg-white text-xl disabled:opacity-40"
+          >
+            ›
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -109,17 +121,17 @@ export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onAnalisis
 
       {k && ant && (
         <>
-          <section className="mt-4 rounded-3xl bg-linear-to-br from-green-600 to-emerald-800 p-5 text-white shadow-lg" data-testid="kpi-venta-total">
-            <p className="text-green-50">Venta total</p>
-            <p className="text-4xl font-bold tabular-nums">{formatearPesos(k.ventaTotal)}</p>
-            <p className="mt-1 text-sm text-green-50">
+          <section className="mt-5 rounded-2xl bg-marca p-6 text-crema shadow-sm" data-testid="kpi-venta-total">
+            <p className="text-crema/75">Venta total</p>
+            <p className="mt-1 text-4xl font-bold tabular-nums">{formatearPesos(k.ventaTotal)}</p>
+            <p className="mt-1 text-sm text-crema/75">
               {variacion(k.ventaTotal, ant.ventaTotal)
                 ? `${variacion(k.ventaTotal, ant.ventaTotal)} contra ${COMPARACION[periodo.tipo]} (${formatearPesos(ant.ventaTotal)})`
                 : `Sin ventas en ${COMPARACION[periodo.tipo]} para comparar`}
             </p>
           </section>
 
-          <dl className="mt-3 grid grid-cols-2 gap-3">
+          <dl className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
             <Tarjeta nombre="Ventas" valor={String(k.tickets)} variacion={variacion(k.tickets, ant.tickets)} testId="kpi-tickets" />
             <Tarjeta
               nombre="Ticket promedio"
@@ -127,7 +139,12 @@ export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onAnalisis
               variacion={variacion(k.ticketPromedio, ant.ticketPromedio)}
               testId="kpi-ticket-promedio"
             />
-            <Tarjeta nombre="Artículos vendidos" valor={formatearCantidad(k.articulos)} variacion={variacion(k.articulos, ant.articulos)} testId="kpi-articulos" />
+            <Tarjeta
+              nombre="Artículos vendidos"
+              valor={formatearCantidad(k.articulos)}
+              variacion={variacion(k.articulos, ant.articulos)}
+              testId="kpi-articulos"
+            />
             <Tarjeta
               nombre="Artículos por venta"
               valor={k.articulosPorTicket === null ? '—' : formatearCantidad(k.articulosPorTicket)}
@@ -138,8 +155,8 @@ export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onAnalisis
 
           {k.diasSinDetalle > 0 && (
             <p className="mt-3 rounded-xl bg-stone-100 p-3 text-stone-700">
-              Incluye {formatearPesos(k.totalSinDetalle)} cargados como total del día ({k.diasSinDetalle === 1 ? '1 día' : `${k.diasSinDetalle} días`}). Esas ventas no
-              cuentan en el ticket promedio ni en los artículos.
+              Incluye {formatearPesos(k.totalSinDetalle)} cargados como total del día ({k.diasSinDetalle === 1 ? '1 día' : `${k.diasSinDetalle} días`}). Esas
+              ventas no cuentan en el ticket promedio ni en los artículos.
             </p>
           )}
 
@@ -169,7 +186,7 @@ export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onAnalisis
       )}
 
       {periodo.tipo === 'dia' && (
-        <div className="mt-6 grid grid-cols-2 gap-2">
+        <div className="mt-6 grid grid-cols-2 gap-2 lg:max-w-xl">
           <Boton type="button" variante="secundario" onClick={() => onVerTickets(periodo.desde)}>
             Ver ventas
           </Boton>
@@ -179,11 +196,11 @@ export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onAnalisis
         </div>
       )}
 
-      <Boton type="button" variante="secundario" onClick={onAnalisis} className="mt-2">
+      <Boton type="button" variante="secundario" onClick={onAnalisis} className="mt-2 lg:max-w-xl">
         Ver análisis y gráficos
       </Boton>
 
-      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-6">
+      <Boton type="button" variante="secundario" onClick={onVolver} className="mt-6 sm:block sm:w-auto sm:px-8">
         Volver
       </Boton>
     </main>
@@ -192,9 +209,9 @@ export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onAnalisis
 
 function Tarjeta({ nombre, valor, variacion, testId }: { nombre: string; valor: string; variacion: string | null; testId: string }) {
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-3 shadow-sm" data-testid={testId}>
+    <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-xs" data-testid={testId}>
       <dt className="text-sm text-stone-600">{nombre}</dt>
-      <dd className="text-xl font-bold tabular-nums">{valor}</dd>
+      <dd className="mt-1 text-2xl font-bold tabular-nums">{valor}</dd>
       {variacion && <dd className="text-sm text-stone-600">{variacion}</dd>}
     </div>
   );

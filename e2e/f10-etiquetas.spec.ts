@@ -1,9 +1,9 @@
-import { entrarComoDueno } from './ayudas';
+import { entrarComoDueno, irA } from './ayudas';
 import { expect, test } from '@playwright/test';
 
 test('F10: etiquetas elegidas del catálogo, con medidas a mano que se recuerdan', async ({ page }) => {
   await entrarComoDueno(page);
-  await page.getByRole('button', { name: 'Catálogo' }).click();
+  await irA(page, 'Catálogo');
   await page.getByRole('button', { name: 'Importar desde Excel' }).click();
   await page.getByLabel('Archivo del catálogo').setInputFiles({
     name: 'catalogo.csv',
@@ -15,7 +15,7 @@ test('F10: etiquetas elegidas del catálogo, con medidas a mano que se recuerdan
   await page.getByRole('button', { name: 'Ver el catálogo' }).click();
   await page.getByRole('button', { name: 'Volver' }).click();
 
-  await page.getByRole('button', { name: 'Etiquetas' }).click();
+  await irA(page, 'Etiquetas');
   await expect(page.getByRole('heading', { name: 'Productos (0)' })).toBeVisible();
   await expect(page.getByRole('button', { name: /Bajar PDF/ })).toBeDisabled();
   await page.getByLabel('Agregar del catálogo').fill('aceite');
@@ -32,7 +32,7 @@ test('F10: etiquetas elegidas del catálogo, con medidas a mano que se recuerdan
   await page.getByLabel('Columnas').fill('2');
 
   await page.getByRole('button', { name: 'Volver' }).click();
-  await page.getByRole('button', { name: 'Etiquetas' }).click();
+  await irA(page, 'Etiquetas');
   await page.getByText('Medidas a mano').click();
   await expect(page.getByLabel('Filas')).toHaveValue('4');
 });
