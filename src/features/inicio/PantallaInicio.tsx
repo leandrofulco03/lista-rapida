@@ -8,12 +8,13 @@ import {
   IconoConfig,
   IconoEtiqueta,
   IconoFlecha,
+  IconoGrafico,
   IconoLista,
   IconoProveedores,
   IconoSubir,
 } from '../../ui/Iconos';
 
-type Destino = 'subir' | 'catalogo' | 'proveedores' | 'config' | 'equipo' | 'etiquetas' | 'lista-precios' | 'ayuda' | 'vender' | 'ventas';
+type Destino = 'subir' | 'catalogo' | 'proveedores' | 'config' | 'equipo' | 'etiquetas' | 'lista-precios' | 'ayuda' | 'vender' | 'ventas' | 'analisis';
 
 interface Props {
   config: ConfigComercio;
@@ -25,6 +26,7 @@ interface Props {
 
 /** Accesos secundarios. El texto es el nombre accesible del botón (el ícono es decorativo). */
 const SECCIONES: { destino: Destino; etiqueta: string; Icono: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+  { destino: 'analisis', etiqueta: 'Análisis', Icono: IconoGrafico },
   { destino: 'etiquetas', etiqueta: 'Etiquetas', Icono: IconoEtiqueta },
   { destino: 'lista-precios', etiqueta: 'Lista de precios', Icono: IconoLista },
   { destino: 'catalogo', etiqueta: 'Catálogo', Icono: IconoCatalogo },

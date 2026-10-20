@@ -63,8 +63,8 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
   const [aviso, setAviso] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
   const [cobrando, setCobrando] = useState(false);
   const campoBusqueda = useRef<HTMLInputElement>(null);
-  /** Un código que llegó (Enter o escáner) antes de que cargaran los productos. */
-  const codigoEnEspera = useRef<string | null>(null);
+  /** Códigos que llegaron (Enter o escáner) antes de que cargaran los productos; se agregan en orden al cargar. */
+  const codigosEnEspera = useRef<string[]>([]);
 
   // Primero lo guardado en el dispositivo (sirve sin conexión); después lo de la base, si hay internet.
   useEffect(() => {
@@ -99,8 +99,7 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
     (codigo: string) => {
       setEscaneando(false);
       if (productos === null) {
-        codigoEnEspera.current = codigo;
-        setBusqueda(codigo);
+        codigosEnEspera.current.push(codigo);
         return;
       }
       const p = porCodigo(productos, codigo);
@@ -111,17 +110,20 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
   );
 
   useEffect(() => {
-    const codigo = codigoEnEspera.current;
-    if (productos === null || codigo === null) return;
-    codigoEnEspera.current = null;
-    const p = porCodigo(productos, codigo);
-    if (p) agregar(p);
+    if (productos === null || codigosEnEspera.current.length === 0) return;
+    const codigos = codigosEnEspera.current;
+    codigosEnEspera.current = [];
+    for (const codigo of codigos) {
+      const p = porCodigo(productos, codigo);
+      if (p) agregar(p);
+    }
   }, [productos, agregar]);
 
   function alBuscar(e: FormEvent) {
     e.preventDefault();
     if (productos === null) {
-      codigoEnEspera.current = busqueda;
+      if (busqueda.trim()) codigosEnEspera.current.push(busqueda);
+      setBusqueda('');
       return;
     }
     // Un lector de códigos escribe el código y "Enter"; también vale escribir el código a mano.

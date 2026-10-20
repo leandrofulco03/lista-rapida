@@ -114,3 +114,11 @@ export const IconoAlerta = (p: Props) => (
     <path d="M12 9v4M12 17h.01" />
   </Icono>
 );
+
+export const IconoGrafico = (p: Props) => (
+  <Icono {...p}>
+    <path d="M4 20V4" />
+    <path d="M4 20h16" />
+    <path d="M7 15l4-4 3 3 5-6" />
+  </Icono>
+);

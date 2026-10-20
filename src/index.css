@@ -24,3 +24,27 @@
     outline-offset: 2px;
   }
 }
+
+/*
+ * Colores de los gráficos (Fase 9). Paleta categórica validada (orden fijo, apto daltonismo en pares vecinos)
+ * y una rampa de un solo tono para magnitudes (mapa de calor). Se cambian acá para todo el sitio.
+ */
+:root {
+  --graf-superficie: #ffffff;
+  --graf-grilla: #e7e5e4;
+  --graf-eje: #a8a29e;
+  --graf-texto: #1c1917;
+  --graf-texto-2: #57534e;
+  --graf-serie-1: #2a78d6;
+  --graf-serie-2: #eb6834;
+  --graf-serie-3: #1baf7a;
+  --graf-serie-4: #eda100;
+  --graf-serie-5: #e87ba4;
+  --graf-otros: #b5b3ad;
+  --graf-sec-0: #f0efec;
+  --graf-sec-1: #cde2fb;
+  --graf-sec-2: #86b6ef;
+  --graf-sec-3: #3987e5;
+  --graf-sec-4: #1c5cab;
+  --graf-sec-5: #0d366b;
+}

@@ -2,6 +2,20 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 22/10/2026 · v2 Fase 9: análisis
+
+- **Pantalla Análisis** (sólo el dueño, desde el inicio y desde Ventas), con un período arriba que vale para todo: 7 días, 30 días, este mes, mes pasado, 90 días. Al cambiarlo, lo anterior queda atenuado hasta que llegan los datos (sin parpadeo).
+- **Ganancia = lo cobrado − lo que costó.** El costo del catálogo está sin IVA y el recargo se aplica sobre costo + IVA cuando se vende con IVA incluido (F08); en ese caso el IVA cuenta como costo (lo que paga un monotributista, que no lo recupera). Así la ganancia coincide con el recargo: 30% de recargo = 23,1% de margen. Si el comercio vende sin IVA, la ganancia es precio − costo. Lo vendido sin costo conocido ("Varios", productos con costo 0) y el total del día no entran en la ganancia, y la pantalla lo dice con el monto. Descartado: un ajuste por condición fiscal (responsable inscripto); se suma si el piloto lo pide.
+- **El IVA de cada línea se guarda al vender** (como el costo). Las ventas anteriores usan el IVA del producto, o 21%.
+- **Gráficos hechos a mano** (SVG y HTML, `src/ui/graficos/`), sin librería: son cuatro formas simples y una librería sumaba unos 100 kB. Siguen la guía de visualización: línea de 2px con lavado suave, grilla fina, una sola serie sin leyenda, barras finas de un color con el valor en la punta, torta con hasta 5 porciones + "Otros" (con más, no se lee), mapa de calor de un solo tono (5 pasos) con escala. Cada gráfico tiene tooltip con mouse, dedo y teclado, y "Ver los datos" con la tabla.
+- **Colores de los gráficos como variables** en `src/index.css` (`--graf-*`), para cambiarlos en el rediseño. La paleta categórica (5 colores, orden fijo) pasó el validador de daltonismo; tres colores tienen poco contraste con el fondo blanco, por eso la leyenda lleva siempre el valor y el porcentaje escritos.
+- **Torta de más vendidos** (la pidió Leandro), por plata o por unidades, con los 5 primeros y "Otros". Debajo, los 10 que más facturaron en barras, con unidades y ganancia.
+- **Mapa de día y hora** en horario de Argentina, de la primera a la última hora con ventas.
+- **Precios para revisar** (se calcula en la app con F08): vende a pérdida (por debajo de costo + IVA), por debajo del precio que da su recargo (más de 2% abajo) o sin cambios hace 45 días o más. Los productos sin costo no se pueden evaluar.
+- **Sin movimiento:** productos sin ventas en los últimos 30 días (o que nunca se vendieron).
+- **Seguridad, corregido:** en la Fase 8 el empleado podía leer directo las líneas de sus ventas, que traen el costo. Ahora esa tabla no se lee directo: las ventas del día y el análisis se leen por funciones que controlan quién llama.
+- **Bug corregido:** varios códigos escritos o escaneados seguidos mientras cargaban los productos se perdían (sólo quedaba el último). Ahora esperan en fila y se agregan todos.
+
 ## 21/10/2026 · v2 Fase 8: ventas
 
 Decisiones de Leandro: el empleado ve sus tickets de hoy; se permite "Varios" con importe a mano; el empleado anula sus ventas del día y el dueño cualquiera, y la venta anulada queda marcada (no se borra).

@@ -27,6 +27,7 @@ import { PantallaResumen } from './features/ventas/PantallaResumen';
 import { PantallaTotalDia } from './features/ventas/PantallaTotalDia';
 import { PantallaVender } from './features/ventas/PantallaVender';
 import { PantallaVentasDelDia } from './features/ventas/PantallaVentasDelDia';
+import { PantallaAnalisis } from './features/analisis/PantallaAnalisis';
 
 type Pantalla =
   | 'inicio'
@@ -42,7 +43,8 @@ type Pantalla =
   | 'vender'
   | 'ventas'
   | 'ventas-dia'
-  | 'total-dia';
+  | 'total-dia'
+  | 'analisis';
 
 /** Pantallas del empleado: sólo vende y ve sus ventas de hoy. */
 type PantallaEmpleadoNav = 'inicio' | 'vender' | 'mis-ventas';
@@ -224,9 +226,12 @@ export function App() {
             onVender={() => ir('vender')}
             onVerTickets={(dia) => ir('ventas-dia', dia)}
             onTotalDia={(dia) => ir('total-dia', dia)}
+            onAnalisis={() => ir('analisis')}
             onVolver={() => ir('inicio')}
           />
         );
+      case 'analisis':
+        return <PantallaAnalisis config={e.config} onVolver={() => ir('inicio')} />;
       case 'ventas-dia':
         return <PantallaVentasDelDia esDueno diaInicial={e.dia} onVolver={() => ir('ventas')} />;
       case 'total-dia':

@@ -135,7 +135,7 @@ export const periodoSiguiente = (p: Periodo): Periodo => periodoDe(p.tipo, sumar
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
 
-function diaLegible(dia: Dia, conAnio = false): string {
+export function diaLegible(dia: Dia, conAnio = false): string {
   const [a, m, d] = dia.split('-').map(Number) as [number, number, number];
   return `${d} de ${MESES[m - 1]}${conAnio ? ` de ${a}` : ''}`;
 }

@@ -24,6 +24,7 @@ interface Props {
   onVender: () => void;
   onVerTickets: (dia: Dia) => void;
   onTotalDia: (dia: Dia) => void;
+  onAnalisis: () => void;
   onVolver: () => void;
 }
 
@@ -36,7 +37,7 @@ const TIPOS: { tipo: TipoPeriodo; nombre: string }[] = [
 const COMPARACION: Record<TipoPeriodo, string> = { dia: 'el día anterior', semana: 'la semana anterior', mes: 'el mes anterior' };
 
 /** Fase 8: resumen de ventas del dueño, por día, semana o mes, contra el período anterior. */
-export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onVolver }: Props) {
+export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onAnalisis, onVolver }: Props) {
   const sesion = useSesion();
   const hoy = diaDe(new Date());
   const [periodo, setPeriodo] = useState<Periodo>(periodoDe('dia', hoy));
@@ -177,6 +178,10 @@ export function PantallaResumen({ onVender, onVerTickets, onTotalDia, onVolver }
           </Boton>
         </div>
       )}
+
+      <Boton type="button" variante="secundario" onClick={onAnalisis} className="mt-2">
+        Ver análisis y gráficos
+      </Boton>
 
       <Boton type="button" variante="secundario" onClick={onVolver} className="mt-6">
         Volver
