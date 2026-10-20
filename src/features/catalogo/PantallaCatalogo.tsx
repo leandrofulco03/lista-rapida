@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { db, filtrarProductos, listarProductos, listarRubros } from '../../db';
+import { filtrarProductos, listarProductos, listarRubros } from '../../db';
+import { useSesion } from '../../sesion';
 import type { Producto, Rubro } from '../../db';
 import type { ConfigComercio } from '../../domain/config';
 import { formatearPesos } from '../../domain/dinero';
@@ -22,13 +23,14 @@ const MOSTRAR = 100;
 
 /** F03: catálogo propio del comercio, con búsqueda. */
 export function PantallaCatalogo({ config, onVolver }: Props) {
+  const sesion = useSesion();
   const [productos, setProductos] = useState<Producto[] | null>(null);
   const [rubros, setRubros] = useState<Rubro[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [vista, setVista] = useState<Vista>({ tipo: 'lista' });
 
   async function cargar() {
-    const [p, r] = await Promise.all([listarProductos(db), listarRubros(db)]);
+    const [p, r] = await Promise.all([listarProductos(sesion), listarRubros(sesion)]);
     setProductos(p);
     setRubros(r);
   }

@@ -1,3 +1,5 @@
+import { compararIds } from './id';
+import type { Id } from './id';
 /**
  * F07: vinculación de cada línea de la lista del proveedor con un producto del catálogo.
  *
@@ -10,14 +12,14 @@
 
 /** Un producto del catálogo, con lo que hace falta para compararlo. */
 export interface ProductoComparable {
-  id: number;
+  id: Id;
   descripcionNormalizada: string;
 }
 
 export type EstadoVinculo = 'vinculada' | 'sugerida' | 'dudosa' | 'nueva';
 
 export interface Opcion {
-  productoId: number;
+  productoId: Id;
   /** Similitud de 0 a 1. */
   similitud: number;
 }
@@ -25,7 +27,7 @@ export interface Opcion {
 export interface ResultadoVinculo {
   estado: EstadoVinculo;
   /** Producto elegido: el vinculado antes o la mejor sugerencia. null en dudosas y nuevas. */
-  productoId: number | null;
+  productoId: Id | null;
   /** Hasta 3 mejores opciones, de mayor a menor similitud. */
   opciones: Opcion[];
 }
@@ -146,8 +148,8 @@ export function similitud(a: string, b: string): number {
  * los productos que la tienen. Así no se compara cada línea con todo el catálogo.
  */
 export class IndiceCatalogo {
-  private readonly porClave = new Map<string, Set<number>>();
-  private readonly productos = new Map<number, { normalizada: string; contenido: Contenido }>();
+  private readonly porClave = new Map<string, Set<Id>>();
+  private readonly productos = new Map<Id, { normalizada: string; contenido: Contenido }>();
 
   constructor(productos: readonly ProductoComparable[]) {
     for (const p of productos) {
@@ -168,7 +170,7 @@ export class IndiceCatalogo {
 
   /** Las mejores opciones para una descripción, de mayor a menor similitud. */
   buscar(normalizada: string, cantidad = OPCIONES_DUDOSA): (Opcion & { contenidoDistinto: boolean; variedadDistinta: boolean })[] {
-    const candidatos = new Set<number>();
+    const candidatos = new Set<Id>();
     for (const clave of this.claves(normalizada)) for (const id of this.porClave.get(clave) ?? []) candidatos.add(id);
     const contenido = contenidoDe(normalizada);
     return [...candidatos]
@@ -182,7 +184,7 @@ export class IndiceCatalogo {
         };
       })
       .filter((o) => o.similitud > 0)
-      .sort((a, b) => b.similitud - a.similitud || a.productoId - b.productoId)
+      .sort((a, b) => b.similitud - a.similitud || compararIds(a.productoId, b.productoId))
       .slice(0, cantidad);
   }
 }
@@ -203,7 +205,7 @@ export function claveVinculo(codigo: string | null, descripcion: string, present
  */
 export function vincularLinea(
   linea: { codigo: string | null; descripcion: string; presentacion?: string | null },
-  vinculados: ReadonlyMap<string, number>,
+  vinculados: ReadonlyMap<string, Id>,
   indice: IndiceCatalogo,
 ): ResultadoVinculo {
   const recordado = vinculados.get(claveVinculo(linea.codigo, linea.descripcion, linea.presentacion));

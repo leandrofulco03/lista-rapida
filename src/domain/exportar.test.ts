@@ -5,14 +5,14 @@ import type { ProductoExportar } from './exportar';
 const p = (codigoInterno: string, descripcion: string, rubroId: number | null, precio: number): ProductoExportar => ({
   codigoInterno,
   descripcion,
-  rubroId,
+  rubroId: rubroId === null ? null : String(rubroId),
   ivaPct: 2100,
   precioVentaActual: precio,
   actualizado: '2026-10-12T15:00:00.000Z',
 });
 const rubros = new Map([
-  [1, 'Limpieza'],
-  [2, 'Almacén'],
+  ['1', 'Limpieza'],
+  ['2', 'Almacén'],
 ]);
 
 describe('agruparPorRubro', () => {

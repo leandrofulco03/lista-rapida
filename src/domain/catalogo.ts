@@ -1,3 +1,4 @@
+import type { Id } from './id';
 import { FILAS_BUSCAR_ENCABEZADO, detectarColumnas, puntajeTitulo, textoCelda } from './columnas';
 import type { Confianza } from './columnas';
 import type { Centavos, Porcentaje } from './dinero';
@@ -223,8 +224,10 @@ export function extraerProductosCatalogo(filas: readonly (readonly Celda[])[], m
 /** Datos de un producto que carga o edita el comerciante (F03). */
 export interface DatosProducto {
   codigoInterno: string;
+  /** Código de barras (EAN, 6 a 14 dígitos); null si no tiene. Si no se manda, al editar queda el que tenía. */
+  codigoBarras?: string | null;
   descripcion: string;
-  rubroId: number | null;
+  rubroId: Id | null;
   /** Recargo propio; null si usa el del rubro o el general. */
   recargoPct: Porcentaje | null;
   ivaPct: Porcentaje;
@@ -235,7 +238,7 @@ export interface DatosProducto {
 export const LARGO_MAXIMO_CODIGO = 30;
 export const LARGO_MAXIMO_DESCRIPCION = 120;
 
-export type ErroresProducto = Partial<Record<'codigoInterno' | 'descripcion' | 'recargoPct' | 'ivaPct' | 'costoActual' | 'precioVentaActual', string>>;
+export type ErroresProducto = Partial<Record<'codigoInterno' | 'codigoBarras' | 'descripcion' | 'recargoPct' | 'ivaPct' | 'costoActual' | 'precioVentaActual', string>>;
 
 /** Un mensaje por campo con problemas; vacío si el producto es válido. La unicidad del código la controla la base. */
 export function validarProducto(datos: DatosProducto): ErroresProducto {
@@ -243,6 +246,7 @@ export function validarProducto(datos: DatosProducto): ErroresProducto {
   const codigo = datos.codigoInterno.trim();
   if (codigo === '') errores.codigoInterno = 'Escribí un código.';
   else if (codigo.length > LARGO_MAXIMO_CODIGO) errores.codigoInterno = `Usá hasta ${LARGO_MAXIMO_CODIGO} letras.`;
+  if (datos.codigoBarras && !/^[0-9]{6,14}$/.test(datos.codigoBarras)) errores.codigoBarras = 'El código de barras tiene de 6 a 14 números.';
   const descripcion = datos.descripcion.trim();
   if (descripcion === '') errores.descripcion = 'Escribí la descripción.';
   else if (descripcion.length > LARGO_MAXIMO_DESCRIPCION) errores.descripcion = `Usá hasta ${LARGO_MAXIMO_DESCRIPCION} letras.`;
@@ -260,7 +264,9 @@ export function validarProducto(datos: DatosProducto): ErroresProducto {
 /** Limpia espacios de más antes de guardar. */
 export function normalizarProducto(datos: DatosProducto): DatosProducto {
   const limpiar = (t: string) => t.replace(/\s+/g, ' ').trim();
-  return { ...datos, codigoInterno: limpiar(datos.codigoInterno), descripcion: limpiar(datos.descripcion) };
+  const limpio = { ...datos, codigoInterno: limpiar(datos.codigoInterno), descripcion: limpiar(datos.descripcion) };
+  if (datos.codigoBarras !== undefined) limpio.codigoBarras = datos.codigoBarras?.replace(/\s+/g, '') || null;
+  return limpio;
 }
 
 /** Próximo código automático libre ("P0001", "P0002"…) para productos que no traen código. */

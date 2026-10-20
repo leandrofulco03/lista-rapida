@@ -1,5 +1,7 @@
 import { useEffect, useId, useState } from 'react';
-import { db, filtrarProductos, listarProductos, productosUltimaRevision } from '../../db';
+import { filtrarProductos, listarProductos, productosUltimaRevision } from '../../db';
+import type { Id } from '../../domain/id';
+import { useSesion } from '../../sesion';
 import type { Producto } from '../../db';
 import { FORMATOS, FORMATO_INICIAL, LIMITES_FORMATO, fechaEtiqueta, medidaEtiqueta, precioEtiqueta, validarFormato } from '../../domain/etiquetas';
 import type { FormatoEtiqueta } from '../../domain/etiquetas';
@@ -10,7 +12,7 @@ import { descargar } from '../../ui/descargar';
 
 interface Props {
   /** Productos para imprimir; si no viene, los que cambiaron de precio en la última lista revisada. */
-  preseleccion?: number[];
+  preseleccion?: Id[];
   onVolver: () => void;
 }
 
@@ -39,8 +41,9 @@ const mm = (n: number) => n.toLocaleString('es-AR', { maximumFractionDigits: 1 }
 
 /** F10: PDF A4 con etiquetas de precio (descripción, precio y fecha) para imprimir en una impresora común. */
 export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
-  const [productos, setProductos] = useState<Map<number, Producto> | null>(null);
-  const [seleccion, setSeleccion] = useState<number[]>([]);
+  const sesion = useSesion();
+  const [productos, setProductos] = useState<Map<Id, Producto> | null>(null);
+  const [seleccion, setSeleccion] = useState<Id[]>([]);
   const [formato, setFormato] = useState<FormatoEtiqueta>(leerFormatoGuardado);
   const [busqueda, setBusqueda] = useState('');
   const [generando, setGenerando] = useState(false);
@@ -48,7 +51,7 @@ export function PantallaEtiquetas({ preseleccion, onVolver }: Props) {
   const ids = { buscar: useId(), columnas: useId(), filas: useId(), margen: useId() };
 
   useEffect(() => {
-    Promise.all([listarProductos(db), preseleccion ? Promise.resolve(preseleccion) : productosUltimaRevision(db)]).then(([lista, elegidos]) => {
+    Promise.all([listarProductos(sesion), preseleccion ? Promise.resolve(preseleccion) : productosUltimaRevision(sesion)]).then(([lista, elegidos]) => {
       const porId = new Map(lista.map((p) => [p.id, p]));
       setProductos(porId);
       setSeleccion([...new Set(elegidos)].filter((id) => porId.has(id)));

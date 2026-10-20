@@ -1,6 +1,7 @@
 import { useId, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { db, importarCatalogo } from '../../db';
+import { importarCatalogo } from '../../db';
+import { useSesion } from '../../sesion';
 import type { ResultadoImportacionCatalogo } from '../../db';
 import { CAMPOS_CATALOGO, NOMBRE_CAMPO_CATALOGO, detectarColumnasCatalogo, extraerProductosCatalogo } from '../../domain/catalogo';
 import type { CampoCatalogo, DeteccionCatalogo, MapeoCatalogo } from '../../domain/catalogo';
@@ -29,6 +30,7 @@ type Paso =
 
 /** F03: carga el catálogo del comercio desde un Excel, CSV o PDF. Los productos que ya están se actualizan. */
 export function PantallaImportarCatalogo({ config, onVolver }: Props) {
+  const sesion = useSesion();
   const [archivo, setArchivo] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [paso, setPaso] = useState<Paso>({ tipo: 'elegir' });
@@ -54,7 +56,7 @@ export function PantallaImportarCatalogo({ config, onVolver }: Props) {
         {...paso}
         onConfirmar={async (mapeo) => {
           const { productos, salteadas } = extraerProductosCatalogo(paso.tabla.filas, mapeo);
-          const resultado = await importarCatalogo(db, productos, config);
+          const resultado = await importarCatalogo(sesion, productos, config);
           setPaso({ tipo: 'listo', resultado, salteadas });
         }}
         onCancelar={() => setPaso({ tipo: 'elegir' })}

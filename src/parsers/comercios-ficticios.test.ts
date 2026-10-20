@@ -30,8 +30,8 @@ async function catalogo(comercio: string) {
   const { filas } = await leer(`${comercio}-catalogo.xlsx`);
   const { mapeo } = detectarColumnasCatalogo(filas);
   const { productos } = extraerProductosCatalogo(filas, mapeo!);
-  // id = posición + 1; el código del catálogo ("0001") lleva al id.
-  const conId = productos.map((p, i) => ({ ...p, id: i + 1, descripcionNormalizada: normalizarDescripcion(p.descripcion) }));
+  // id = posición + 1, con ceros adelante para que el orden de los ids siga el del catálogo; el código ("0001") lleva al id.
+  const conId = productos.map((p, i) => ({ ...p, id: String(i + 1).padStart(4, '0'), descripcionNormalizada: normalizarDescripcion(p.descripcion) }));
   return { productos: conId, idDe: new Map(conId.map((p) => [p.codigo!, p.id])) };
 }
 
@@ -72,7 +72,7 @@ describe('piloto con comercios ficticios', () => {
 
         // Semana 1: sin vínculos. Lo que se sugiere con un toque tiene que estar bien.
         const s1 = await lista(nombre(1));
-        const vinculos = new Map<string, number>();
+        const vinculos = new Map<string, string>();
         s1.lineas.forEach((linea, i) => {
           const esperado = correcto(s1.esperado.lineas[i]!);
           const r = vincularLinea(linea, new Map(), indice);

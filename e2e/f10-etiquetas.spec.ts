@@ -1,9 +1,8 @@
+import { entrarComoDueno } from './ayudas';
 import { expect, test } from '@playwright/test';
 
 test('F10: etiquetas elegidas del catálogo, con medidas a mano que se recuerdan', async ({ page }) => {
-  await page.goto('/');
-  await page.getByLabel('Nombre del comercio').fill('Almacén Don José');
-  await page.getByRole('button', { name: 'Guardar y empezar' }).click();
+  await entrarComoDueno(page);
   await page.getByRole('button', { name: 'Catálogo' }).click();
   await page.getByRole('button', { name: 'Importar desde Excel' }).click();
   await page.getByLabel('Archivo del catálogo').setInputFiles({

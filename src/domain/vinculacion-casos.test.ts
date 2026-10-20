@@ -16,8 +16,8 @@ const casos = JSON.parse(readFileSync(join(__dirname, '../../tests/fixtures/vinc
 };
 
 describe('F07: set de vinculación', () => {
-  const indice = new IndiceCatalogo(casos.catalogo.map((d, id) => ({ id, descripcionNormalizada: normalizarDescripcion(d) })));
-  const resultados = casos.lineas.map((l) => ({ ...l, resultado: vincularLinea({ codigo: null, descripcion: l.descripcion }, new Map(), indice) }));
+  const indice = new IndiceCatalogo(casos.catalogo.map((d, id) => ({ id: String(id), descripcionNormalizada: normalizarDescripcion(d) })));
+  const resultados = casos.lineas.map((l) => ({ ...l, esperado: l.esperado === null ? null : String(l.esperado), resultado: vincularLinea({ codigo: null, descripcion: l.descripcion }, new Map(), indice) }));
 
   it('nunca sugiere un producto equivocado', () => {
     const equivocadas = resultados.filter((r) => r.resultado.estado === 'sugerida' && r.resultado.productoId !== r.esperado);

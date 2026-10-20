@@ -1,75 +1,184 @@
-import { useEffect, useState } from 'react';
-import { db, guardarConfig, leerConfig } from './db';
+import { useEffect, useMemo, useState } from 'react';
+import { crearComercio, guardarConfig, leerConfig, misComercios } from './db';
+import type { MiComercio, Sesion } from './db';
 import type { ConfigComercio } from './domain/config';
-import { PantallaConfig } from './features/config/PantallaConfig';
-import { PantallaInicio } from './features/inicio/PantallaInicio';
-import { PantallaSubirLista } from './features/subir/PantallaSubirLista';
+import type { Id } from './domain/id';
+import { PantallaBienvenida } from './features/acceso/PantallaBienvenida';
+import { PantallaIngreso } from './features/acceso/PantallaIngreso';
+import { PantallaUnirse } from './features/acceso/PantallaUnirse';
+import { PantallaAyuda } from './features/ayuda/PantallaAyuda';
 import { PantallaCatalogo } from './features/catalogo/PantallaCatalogo';
-import { PantallaProveedores } from './features/proveedores/PantallaProveedores';
-import { PantallaRespaldo } from './features/respaldo/PantallaRespaldo';
+import { PantallaConfig } from './features/config/PantallaConfig';
+import { PantallaEmpleado } from './features/empleado/PantallaEmpleado';
+import { PantallaEquipo } from './features/equipo/PantallaEquipo';
 import { PantallaEtiquetas } from './features/etiquetas/PantallaEtiquetas';
 import { PantallaListaPrecios } from './features/exportar/PantallaListaPrecios';
-import { PantallaAyuda } from './features/ayuda/PantallaAyuda';
+import { PantallaInicio } from './features/inicio/PantallaInicio';
+import { PantallaProveedores } from './features/proveedores/PantallaProveedores';
+import { PantallaRespaldo } from './features/respaldo/PantallaRespaldo';
+import { PantallaSubirLista } from './features/subir/PantallaSubirLista';
+import { crearBackend } from './nube';
+import type { Backend, Usuario } from './nube';
+import { ContextoSesion } from './sesion';
 
-type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo' | 'etiquetas' | 'lista-precios' | 'ayuda';
+type Pantalla = 'inicio' | 'config' | 'subir' | 'catalogo' | 'proveedores' | 'respaldo' | 'etiquetas' | 'lista-precios' | 'ayuda' | 'equipo';
 
+/** Qué se muestra: depende de la conexión, de la sesión, del comercio y del rol. */
 type Estado =
   | { tipo: 'cargando' }
-  | { tipo: 'sin-config'; restaurando?: boolean }
-  | { tipo: 'listo'; config: ConfigComercio; pantalla: Pantalla; etiquetas?: number[] };
+  | { tipo: 'sin-conexion'; error: string }
+  | { tipo: 'sin-sesion' }
+  | { tipo: 'sin-comercio'; paso: 'elegir' | 'crear' | 'unirse' }
+  | { tipo: 'empleado'; comercio: MiComercio }
+  | { tipo: 'admin'; comercio: MiComercio; config: ConfigComercio; pantalla: Pantalla; etiquetas?: Id[] };
 
 export function App() {
+  const [backend, setBackend] = useState<Backend | null>(null);
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [estado, setEstado] = useState<Estado>({ tipo: 'cargando' });
 
-  const cargar = (pantalla: Pantalla = 'inicio') =>
-    leerConfig(db).then((config) => setEstado(config ? { tipo: 'listo', config, pantalla } : { tipo: 'sin-config' }));
-
+  // Conexión y sesión.
   useEffect(() => {
-    cargar();
+    let dejar = () => {};
+    crearBackend().then(
+      async (b) => {
+        setBackend(b);
+        dejar = b.alCambiarUsuario((u) => setUsuario((antes) => (antes?.id === u?.id ? antes : u)));
+        const u = await b.usuario();
+        setUsuario(u);
+        if (!u) setEstado({ tipo: 'sin-sesion' });
+      },
+      (e: Error) => setEstado({ tipo: 'sin-conexion', error: e.message }),
+    );
+    return () => dejar();
   }, []);
 
-  async function guardar(config: ConfigComercio) {
-    const guardada = await guardarConfig(db, config);
-    setEstado({ tipo: 'listo', config: guardada, pantalla: 'inicio' });
+  /** Con sesión: busca el comercio y, si es el dueño, su configuración. */
+  async function cargarComercio(b: Backend, pantalla: Pantalla = 'inicio') {
+    try {
+      const [comercio] = await misComercios(b);
+      if (!comercio) return setEstado({ tipo: 'sin-comercio', paso: 'elegir' });
+      if (comercio.rol === 'empleado') return setEstado({ tipo: 'empleado', comercio });
+      const config = await leerConfig({ backend: b, comercioId: comercio.id });
+      if (!config) throw new Error('No pudimos leer la configuración del comercio.');
+      setEstado({ tipo: 'admin', comercio, config, pantalla });
+    } catch (e) {
+      setEstado({ tipo: 'sin-conexion', error: (e as Error).message });
+    }
   }
 
-  if (estado.tipo === 'cargando') return null;
-  if (estado.tipo === 'sin-config') {
-    if (estado.restaurando) {
-      return <PantallaRespaldo onRestaurado={() => cargar()} onVolver={() => setEstado({ tipo: 'sin-config' })} />;
+  useEffect(() => {
+    if (!backend) return;
+    if (!usuario) {
+      setEstado({ tipo: 'sin-sesion' });
+      return;
     }
-    return <PantallaConfig onGuardar={guardar} onRestaurar={() => setEstado({ tipo: 'sin-config', restaurando: true })} />;
-  }
-  const ir = (pantalla: Pantalla) => setEstado({ ...estado, pantalla, etiquetas: undefined });
-  if (estado.pantalla === 'config') {
-    return <PantallaConfig inicial={estado.config} onGuardar={guardar} onCancelar={() => ir('inicio')} />;
-  }
-  if (estado.pantalla === 'subir') {
+    setEstado({ tipo: 'cargando' });
+    cargarComercio(backend);
+  }, [backend, usuario?.id]);
+
+  const comercioId = estado.tipo === 'admin' || estado.tipo === 'empleado' ? estado.comercio.id : null;
+  const sesion = useMemo<Sesion | null>(() => (backend && comercioId ? { backend, comercioId } : null), [backend, comercioId]);
+
+  if (estado.tipo === 'cargando') {
     return (
-      <PantallaSubirLista
-        config={estado.config}
-        onEtiquetas={(productos) => setEstado({ ...estado, pantalla: 'etiquetas', etiquetas: productos })}
-        onListaPrecios={() => ir('lista-precios')}
-        onVolver={() => ir('inicio')}
+      <p className="p-8 text-center text-stone-600" role="status">
+        Cargando…
+      </p>
+    );
+  }
+  if (estado.tipo === 'sin-conexion') {
+    return (
+      <main className="mx-auto max-w-md px-4 pt-8 pb-12">
+        <h1 className="text-2xl font-bold">No pudimos conectarnos</h1>
+        <p className="mt-2 text-stone-700" role="alert">
+          {estado.error}
+        </p>
+        <button type="button" onClick={() => location.reload()} className="mt-6 min-h-11 font-semibold text-green-800 underline underline-offset-4">
+          Probar de nuevo
+        </button>
+      </main>
+    );
+  }
+  if (!backend) return null;
+  if (estado.tipo === 'sin-sesion' || !usuario) return <PantallaIngreso backend={backend} />;
+  const salir = () => backend.salir();
+
+  if (estado.tipo === 'sin-comercio') {
+    if (estado.paso === 'crear') {
+      return (
+        <PantallaConfig
+          onGuardar={async (config) => {
+            await crearComercio(backend, config);
+            await cargarComercio(backend);
+          }}
+          onCancelar={() => setEstado({ tipo: 'sin-comercio', paso: 'elegir' })}
+        />
+      );
+    }
+    if (estado.paso === 'unirse') {
+      return (
+        <PantallaUnirse backend={backend} onUnido={() => cargarComercio(backend)} onVolver={() => setEstado({ tipo: 'sin-comercio', paso: 'elegir' })} />
+      );
+    }
+    return (
+      <PantallaBienvenida
+        email={usuario.email}
+        onCrear={() => setEstado({ tipo: 'sin-comercio', paso: 'crear' })}
+        onUnirse={() => setEstado({ tipo: 'sin-comercio', paso: 'unirse' })}
+        onSalir={salir}
       />
     );
   }
-  if (estado.pantalla === 'lista-precios') {
-    return <PantallaListaPrecios nombreComercio={estado.config.nombreComercio} onVolver={() => ir('inicio')} />;
+
+  if (!sesion) return null;
+  if (estado.tipo === 'empleado') {
+    return <PantallaEmpleado nombreComercio={estado.comercio.nombre} email={usuario.email} onSalir={salir} />;
   }
-  if (estado.pantalla === 'etiquetas') return <PantallaEtiquetas preseleccion={estado.etiquetas} onVolver={() => ir('inicio')} />;
-  if (estado.pantalla === 'catalogo') return <PantallaCatalogo config={estado.config} onVolver={() => ir('inicio')} />;
-  if (estado.pantalla === 'respaldo') {
-    return (
-      <PantallaRespaldo
-        ultimoRespaldo={estado.config.ultimoRespaldo}
-        onExportado={() => cargar('respaldo')}
-        onRestaurado={() => cargar()}
-        onVolver={() => ir('inicio')}
-      />
-    );
+
+  return <ContextoSesion.Provider value={sesion}>{pantallaAdmin(estado)}</ContextoSesion.Provider>;
+
+  function pantallaAdmin(e: Extract<Estado, { tipo: 'admin' }>) {
+    const ir = (pantalla: Pantalla) => setEstado({ ...e, pantalla, etiquetas: undefined });
+    const recargar = (pantalla: Pantalla = 'inicio') => cargarComercio(backend!, pantalla);
+    switch (e.pantalla) {
+      case 'config':
+        return (
+          <PantallaConfig
+            inicial={e.config}
+            onGuardar={async (config) => {
+              const guardada = await guardarConfig(sesion!, config);
+              setEstado({ ...e, config: guardada, comercio: { ...e.comercio, nombre: guardada.nombreComercio }, pantalla: 'inicio' });
+            }}
+            onCancelar={() => ir('inicio')}
+            onRestaurar={() => ir('respaldo')}
+          />
+        );
+      case 'subir':
+        return (
+          <PantallaSubirLista
+            config={e.config}
+            onEtiquetas={(productos) => setEstado({ ...e, pantalla: 'etiquetas', etiquetas: productos })}
+            onListaPrecios={() => ir('lista-precios')}
+            onVolver={() => ir('inicio')}
+          />
+        );
+      case 'lista-precios':
+        return <PantallaListaPrecios nombreComercio={e.config.nombreComercio} onVolver={() => ir('inicio')} />;
+      case 'etiquetas':
+        return <PantallaEtiquetas preseleccion={e.etiquetas} onVolver={() => ir('inicio')} />;
+      case 'catalogo':
+        return <PantallaCatalogo config={e.config} onVolver={() => ir('inicio')} />;
+      case 'respaldo':
+        return <PantallaRespaldo nombreComercio={e.config.nombreComercio} onRestaurado={() => recargar('catalogo')} onVolver={() => ir('config')} />;
+      case 'proveedores':
+        return <PantallaProveedores onVolver={() => ir('inicio')} />;
+      case 'equipo':
+        return <PantallaEquipo onVolver={() => ir('inicio')} />;
+      case 'ayuda':
+        return <PantallaAyuda onIr={ir} onVolver={() => ir('inicio')} />;
+      default:
+        return <PantallaInicio config={e.config} email={usuario!.email} onIr={ir} onSalir={salir} />;
+    }
   }
-  if (estado.pantalla === 'proveedores') return <PantallaProveedores onVolver={() => ir('inicio')} />;
-  if (estado.pantalla === 'ayuda') return <PantallaAyuda onIr={ir} onVolver={() => ir('inicio')} />;
-  return <PantallaInicio config={estado.config} onIr={ir} />;
 }

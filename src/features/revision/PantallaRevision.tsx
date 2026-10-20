@@ -1,5 +1,7 @@
 import { useEffect, useId, useState } from 'react';
-import { aplicarRevision, db, listarProductos, listarRubros, vinculosDeProveedor } from '../../db';
+import { aplicarRevision, listarProductos, listarRubros, vinculosDeProveedor } from '../../db';
+import type { Id } from '../../domain/id';
+import { useSesion } from '../../sesion';
 import type { Proveedor } from '../../db';
 import type { ConfigComercio } from '../../domain/config';
 import { formatearPesos, pesosParaEditar } from '../../domain/dinero';
@@ -14,17 +16,17 @@ import { IconoLista, IconoListo } from '../../ui/Iconos';
 interface Props {
   proveedor: Proveedor;
   archivo: string;
-  lineas: { linea: LineaLista; productoId: number | null }[];
+  lineas: { linea: LineaLista; productoId: Id | null }[];
   listaIncluyeIva: boolean;
   config: ConfigComercio;
-  onEtiquetas: (productos: number[]) => void;
+  onEtiquetas: (productos: Id[]) => void;
   onListaPrecios: () => void;
   onVolver: () => void;
 }
 
 interface Cargada {
   revision: Revision;
-  nombres: Map<number, string>;
+  nombres: Map<Id, string>;
 }
 
 const TEXTO_MOTIVO: Record<NonNullable<Cambio['motivo']>, string> = {
@@ -42,14 +44,15 @@ function textoVariacion(v: number | null): string {
 
 /** F09: revisión de los precios nuevos antes de guardarlos. Ningún precio cambia sin pasar por acá. */
 export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, config, onEtiquetas, onListaPrecios, onVolver }: Props) {
+  const sesion = useSesion();
   const [cargada, setCargada] = useState<Cargada | null>(null);
-  const [decisiones, setDecisiones] = useState<Map<number, Decision>>(new Map());
+  const [decisiones, setDecisiones] = useState<Map<Id, Decision>>(new Map());
   const [guardando, setGuardando] = useState(false);
   const [actualizados, setActualizados] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([listarProductos(db), listarRubros(db), vinculosDeProveedor(db, proveedor.id)]).then(([productos, rubros, vinculos]) => {
+    Promise.all([listarProductos(sesion), listarRubros(sesion), vinculosDeProveedor(sesion, proveedor.id)]).then(([productos, rubros, vinculos]) => {
       const revision = armarRevision({
         lineas,
         productos: new Map(productos.map((p) => [p.id, p])),
@@ -98,7 +101,7 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
 
   const generales = aprobarTodo(cambios);
   const pendientesGenerales = [...generales.keys()].filter((id) => !decisiones.has(id)).length;
-  const decidir = (productoId: number, decision: Decision | undefined) =>
+  const decidir = (productoId: Id, decision: Decision | undefined) =>
     setDecisiones((actuales) => {
       const nuevas = new Map(actuales);
       if (decision === undefined) nuevas.delete(productoId);
@@ -110,7 +113,7 @@ export function PantallaRevision({ proveedor, archivo, lineas, listaIncluyeIva, 
     setGuardando(true);
     setError(null);
     try {
-      const { actualizados: n } = await aplicarRevision(db, {
+      const { actualizados: n } = await aplicarRevision(sesion, {
         proveedorId: proveedor.id,
         archivo,
         totalLineas: lineas.length,

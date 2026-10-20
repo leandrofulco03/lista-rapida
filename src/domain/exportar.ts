@@ -1,3 +1,4 @@
+import type { Id } from './id';
 import type { Centavos, Porcentaje } from './dinero';
 import { formatearPorcentaje } from './porcentaje';
 
@@ -8,7 +9,7 @@ import { formatearPorcentaje } from './porcentaje';
 export interface ProductoExportar {
   codigoInterno: string;
   descripcion: string;
-  rubroId: number | null;
+  rubroId: Id | null;
   ivaPct: Porcentaje;
   precioVentaActual: Centavos;
   actualizado: string;
@@ -23,7 +24,7 @@ export interface GrupoRubro {
 const comparar = new Intl.Collator('es', { sensitivity: 'base', numeric: true }).compare;
 
 /** Productos agrupados por rubro (en orden alfabético, "sin rubro" al final) y ordenados por descripción. */
-export function agruparPorRubro(productos: readonly ProductoExportar[], rubros: ReadonlyMap<number, string>): GrupoRubro[] {
+export function agruparPorRubro(productos: readonly ProductoExportar[], rubros: ReadonlyMap<Id, string>): GrupoRubro[] {
   const grupos = new Map<string | null, ProductoExportar[]>();
   for (const p of productos) {
     const rubro = p.rubroId === null ? null : (rubros.get(p.rubroId) ?? null);
@@ -63,7 +64,7 @@ export const COLUMNAS_CSV = ['Código', 'Descripción', 'Rubro', 'Precio', 'IVA 
  * CSV para el sistema de caja, pensado para abrirse bien en Excel en castellano: UTF-8 con BOM
  * (así se ven los acentos), separado por punto y coma y con coma decimal.
  */
-export function armarCsvCaja(productos: readonly ProductoExportar[], rubros: ReadonlyMap<number, string>): string {
+export function armarCsvCaja(productos: readonly ProductoExportar[], rubros: ReadonlyMap<Id, string>): string {
   const filas = agruparPorRubro(productos, rubros).flatMap((g) =>
     g.productos.map((p) =>
       [p.codigoInterno, p.descripcion, g.rubro ?? '', importeCsv(p.precioVentaActual), formatearPorcentaje(p.ivaPct), fechaCorta(p.actualizado)]
