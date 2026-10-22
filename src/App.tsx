@@ -30,6 +30,8 @@ import { PantallaVentasDelDia } from './features/ventas/PantallaVentasDelDia';
 import { PantallaAnalisis } from './features/analisis/PantallaAnalisis';
 import { PantallaCaja } from './features/caja/PantallaCaja';
 import { PantallaClientes } from './features/clientes/PantallaClientes';
+import { PantallaGastos } from './features/gastos/PantallaGastos';
+import { PantallaStock } from './features/stock/PantallaStock';
 import { Marco } from './ui/Marco';
 import type { GrupoMenu } from './ui/Marco';
 import { MarcoAcceso } from './ui/MarcoAcceso';
@@ -43,9 +45,11 @@ import {
   IconoDocumento,
   IconoEquipo,
   IconoEtiqueta,
+  IconoGastos,
   IconoGrafico,
   IconoInicio,
   IconoProveedores,
+  IconoStock,
   IconoSubir,
   IconoTicket,
   IconoVender,
@@ -68,7 +72,9 @@ type Pantalla =
   | 'total-dia'
   | 'analisis'
   | 'caja'
-  | 'clientes';
+  | 'clientes'
+  | 'stock'
+  | 'gastos';
 
 /** Pantallas del empleado: vende, ve sus ventas de hoy y abre o cierra la caja de hoy. */
 type PantallaEmpleadoNav = 'inicio' | 'vender' | 'mis-ventas' | 'caja';
@@ -84,6 +90,7 @@ const MENU_DUENO: GrupoMenu<Pantalla>[] = [
       { id: 'caja', etiqueta: 'Caja', Icono: IconoCaja },
       { id: 'clientes', etiqueta: 'Clientes', Icono: IconoClientes },
       { id: 'analisis', etiqueta: 'Análisis', Icono: IconoGrafico },
+      { id: 'gastos', etiqueta: 'Gastos y resultado', Icono: IconoGastos },
     ],
   },
   {
@@ -91,6 +98,7 @@ const MENU_DUENO: GrupoMenu<Pantalla>[] = [
     items: [
       { id: 'subir', etiqueta: 'Subir lista', Icono: IconoSubir },
       { id: 'catalogo', etiqueta: 'Catálogo', Icono: IconoCatalogo },
+      { id: 'stock', etiqueta: 'Stock', Icono: IconoStock },
       { id: 'proveedores', etiqueta: 'Proveedores', Icono: IconoProveedores },
       { id: 'etiquetas', etiqueta: 'Etiquetas', Icono: IconoEtiqueta },
       { id: 'lista-precios', etiqueta: 'Lista de precios', Icono: IconoDocumento },
@@ -356,6 +364,10 @@ export function App() {
         return <PantallaAnalisis config={e.config} onVolver={() => ir('inicio')} />;
       case 'caja':
         return <PantallaCaja esDueno onVolver={() => ir('inicio')} />;
+      case 'stock':
+        return <PantallaStock nombreComercio={e.config.nombreComercio} onVolver={() => ir('inicio')} />;
+      case 'gastos':
+        return <PantallaGastos onVolver={() => ir('inicio')} />;
       case 'clientes':
         return <PantallaClientes nombreComercio={e.config.nombreComercio} onVolver={() => ir('inicio')} />;
       case 'ventas-dia':

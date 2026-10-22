@@ -30,8 +30,13 @@ export function PantallaTotalDia({ dia: diaInicial, onGuardado, onVolver }: Prop
   const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
+    setTextos({});
+    // Lo que se escribió mientras cargaba no se pisa con lo guardado.
     leerSinDetalle(sesion, dia).then((m) =>
-      setTextos(Object.fromEntries(Object.entries(m).map(([medio, monto]) => [medio, pesosParaEditar(monto as number)]))),
+      setTextos((escrito) => ({
+        ...Object.fromEntries(Object.entries(m).map(([medio, monto]) => [medio, pesosParaEditar(monto as number)])),
+        ...escrito,
+      })),
     );
   }, [dia, sesion]);
 

@@ -2,6 +2,22 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 22/10/2026 · v2 Fase 10 (segunda parte): stock, pedido, gastos y resultado
+
+Todo es del dueño: el empleado no ve stock, gastos ni resultado. Migración: `supabase/migrations/20261024000000_stock_gastos.sql`.
+
+- **Stock opcional por producto** (decisión de Leandro): sólo llevan stock los productos que tienen fila en la tabla `stock`, separada de `productos` para no tocar el catálogo ni sus importaciones. Se empieza a llevar al contarlo ("Contar stock") o al anotar lo que llegó ("Llegó mercadería").
+- **Se descuenta al vender, en la misma transacción de la venta**, y vuelve al anularla. Una venta reenviada (sin conexión) no descuenta dos veces. Cada cambio queda en `movimientos_stock` (inicio, venta, anulación, ingreso, ajuste) con la cantidad con signo.
+- **Puede quedar negativo:** si se vendió más de lo cargado, no se frena la venta (puede haber sido sin conexión); la pantalla lo marca en rojo y pide contarlo.
+- **"Contar stock" reemplaza; "Llegó mercadería" suma.** Las cantidades admiten 3 decimales (kilos).
+- **Sugerencia de pedido** (en la app, `src/domain/stock.ts`): venta por día = lo vendido en los últimos 28 días / 28; pedir = venta por día × días a cubrir (7, 14 o 30) − lo que hay (lo negativo cuenta como cero), redondeado hacia arriba. Un producto que no se vendió en 4 semanas no se sugiere (no hay con qué calcular). Ordenado del que se acaba antes.
+- **Agrupado por proveedor** según los vínculos de las listas; si lo traen varios, el primero por nombre. "Copiar pedido" y "Mandar por WhatsApp" (wa.me sin número: se elige el contacto) arman el texto del pedido.
+- **Gastos fijos por mes:** una lista de gastos (nombre único entre los activos) y un monto por mes en `gastos_mes`. Cada mes se carga aparte porque cambian (la luz); "Usar los montos del mes anterior" completa lo que falta. "Ya no lo pago" archiva el gasto: deja de aparecer, salvo en los meses en que tuvo monto.
+- **Resultado neto del mes = ganancia − gastos.** La ganancia es la misma de Análisis (lo vendido con costo − su costo, con IVA como costo si se vende con IVA incluido). Lo vendido sin costo ("Varios", total del día, productos sin costo) no entra, y la pantalla dice cuánto es: el resultado real puede ser mayor. Se ven los últimos 6 meses.
+- **No se mezcla con la caja:** una salida de caja (por ejemplo, pagar la luz en efectivo) no se toma como gasto, para no contar dos veces lo que se anota en Gastos.
+- **Arreglos de la pantalla:** un código escrito con Enter mientras cargan los productos se agrega cuando terminan de cargar; agregar dos gastos seguidos rápido ya no borra el segundo nombre ni lo escrito en los montos. En "Total del día", lo escrito mientras cargaban los montos guardados ya no se borra (pasaba antes de esta fase).
+- **Descartado por ahora:** stock mínimo por producto (la sugerencia usa la venta real), stock por variedad o lote, vencimientos, gastos variables del día a día, y prorratear los gastos en los períodos de Análisis que no son meses.
+
 ## 22/10/2026 · v2 Fase 10 (primera parte): caja y fiado
 
 Decisiones de Leandro: la Fase 10 va en dos PR (primero caja y fiado; después stock con sugerencia de pedido, gastos fijos y resultado neto); un arqueo por día; el empleado vende fiado y el dueño hace todo lo demás; el stock será opcional por producto.
