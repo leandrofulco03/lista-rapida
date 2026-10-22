@@ -17,6 +17,16 @@ Web instalable (PWA) para almacenes y kioscos de Argentina: ventas del día, pre
 - **v2 · Rediseño, hecho:** nombre Vendia, menú lateral (cajón en el celular), colores verde y crema, panel de inicio y pantallas anchas en la compu.
 - Fase 6 (Piloto): listas ficticias de un kiosco, una ferretería y un almacén en `tests/fixtures/comercios` (se arman con `python3 scripts/generar-comercios.py`), medidas de punta a punta. Ya está publicada; falta probar con listas reales.
 
+## Comercio demo
+
+Un kiosco ficticio con 5 semanas de ventas, clientes con fiado, cajas, stock y gastos, para mirar la app con datos (`src/demo/demo.ts`). Usa el mismo catálogo y los mismos proveedores que `tests/fixtures/comercios/kiosco-*`, así se le pueden subir las listas de la semana 2. Se carga en el Supabase de `.env.local` con:
+
+```bash
+VENDIA_CARGAR_DEMO=1 VENDIA_DEMO_EMAIL=otro.demo@vendia-demo.com npx vitest run src/demo/demo.supabase.test.ts
+```
+
+Crea la cuenta del dueño y la del empleado (`+empleado` en el email) y muestra la contraseña al final.
+
 ## Comandos
 
 Para correr la app con la nube: copiá `.env.example` como `.env.local` y completá los datos del proyecto de Supabase. El esquema se carga con las migraciones de `supabase/migrations` (en el panel de Supabase, SQL Editor, o con `npx supabase db push`).
