@@ -181,3 +181,19 @@ export const IconoSalir = (p: Props) => (
     <path d="M10 8l-4 4 4 4M6 12h10" />
   </Icono>
 );
+
+export const IconoCaja = (p: Props) => (
+  <Icono {...p}>
+    <rect x="3" y="7" width="18" height="12" rx="2" />
+    <circle cx="12" cy="13" r="2.5" />
+    <path d="M6 10h.01M18 16h.01M7 4h10" />
+  </Icono>
+);
+
+export const IconoClientes = (p: Props) => (
+  <Icono {...p}>
+    <circle cx="10" cy="8" r="3.5" />
+    <path d="M3.5 20a6.5 6.5 0 0 1 10.4-5.2" />
+    <path d="M18 13v8M15.5 15.5c0-.8.9-1.5 2.5-1.5s2.5.6 2.5 1.4-1 1.2-2.5 1.6-2.5.8-2.5 1.6.9 1.4 2.5 1.4 2.5-.7 2.5-1.5" />
+  </Icono>
+);

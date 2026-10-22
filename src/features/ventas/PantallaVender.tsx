@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { baseDispositivo, guardarProductosDispositivo, masVendidos, productosDelDispositivo, productosParaVender } from '../../db';
-import type { ProductoVenta } from '../../db';
+import { baseDispositivo, clientesParaVender, guardarProductosDispositivo, masVendidos, productosDelDispositivo, productosParaVender } from '../../db';
+import type { ClienteVenta, ProductoVenta } from '../../db';
 import { formatearPesos } from '../../domain/dinero';
 import type { Id } from '../../domain/id';
 import { leerImporte } from '../../domain/importe';
@@ -12,16 +12,19 @@ import {
   cambiarCantidad,
   formatearCantidad,
   leerCantidad,
-  MEDIOS_PAGO,
+  MEDIO_FIADO,
+  MEDIOS_VENTA,
   problemaTicket,
   subtotal,
   totalTicket,
 } from '../../domain/ventas';
-import type { LineaTicket, MedioPago } from '../../domain/ventas';
+import type { LineaTicket, MedioVenta } from '../../domain/ventas';
 import { useSesion } from '../../sesion';
 import { Boton } from '../../ui/Boton';
 import { Escaner, puedeEscanear } from '../../ui/Escaner';
 import { AvisoPendientes, useCola } from './cola';
+import { ElegirCliente } from './ElegirCliente';
+import type { ClienteElegido } from './ElegirCliente';
 
 interface Props {
   onVolver: () => void;
@@ -56,7 +59,9 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
   const [productos, setProductos] = useState<ProductoVenta[] | null>(null);
   const [rapidos, setRapidos] = useState<Id[]>([]);
   const [lineas, setLineas] = useState<LineaTicket[]>([]);
-  const [medio, setMedio] = useState<MedioPago | null>(null);
+  const [medio, setMedio] = useState<MedioVenta | null>(null);
+  const [clientes, setClientes] = useState<ClienteVenta[]>([]);
+  const [cliente, setCliente] = useState<ClienteElegido | null>(null);
   const [busqueda, setBusqueda] = useState('');
   const [escaneando, setEscaneando] = useState(false);
   const [varios, setVarios] = useState<{ monto: string; descripcion: string } | null>(null);
@@ -73,13 +78,15 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
       if (g) {
         setProductos((actual) => actual ?? g.productos);
         setRapidos((actual) => (actual.length ? actual : g.masVendidos));
+        setClientes((actual) => (actual.length ? actual : (g.clientes ?? [])));
       }
     });
-    Promise.all([productosParaVender(sesion), masVendidos(sesion)])
-      .then(([p, m]) => {
+    Promise.all([productosParaVender(sesion), masVendidos(sesion), clientesParaVender(sesion)])
+      .then(([p, m, k]) => {
         setProductos(p);
         setRapidos(m);
-        return guardarProductosDispositivo(b, { comercioId: sesion.comercioId, productos: p, masVendidos: m, fecha: new Date().toISOString() });
+        setClientes(k);
+        return guardarProductosDispositivo(b, { comercioId: sesion.comercioId, productos: p, masVendidos: m, clientes: k, fecha: new Date().toISOString() });
       })
       .catch(() => setProductos((actual) => actual ?? []));
   }, [sesion]);
@@ -145,28 +152,52 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
   }
 
   async function cobrar() {
-    const problema = problemaTicket(lineas, medio);
+    const problema = problemaTicket(lineas, medio, cliente);
     if (problema) {
       setAviso({ tipo: 'error', texto: problema });
       return;
     }
     setCobrando(true);
     try {
-      const enLaBase = await cola.guardar({ id: crypto.randomUUID(), fecha: new Date().toISOString(), medioPago: medio!, lineas });
-      setAviso({
-        tipo: 'ok',
-        texto: enLaBase
-          ? `Venta guardada: ${formatearPesos(total)}.`
-          : `Venta de ${formatearPesos(total)} guardada en este dispositivo. Se sube sola cuando haya internet.`,
+      const fiado = medio === MEDIO_FIADO.id && cliente ? cliente : null;
+      const enLaBase = await cola.guardar({
+        id: crypto.randomUUID(),
+        fecha: new Date().toISOString(),
+        medioPago: medio!,
+        lineas,
+        ...(fiado && { cliente: { id: fiado.id, nombre: fiado.nombre } }),
       });
+      const monto = formatearPesos(total);
+      let texto: string;
+      if (fiado) {
+        texto = enLaBase
+          ? `Fiado a ${fiado.nombre}: ${monto}.`
+          : `Fiado a ${fiado.nombre} de ${monto} guardado en este dispositivo. Se sube solo cuando haya internet.`;
+      } else {
+        texto = enLaBase ? `Venta guardada: ${monto}.` : `Venta de ${monto} guardada en este dispositivo. Se sube sola cuando haya internet.`;
+      }
+      setAviso({ tipo: 'ok', texto });
+      if (fiado) recordarFiado(fiado, total);
       setLineas([]);
       setMedio(null);
+      setCliente(null);
       campoBusqueda.current?.focus();
     } catch (err) {
       setAviso({ tipo: 'error', texto: `No se pudo guardar la venta: ${(err as Error).message}` });
     } finally {
       setCobrando(false);
     }
+  }
+
+  /** El cliente queda en la lista (nuevo, o con menos disponible) también en el dispositivo, para la próxima venta sin conexión. */
+  function recordarFiado(fiado: ClienteElegido, monto: number) {
+    const disponible = fiado.disponible === null ? null : fiado.disponible - monto;
+    const lista = fiado.nuevo
+      ? [...clientes, { id: fiado.id, nombre: fiado.nombre, disponible }].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
+      : clientes.map((k) => (k.id === fiado.id ? { ...k, disponible } : k));
+    setClientes(lista);
+    const b = baseDispositivo();
+    productosDelDispositivo(b, sesion.comercioId).then((g) => g && guardarProductosDispositivo(b, { ...g, clientes: lista }));
   }
 
   return (
@@ -300,12 +331,15 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
           <fieldset className="mt-4">
             <legend className="text-lg font-semibold">¿Cómo pagó?</legend>
             <div className="mt-2 grid grid-cols-2 gap-2">
-              {MEDIOS_PAGO.map((m) => (
+              {MEDIOS_VENTA.map((m) => (
                 <button
                   key={m.id}
                   type="button"
                   aria-pressed={medio === m.id}
-                  onClick={() => setMedio(m.id)}
+                  onClick={() => {
+                    setMedio(m.id);
+                    setAviso(null);
+                  }}
                   className={`min-h-11 rounded-xl border px-3 text-base font-medium transition active:scale-[0.98] ${
                     medio === m.id ? 'border-green-600 bg-green-600 text-white shadow-md' : 'border-stone-200 bg-white shadow-sm'
                   }`}
@@ -315,6 +349,7 @@ export function PantallaVender({ onVolver, onMisVentas }: Props) {
               ))}
             </div>
           </fieldset>
+          {medio === MEDIO_FIADO.id && <ElegirCliente clientes={clientes} elegido={cliente} total={total} onElegir={setCliente} />}
 
           {aviso && (
             <p

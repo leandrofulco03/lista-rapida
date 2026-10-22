@@ -2,6 +2,22 @@
 
 Registro de qué se eligió, qué se descartó y por qué. Lo más nuevo arriba.
 
+## 22/10/2026 · v2 Fase 10 (primera parte): caja y fiado
+
+Decisiones de Leandro: la Fase 10 va en dos PR (primero caja y fiado; después stock con sugerencia de pedido, gastos fijos y resultado neto); un arqueo por día; el empleado vende fiado y el dueño hace todo lo demás; el stock será opcional por producto.
+
+- **Tablas nuevas** (`supabase/migrations/20261023000000_caja_fiado.sql`): `clientes`, `pagos_fiado`, `cajas` (una por comercio y día) y `movimientos_caja`. Nadie las lee ni escribe directo: todo pasa por funciones que controlan quién llama.
+- **Fiado es un medio de pago más al vender** (`ventas.medio_pago = 'fiado'`, con `cliente_id` obligatorio). Cuenta como venta del día en que se llevó la mercadería; lo que el cliente paga después baja su deuda, no es otra venta. No va en "Total del día" ni como medio para pagar el fiado.
+- **Saldo = ventas fiadas sin anular − pagos sin anular.** Se calcula al leer, no se guarda (no hay un número que se pueda desfasar). Negativo = tiene a favor. Anular la venta fiada o el pago corrige el saldo solo.
+- **Fiar sin conexión:** la lista de clientes se guarda en el dispositivo con los productos. Un cliente nuevo lo crea el dispositivo con su id y viaja con la venta; la base lo da de alta al recibirla. Si ya hay un cliente activo con el mismo nombre (sin importar mayúsculas), la venta va a ése en vez de crear otro.
+- **El límite avisa, no bloquea.** Al elegir un cliente que con esa venta pasa su límite, la pantalla avisa cuánto le queda. No se rechaza en la base porque la venta pudo hacerse sin conexión (la mercadería ya se entregó). El empleado ve cuánto le queda al cliente, no cuánto debe. En Clientes se marca "Pasó su límite".
+- **Clientes (sólo el dueño):** lo que le deben en total, la lista por saldo, el detalle con los movimientos, "Registrar pago" (por medio de pago, con nota) y "Anular pago". "Recordar por WhatsApp" abre wa.me con el saldo; el número se arma con 54 9 adelante si se anotó sin el país. Archivar saca al cliente de la lista para vender y no se puede con deuda. Dos clientes activos no se llaman igual.
+- **Arqueo:** se abre con lo que hay en el cajón (propone lo que se contó en el último cierre), se anotan entradas y salidas de efectivo con motivo y se cierra contando. **Esperado = apertura + ventas en efectivo (tickets y total del día) + pagos de fiado en efectivo + entradas − salidas.** Diferencia = contado − esperado ("Cerró justo", "Sobran", "Faltan").
+- **El empleado cuenta a ciegas:** abre, anota y cierra la caja de hoy, pero no ve el esperado ni la diferencia (así no "ajusta" lo contado). Con la caja cerrada sólo el dueño la cambia: la reabre o la vuelve a cerrar. El dueño ve cualquier día y el historial de las últimas dos semanas.
+- **La caja necesita internet.** Las ventas sin subir no cuentan en el esperado hasta que suben; la pantalla avisa cuántas hay de ese día. Una venta anulada o un pago cargado después del cierre cambian el esperado, y la diferencia se recalcula.
+- **Menú:** Caja y Clientes en Ventas (dueño); Caja para el empleado, también en su inicio. La Ayuda suma un paso ("Llevá la caja y el fiado") y el tema "Caja y fiado".
+- **Descartado por ahora:** caja por turno o por empleado (se suma si el piloto lo pide), cobrar fiado desde el empleado, intereses o vencimientos del fiado, y avisos automáticos por WhatsApp (hace falta la API paga de WhatsApp).
+
 ## 20/10/2026 · v2: rediseño y nombre Vendia
 
 - **Nombre:** la app pasa a llamarse **Vendia** (decisión de Leandro). Cambian el título, el manifest, el logo (una "V" crema sobre verde) y los íconos de la PWA (`node scripts/generar-iconos.mjs`). La pantalla para traer la copia de seguridad sigue nombrando a ListaMatch, porque es la versión anterior.

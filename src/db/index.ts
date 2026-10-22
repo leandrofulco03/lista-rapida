@@ -8,3 +8,5 @@ export * from './respaldo';
 export * from './ventas';
 export * from './cola';
 export * from './analisis';
+export * from './clientes';
+export * from './caja';

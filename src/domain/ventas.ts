@@ -15,8 +15,14 @@ export const MEDIOS_PAGO = [
 ] as const;
 export type MedioPago = (typeof MEDIOS_PAGO)[number]['id'];
 
-export const nombreMedio = (medio: string): string => MEDIOS_PAGO.find((m) => m.id === medio)?.nombre ?? medio;
+/** Fase 10: "fiado" queda a cuenta de un cliente. Es un medio para vender, no para pagar el fiado ni el total del día. */
+export const MEDIO_FIADO = { id: 'fiado', nombre: 'Fiado' } as const;
+export const MEDIOS_VENTA = [...MEDIOS_PAGO, MEDIO_FIADO] as const;
+export type MedioVenta = MedioPago | typeof MEDIO_FIADO.id;
+
+export const nombreMedio = (medio: string): string => MEDIOS_VENTA.find((m) => m.id === medio)?.nombre ?? medio;
 export const esMedioPago = (valor: unknown): valor is MedioPago => MEDIOS_PAGO.some((m) => m.id === valor);
+export const esMedioVenta = (valor: unknown): valor is MedioVenta => MEDIOS_VENTA.some((m) => m.id === valor);
 
 /** Una línea del ticket. Sin producto es "Varios": un importe a mano. */
 export interface LineaTicket {
@@ -73,13 +79,14 @@ export function leerCantidad(texto: string): number | null {
 
 export const formatearCantidad = (n: number): string => n.toLocaleString('es-AR', { maximumFractionDigits: 3 });
 
-/** Problema que impide cobrar el ticket, o null. */
-export function problemaTicket(lineas: readonly LineaTicket[], medio: string | null): string | null {
+/** Problema que impide cobrar el ticket, o null. Fiado necesita el cliente. */
+export function problemaTicket(lineas: readonly LineaTicket[], medio: string | null, cliente: { id: Id } | null = null): string | null {
   if (lineas.length === 0) return 'Agregá al menos un producto.';
   if (lineas.some((l) => !cantidadValida(l.cantidad))) return 'Hay una cantidad que no es válida.';
   if (lineas.some((l) => !Number.isSafeInteger(l.precioUnitario) || l.precioUnitario < 0)) return 'Hay un precio que no es válido.';
   if (totalTicket(lineas) <= 0) return 'El total tiene que ser mayor que cero.';
-  if (!esMedioPago(medio)) return 'Elegí cómo pagó.';
+  if (!esMedioVenta(medio)) return 'Elegí cómo pagó.';
+  if (medio === MEDIO_FIADO.id && !cliente) return 'Elegí a quién se le fía.';
   return null;
 }
 
