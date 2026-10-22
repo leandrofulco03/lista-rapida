@@ -3,4 +3,4 @@ export const NOMBRE_APP = 'Vendia';
 export const NOMBRE_CORTO = 'Vendia';
 export const DESCRIPCION_APP = 'Ventas, precios y proveedores de tu almacén o kiosco, en un solo lugar.';
 export const COLOR_TEMA = '#31493c';
-export const COLOR_FONDO = '#fffff1';
+export const COLOR_FONDO = '#fffff3';
