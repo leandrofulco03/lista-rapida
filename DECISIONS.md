@@ -86,7 +86,8 @@ Cambio de rumbo decidido por Leandro. La app sigue comparando las listas de los 
 - **Sin copia de seguridad:** con los datos en la nube se sacan la copia manual, su recordatorio y "Tengo una copia de seguridad". Queda "Traer datos de la versión anterior" (en Configuración), que lee la copia JSON de la v1, pasa sus ids a uuid y reemplaza la sección Precios del comercio en una transacción; se queda con el nombre del comercio de ahora. Vínculos o líneas que apuntan a filas que no existen en la copia se dejan afuera.
 - **Lista de productos de una vez:** las funciones de lectura devuelven un solo JSON con todo el catálogo, porque Supabase corta en 1000 filas las respuestas de una función que devuelve filas.
 - **Código de barras** en el producto (todavía no se edita en pantalla: llega con la Fase 8). Si la app no lo manda al editar, la base deja el que tenía. La búsqueda del catálogo también lo encuentra.
-- **Pendiente:** cargar las migraciones 2 y 3 en el Supabase real, cargar las variables en Vercel y conectar el repo; mails propios (Resend u otro) antes de usarla con comercios reales; varios comercios por cuenta (hoy se abre el primero).
+- **Hecho (22/10/2026):** las 5 migraciones están cargadas en el Supabase real y Vercel publica solo desde `main`.
+- **Pendiente:** mails propios antes de usarla con comercios reales (gratis: SMTP de una cuenta de Gmail con contraseña de aplicación); varios comercios por cuenta (hoy se abre el primero).
 
 ## 13/10/2026 · Alta desde la lista (F07/F03) y precio a mano en la revisión (F09)
 
