@@ -28,13 +28,17 @@ import { PantallaTotalDia } from './features/ventas/PantallaTotalDia';
 import { PantallaVender } from './features/ventas/PantallaVender';
 import { PantallaVentasDelDia } from './features/ventas/PantallaVentasDelDia';
 import { PantallaAnalisis } from './features/analisis/PantallaAnalisis';
+import { PantallaCaja } from './features/caja/PantallaCaja';
+import { PantallaClientes } from './features/clientes/PantallaClientes';
 import { Marco } from './ui/Marco';
 import type { GrupoMenu } from './ui/Marco';
 import { MarcoAcceso } from './ui/MarcoAcceso';
 import { Logo } from './ui/Logo';
 import {
   IconoAyuda,
+  IconoCaja,
   IconoCatalogo,
+  IconoClientes,
   IconoConfig,
   IconoDocumento,
   IconoEquipo,
@@ -62,10 +66,12 @@ type Pantalla =
   | 'ventas'
   | 'ventas-dia'
   | 'total-dia'
-  | 'analisis';
+  | 'analisis'
+  | 'caja'
+  | 'clientes';
 
-/** Pantallas del empleado: sólo vende y ve sus ventas de hoy. */
-type PantallaEmpleadoNav = 'inicio' | 'vender' | 'mis-ventas';
+/** Pantallas del empleado: vende, ve sus ventas de hoy y abre o cierra la caja de hoy. */
+type PantallaEmpleadoNav = 'inicio' | 'vender' | 'mis-ventas' | 'caja';
 
 /** Menú del dueño, agrupado por área. */
 const MENU_DUENO: GrupoMenu<Pantalla>[] = [
@@ -75,6 +81,8 @@ const MENU_DUENO: GrupoMenu<Pantalla>[] = [
     items: [
       { id: 'vender', etiqueta: 'Vender', Icono: IconoVender },
       { id: 'ventas', etiqueta: 'Ventas', Icono: IconoTicket },
+      { id: 'caja', etiqueta: 'Caja', Icono: IconoCaja },
+      { id: 'clientes', etiqueta: 'Clientes', Icono: IconoClientes },
       { id: 'analisis', etiqueta: 'Análisis', Icono: IconoGrafico },
     ],
   },
@@ -107,6 +115,7 @@ const MENU_EMPLEADO: GrupoMenu<PantallaEmpleadoNav>[] = [
       { id: 'inicio', etiqueta: 'Inicio', Icono: IconoInicio },
       { id: 'vender', etiqueta: 'Vender', Icono: IconoVender },
       { id: 'mis-ventas', etiqueta: 'Mis ventas', Icono: IconoTicket },
+      { id: 'caja', etiqueta: 'Caja', Icono: IconoCaja },
     ],
   },
 ];
@@ -254,7 +263,11 @@ export function App() {
     let contenido;
     if (e.pantalla === 'vender') contenido = <PantallaVender onVolver={() => ir('inicio')} onMisVentas={() => ir('mis-ventas')} />;
     else if (e.pantalla === 'mis-ventas') contenido = <PantallaVentasDelDia esDueno={false} onVolver={() => ir('inicio')} />;
-    else contenido = <PantallaEmpleado nombreComercio={e.comercio.nombre} onVender={() => ir('vender')} onMisVentas={() => ir('mis-ventas')} />;
+    else if (e.pantalla === 'caja') contenido = <PantallaCaja esDueno={false} onVolver={() => ir('inicio')} />;
+    else
+      contenido = (
+        <PantallaEmpleado nombreComercio={e.comercio.nombre} onVender={() => ir('vender')} onMisVentas={() => ir('mis-ventas')} onCaja={() => ir('caja')} />
+      );
     return (
       <Marco
         nombreComercio={e.comercio.nombre}
@@ -341,6 +354,10 @@ export function App() {
         );
       case 'analisis':
         return <PantallaAnalisis config={e.config} onVolver={() => ir('inicio')} />;
+      case 'caja':
+        return <PantallaCaja esDueno onVolver={() => ir('inicio')} />;
+      case 'clientes':
+        return <PantallaClientes nombreComercio={e.config.nombreComercio} onVolver={() => ir('inicio')} />;
       case 'ventas-dia':
         return <PantallaVentasDelDia esDueno diaInicial={e.dia} onVolver={() => ir('ventas')} />;
       case 'total-dia':

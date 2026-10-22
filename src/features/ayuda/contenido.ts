@@ -5,7 +5,7 @@
  */
 
 /** Pantallas a las que la guía puede llevar con un botón. */
-export type DestinoAyuda = 'config' | 'catalogo' | 'subir' | 'proveedores' | 'etiquetas' | 'lista-precios' | 'equipo' | 'vender' | 'analisis';
+export type DestinoAyuda = 'config' | 'catalogo' | 'subir' | 'proveedores' | 'etiquetas' | 'lista-precios' | 'equipo' | 'vender' | 'analisis' | 'caja' | 'clientes';
 
 export interface PasoGuia {
   titulo: string;
@@ -57,6 +57,16 @@ export const PASOS_GUIA: PasoGuia[] = [
       'Si no querés cargar cada venta, en Ventas podés anotar el "Total del día".',
     ],
     accion: { etiqueta: 'Cargar una venta', destino: 'vender' },
+  },
+  {
+    titulo: 'Llevá la caja y el fiado',
+    texto: 'En Caja abrís el día con el efectivo que hay, anotás lo que sale (un pago a un proveedor, un retiro) y al cerrar contás la plata. La app te dice si sobra o falta.',
+    detalles: [
+      'Para fiar, elegí "Fiado" al cobrar y el cliente (o escribí uno nuevo).',
+      'En Clientes ves cuánto te debe cada uno, anotás lo que te paga y le podés recordar el saldo por WhatsApp.',
+      'Tus empleados pueden abrir y cerrar la caja de hoy, pero no ven cuánto debería haber.',
+    ],
+    accion: { etiqueta: 'Ir a Caja', destino: 'caja' },
   },
   {
     titulo: 'Mirá cómo te va',
@@ -138,7 +148,7 @@ export const PREGUNTAS: TemaPreguntas[] = [
       {
         pregunta: '¿Cómo me muevo por la app?',
         respuesta: [
-          'Con el menú de la izquierda, que tiene todas las secciones agrupadas: Ventas (Vender, Ventas, Análisis), Precios (Subir lista, Catálogo, Proveedores, Etiquetas, Lista de precios) y Comercio (Equipo, Configuración, Ayuda).',
+          'Con el menú de la izquierda, que tiene todas las secciones agrupadas: Ventas (Vender, Ventas, Caja, Clientes, Análisis), Precios (Subir lista, Catálogo, Proveedores, Etiquetas, Lista de precios) y Comercio (Equipo, Configuración, Ayuda).',
           'En el celular el menú está escondido: tocá el botón de las tres rayitas, arriba a la izquierda. Se cierra solo al elegir una sección, o tocando afuera.',
           'Abajo del menú están tu cuenta y el botón "Salir".',
         ],
@@ -349,6 +359,54 @@ export const PREGUNTAS: TemaPreguntas[] = [
     ],
   },
   {
+    tema: 'Caja y fiado',
+    preguntas: [
+      {
+        pregunta: '¿Cómo hago el arqueo de caja?',
+        respuesta: [
+          'Al empezar el día, entrá a Caja y anotá con cuánto efectivo arranca (la app te propone lo que quedó en el último cierre).',
+          'Durante el día, anotá lo que sale o entra en efectivo que no es una venta: un pago a un proveedor, un retiro tuyo, cambio que agregaste.',
+          'Al cerrar, contá la plata y escribí cuánto hay. La app lo compara con lo que debería haber y te dice si cerró justo, si sobra o si falta.',
+        ],
+      },
+      {
+        pregunta: '¿Cómo calcula lo que debería haber en la caja?',
+        respuesta: [
+          'Lo que había al abrir, más las ventas en efectivo del día, más lo que pagaron en efectivo los clientes de fiado, más las entradas, menos las salidas.',
+          'Las ventas con débito, crédito, QR, transferencia o fiado no suman, porque esa plata no está en el cajón.',
+        ],
+      },
+      {
+        pregunta: '¿Mis empleados ven cuánto debería haber?',
+        respuesta: [
+          'No. Pueden abrir la caja de hoy, anotar salidas y cerrarla contando la plata, pero no ven lo esperado ni la diferencia: así cuentan sin saber cuánto "tiene que dar".',
+          'Una vez cerrada, sólo el dueño la puede reabrir o corregir.',
+        ],
+      },
+      {
+        pregunta: '¿Cómo vendo fiado?',
+        respuesta: [
+          'Al cobrar, elegí "Fiado" y buscá al cliente. Si es la primera vez, escribí su nombre y tocá "Cliente nuevo". Funciona también sin internet.',
+          'Si el cliente tiene un límite y la venta lo pasa, la app te avisa. La venta se puede hacer igual: decidís vos.',
+        ],
+      },
+      {
+        pregunta: '¿Cómo anoto lo que me paga un cliente?',
+        respuesta: [
+          'En Clientes, abrí el cliente y tocá "Registrar pago". Escribí cuánto pagó y cómo. Si pagó en efectivo, suma a la caja del día.',
+          'Si te equivocaste, tocá "Anular pago" en sus movimientos.',
+          'Con su celular cargado, "Recordar por WhatsApp" le manda un mensaje con lo que debe.',
+        ],
+      },
+      {
+        pregunta: '¿Lo fiado cuenta como venta?',
+        respuesta: [
+          'Sí: lo fiado es una venta del día en que se llevó la mercadería, y aparece en Ventas como "Fiado". Lo que paga después no se cuenta otra vez como venta: baja su deuda.',
+        ],
+      },
+    ],
+  },
+  {
     tema: 'Análisis',
     preguntas: [
       {
@@ -414,7 +472,7 @@ export const PREGUNTAS: TemaPreguntas[] = [
         pregunta: '¿Cómo sumo a un empleado?',
         respuesta: [
           'En Equipo, tocá "Generar código" y pasáselo. El empleado crea su cuenta, toca "Tengo un código" y lo escribe. El código sirve una vez y dura 7 días.',
-          'El empleado ve un menú corto: Inicio, Vender y Mis ventas (las suyas de hoy).',
+          'El empleado ve un menú corto: Inicio, Vender, Mis ventas (las suyas de hoy) y Caja (la de hoy).',
           'Si deja de trabajar con vos, quitalo desde Equipo y ya no puede entrar.',
         ],
       },

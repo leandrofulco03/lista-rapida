@@ -3,6 +3,7 @@ import type { EntityTable } from 'dexie';
 import type { Id } from '../domain/id';
 import { registrarVenta } from './ventas';
 import type { ProductoVenta, VentaNueva } from './ventas';
+import type { ClienteVenta } from './clientes';
 import type { Sesion } from './tipos';
 
 /**
@@ -24,6 +25,8 @@ export interface ProductosGuardados {
   comercioId: Id;
   productos: ProductoVenta[];
   masVendidos: Id[];
+  /** Clientes para fiar sin conexión (Fase 10; las copias viejas no lo tienen). */
+  clientes?: ClienteVenta[];
   fecha: string;
 }
 

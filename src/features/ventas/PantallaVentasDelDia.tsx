@@ -104,6 +104,7 @@ export function PantallaVentasDelDia({ esDueno, diaInicial, onVolver }: Props) {
               <li key={p.id} className={`rounded-xl border p-3 ${p.error ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}>
                 <p className="font-semibold tabular-nums">
                   {hora(p.venta.fecha)} · {formatearPesos(totalTicket(p.venta.lineas))} · {nombreMedio(p.venta.medioPago)}
+                  {p.venta.cliente ? ` a ${p.venta.cliente.nombre}` : ''}
                 </p>
                 {p.error && (
                   <>
@@ -140,6 +141,7 @@ export function PantallaVentasDelDia({ esDueno, diaInicial, onVolver }: Props) {
               <span className="min-w-0 flex-1">
                 <span className="block font-semibold tabular-nums">
                   {hora(t.fecha)} · {nombreMedio(t.medioPago)}
+                  {t.cliente ? ` a ${t.cliente}` : ''}
                   {t.anulada && <span className="ml-2 rounded bg-stone-200 px-1.5 text-sm">Anulada</span>}
                 </span>
                 <span className="block text-sm text-stone-600">

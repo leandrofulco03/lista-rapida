@@ -1,6 +1,6 @@
 import type { Centavos } from '../domain/dinero';
 import type { Id } from '../domain/id';
-import type { DatosResumen, Dia, LineaTicket, MedioPago } from '../domain/ventas';
+import type { DatosResumen, Dia, LineaTicket, MedioPago, MedioVenta } from '../domain/ventas';
 import type { Sesion } from './tipos';
 
 /** Fase 8: ventas en la base. Cualquier miembro vende; el resumen y el total del día son del dueño. */
@@ -28,8 +28,10 @@ export async function masVendidos(s: Sesion, cantidad = 8): Promise<Id[]> {
 export interface VentaNueva {
   id: Id;
   fecha: string;
-  medioPago: MedioPago;
+  medioPago: MedioVenta;
   lineas: LineaTicket[];
+  /** Sólo con fiado. Si el id no existe en la base, se crea el cliente con ese nombre (alta sin conexión). */
+  cliente?: { id: Id; nombre: string };
 }
 
 export interface VentaGuardada {
@@ -50,12 +52,14 @@ export async function anularVenta(s: Sesion, id: Id): Promise<void> {
 export interface TicketDelDia {
   id: Id;
   fecha: string;
-  medioPago: MedioPago;
+  medioPago: MedioVenta;
   total: Centavos;
   articulos: number;
   anulada: boolean;
   vendedor: string;
   propia: boolean;
+  /** Nombre del cliente si fue fiado. */
+  cliente: string | null;
   lineas: { descripcion: string; cantidad: number; precioUnitario: Centavos; subtotal: Centavos }[];
 }
 
