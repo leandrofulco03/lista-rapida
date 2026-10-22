@@ -6,10 +6,20 @@ import type { Backend } from '../../nube';
 import { Boton } from '../../ui/Boton';
 import { CampoTexto } from '../../ui/CampoTexto';
 import { Opciones } from '../../ui/Opciones';
+import { IconoCaja, IconoCatalogo, IconoGrafico, IconoSubir, IconoVender } from '../../ui/Iconos';
 
 interface Props {
   backend: Backend;
 }
+
+/** Resumen de cómo se usa, debajo del formulario: para quien llega por primera vez. */
+const PASOS = [
+  { Icono: IconoCatalogo, titulo: 'Cargá tus productos', texto: 'Subí tu planilla de Excel o cargalos de a uno. Se hace una sola vez.' },
+  { Icono: IconoVender, titulo: 'Vendé desde el celular o la compu', texto: 'Buscá, escribí el código o escanealo. Anda sin internet y se sube sola.' },
+  { Icono: IconoCaja, titulo: 'Llevá la caja, el fiado y el stock', texto: 'Cerrá la caja contando la plata, anotá lo que te deben y sabé qué pedir.' },
+  { Icono: IconoSubir, titulo: 'Actualizá precios con la lista del proveedor', texto: 'Subí su Excel o PDF: la app calcula los precios nuevos y vos los aprobás.' },
+  { Icono: IconoGrafico, titulo: 'Mirá cómo te va', texto: 'Cuánto vendiste, cuánto ganaste, qué se vende más y cuánto te queda después de los gastos.' },
+];
 
 type Modo = 'ingresar' | 'registrarse';
 
@@ -83,6 +93,29 @@ export function PantallaIngreso({ backend }: Props) {
           ? 'Si sos empleado, creá tu cuenta y después escribí el código que te pasó el dueño del comercio.'
           : 'Dueños y empleados entran con su propia cuenta.'}
       </p>
+
+      <section className="mt-12 border-t border-stone-200 pt-8" aria-labelledby="como-funciona" data-testid="como-funciona">
+        <h2 id="como-funciona" className="text-lg font-semibold">
+          ¿Cómo funciona?
+        </h2>
+        <ol className="mt-5 space-y-5">
+          {PASOS.map(({ Icono, titulo, texto }) => (
+            <li key={titulo} className="flex gap-4">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
+                <Icono className="size-5" />
+              </span>
+              <div className="min-w-0">
+                <h3 className="font-semibold text-stone-900">{titulo}</h3>
+                <p className="mt-0.5 text-sm text-stone-600">{texto}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-6 rounded-xl bg-white p-4 text-sm text-stone-700 shadow-xs ring-1 ring-stone-200">
+          <span className="font-semibold text-stone-900">¿Trabajás con alguien?</span> Sumalo a tu equipo con un código: entra con su cuenta, carga ventas y
+          no ve tus costos ni tus números.
+        </p>
+      </section>
     </main>
   );
 }
