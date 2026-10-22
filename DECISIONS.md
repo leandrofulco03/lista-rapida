@@ -87,7 +87,8 @@ Cambio de rumbo decidido por Leandro. La app sigue comparando las listas de los 
 - **Lista de productos de una vez:** las funciones de lectura devuelven un solo JSON con todo el catálogo, porque Supabase corta en 1000 filas las respuestas de una función que devuelve filas.
 - **Código de barras** en el producto (todavía no se edita en pantalla: llega con la Fase 8). Si la app no lo manda al editar, la base deja el que tenía. La búsqueda del catálogo también lo encuentra.
 - **Hecho (22/10/2026):** las 5 migraciones están cargadas en el Supabase real y Vercel publica solo desde `main`.
-- **Pendiente:** mails propios antes de usarla con comercios reales (gratis: SMTP de una cuenta de Gmail con contraseña de aplicación); varios comercios por cuenta (hoy se abre el primero).
+- **Mails (22/10/2026):** se apaga "Confirm email" en Supabase (Authentication → Sign In / Providers → Email), decisión de Leandro: sin costo y quien se registra entra directo. La app ya lo maneja (si `signUp` devuelve sesión, entra). Contra: no se verifica que el mail exista. Cuando sumemos "olvidé mi contraseña", hace falta SMTP propio (gratis: Gmail con contraseña de aplicación).
+- **Pendiente:** varios comercios por cuenta (hoy se abre el primero).
 
 ## 13/10/2026 · Alta desde la lista (F07/F03) y precio a mano en la revisión (F09)
 
