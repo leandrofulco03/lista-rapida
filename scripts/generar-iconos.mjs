@@ -4,7 +4,7 @@ import { chromium } from '@playwright/test';
 const logo = (lado, margen, radio) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="${lado}" height="${lado}">
   <rect width="64" height="64" rx="${radio}" fill="#31493c"/>
   <g transform="translate(32 32) scale(${margen}) translate(-32 -32)">
-    <path d="M19 21 32 44 45 21" fill="none" stroke="#fafade" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M19 21 32 44 45 21" fill="none" stroke="#fffff1" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
   </g></svg>`;
 
 const iconos = [
