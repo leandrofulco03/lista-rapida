@@ -5,7 +5,7 @@
  */
 
 /** Pantallas a las que la guía puede llevar con un botón. */
-export type DestinoAyuda = 'config' | 'catalogo' | 'subir' | 'proveedores' | 'etiquetas' | 'lista-precios' | 'equipo' | 'vender' | 'analisis' | 'caja' | 'clientes';
+export type DestinoAyuda = 'config' | 'catalogo' | 'subir' | 'proveedores' | 'etiquetas' | 'lista-precios' | 'equipo' | 'vender' | 'analisis' | 'caja' | 'clientes' | 'stock' | 'gastos';
 
 export interface PasoGuia {
   titulo: string;
@@ -79,6 +79,15 @@ export const PASOS_GUIA: PasoGuia[] = [
     accion: { etiqueta: 'Ir a Análisis', destino: 'analisis' },
   },
   {
+    titulo: 'Controlá el stock y anotá tus gastos',
+    texto: 'En Stock cargás lo que tenés de los productos que querés controlar: se descuentan solos al vender y "Para pedir" te dice cuánto pedir de cada uno.',
+    detalles: [
+      '"Llegó mercadería" suma lo que entró; "Contar stock" corrige con lo que contaste.',
+      'En "Gastos y resultado" anotás los gastos fijos del mes (alquiler, luz, sueldos) y ves cuánto te queda después de pagarlos.',
+    ],
+    accion: { etiqueta: 'Ir a Stock', destino: 'stock' },
+  },
+  {
     titulo: 'Subí la lista del proveedor',
     texto: 'Elegí el proveedor (o escribí el nombre de uno nuevo), indicá si los precios de su lista incluyen IVA y elegí el archivo. Después tocá "Leer lista".',
     detalles: [
@@ -148,7 +157,7 @@ export const PREGUNTAS: TemaPreguntas[] = [
       {
         pregunta: '¿Cómo me muevo por la app?',
         respuesta: [
-          'Con el menú de la izquierda, que tiene todas las secciones agrupadas: Ventas (Vender, Ventas, Caja, Clientes, Análisis), Precios (Subir lista, Catálogo, Proveedores, Etiquetas, Lista de precios) y Comercio (Equipo, Configuración, Ayuda).',
+          'Con el menú de la izquierda, que tiene todas las secciones agrupadas: Ventas (Vender, Ventas, Caja, Clientes, Análisis, Gastos y resultado), Precios (Subir lista, Catálogo, Stock, Proveedores, Etiquetas, Lista de precios) y Comercio (Equipo, Configuración, Ayuda).',
           'En el celular el menú está escondido: tocá el botón de las tres rayitas, arriba a la izquierda. Se cierra solo al elegir una sección, o tocando afuera.',
           'Abajo del menú están tu cuenta y el botón "Salir".',
         ],
@@ -402,6 +411,46 @@ export const PREGUNTAS: TemaPreguntas[] = [
         pregunta: '¿Lo fiado cuenta como venta?',
         respuesta: [
           'Sí: lo fiado es una venta del día en que se llevó la mercadería, y aparece en Ventas como "Fiado". Lo que paga después no se cuenta otra vez como venta: baja su deuda.',
+        ],
+      },
+    ],
+  },
+  {
+    tema: 'Stock y gastos',
+    preguntas: [
+      {
+        pregunta: '¿Tengo que cargar el stock de todos los productos?',
+        respuesta: [
+          'No. Sólo llevan stock los productos que cargás en Stock. Los demás se venden igual, sin control.',
+          'Conviene empezar por los que más se venden o los que más te cuesta reponer a tiempo.',
+        ],
+      },
+      {
+        pregunta: '¿Cómo se actualiza el stock?',
+        respuesta: [
+          'Al vender se descuenta solo, y si anulás la venta vuelve. Cuando llega mercadería, tocá "Llegó mercadería" y escribí cuánto entró de cada producto.',
+          'Cada tanto contá lo que hay con "Contar stock": la app deja la cantidad que contaste. Si quedó en negativo es porque se vendió más de lo que habías cargado.',
+        ],
+      },
+      {
+        pregunta: '¿Cómo calcula cuánto pedir?',
+        respuesta: [
+          'Con lo que vendiste en las últimas 4 semanas calcula cuánto vendés por día, y lo multiplica por los días que querés cubrir (7, 14 o 30). Te sugiere pedir lo que falta para llegar.',
+          'Los productos aparecen agrupados por el proveedor que los trae (según las listas que subiste). Podés copiar el pedido o mandarlo por WhatsApp.',
+        ],
+      },
+      {
+        pregunta: '¿Qué es el resultado del mes?',
+        respuesta: [
+          'Es la ganancia de lo que vendiste en el mes menos los gastos fijos que anotaste. Si es positivo, el negocio dejó plata después de pagar los gastos.',
+          'La ganancia sólo cuenta lo vendido con costo cargado: lo de "Varios", el total del día o los productos sin costo no entran, y la pantalla te avisa cuánto quedó afuera.',
+        ],
+      },
+      {
+        pregunta: '¿Tengo que cargar los gastos todos los meses?',
+        respuesta: [
+          'Sí, porque cambian (la luz, por ejemplo). Para no escribir todo de nuevo, tocá "Usar los montos del mes anterior" y corregí lo que cambió.',
+          'Si un gasto se terminó, tocá "Ya no lo pago" y deja de aparecer.',
         ],
       },
     ],

@@ -10,3 +10,5 @@ export * from './cola';
 export * from './analisis';
 export * from './clientes';
 export * from './caja';
+export * from './stock';
+export * from './gastos';
